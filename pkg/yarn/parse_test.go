@@ -40,7 +40,7 @@ func TestGetPackageName(t *testing.T) {
 	}
 
 	for _, v := range vectors {
-		actual, err := getPackageName(v.target)
+		actual, _, err := parsePackageLocator(v.target)
 
 		if v.occurErr != (err != nil) {
 			t.Errorf("expect error %t but err is %s", v.occurErr, err)
@@ -77,6 +77,22 @@ func TestParse(t *testing.T) {
 		{
 			file:      "testdata/yarn_realworld.lock",
 			libraries: YarnRealWorld,
+		},
+		{
+			file:      "testdata/yarn_v2_normal.lock",
+			libraries: YarnV2Normal,
+		},
+		{
+			file:      "testdata/yarn_v2_react.lock",
+			libraries: YarnV2React,
+		},
+		{
+			file:      "testdata/yarn_v2_with_dev.lock",
+			libraries: YarnV2WithDev,
+		},
+		{
+			file:      "testdata/yarn_v2_many.lock",
+			libraries: YarnV2Many,
 		},
 	}
 
