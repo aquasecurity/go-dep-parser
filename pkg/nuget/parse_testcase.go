@@ -52,8 +52,6 @@ var (
 		{"NuGet.Frameworks", "5.0.0"},
 		{"runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl", "4.3.0"},
 		{"System.Linq", "4.3.0"},
-		{"System.Collections", "4.3.0"},
-		{"System.Diagnostics.Debug", "4.3.0"},
 		{"System.Resources.ResourceManager", "4.3.0"},
 		{"System.Runtime", "4.3.0"},
 		{"System.Runtime.Extensions", "4.3.0"},
