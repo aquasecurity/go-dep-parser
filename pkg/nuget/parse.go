@@ -23,10 +23,10 @@ type LockFile struct {
 }
 
 type Dependency struct {
-	Type         string            `json:"type"`
-	Resolved     string            `json:"resolved"`
-	Dependencies map[string]string `json:"dependencies"`
-	ContentHash  string            `json:"contentHash"`
+	Type         string
+	Resolved     string
+	Dependencies map[string]string
+	ContentHash  string
 }
 
 func Parse(r io.Reader) ([]types.Library, error) {
