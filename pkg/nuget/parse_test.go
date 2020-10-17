@@ -21,6 +21,10 @@ func TestParse(t *testing.T) {
 			libraries: NuGetNormal,
 		},
 		{
+			file:      "testdata/packages_lock_dup.json",
+			libraries: NuGetDuplicated,
+		},
+		{
 			file:      "testdata/packages_lock_with_trans.json",
 			libraries: NuGetWithTransitive,
 		},

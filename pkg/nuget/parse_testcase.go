@@ -11,6 +11,15 @@ var (
 		{"System.Runtime", "4.3.1"},
 	}
 
+	NuGetDuplicated = []types.Library{
+		{"Microsoft.NET.Test.Sdk", "16.6.1"},
+		{"Microsoft.CodeCoverage", "16.6.1"},
+		{"Microsoft.TestPlatform.TestHost", "16.6.1"},
+		{"Newtonsoft.Json", "12.0.3"},
+		{"System.Runtime", "4.3.2"},
+		{"System.Runtime", "4.3.1"},
+	}
+
 	NuGetWithTransitive = []types.Library{
 		{"Microsoft.NET.Test.Sdk", "16.6.1"},
 		{"Microsoft.CodeCoverage", "16.6.1"},
