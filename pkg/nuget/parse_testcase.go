@@ -65,4 +65,12 @@ var (
 		{"System.Runtime", "4.3.0"},
 		{"System.Runtime.Extensions", "4.3.0"},
 	}
+
+	NuGetLegacy = []types.Library{
+		{"Microsoft.NET.Test.Sdk", "16.6.1"},
+		{"Microsoft.CodeCoverage", "16.6.1"},
+		{"Microsoft.TestPlatform.TestHost", "16.6.1"},
+		{"AWSSDK.Core", "3.5.1.26"},
+		{"System.Runtime", "4.3.1"},
+	}
 )

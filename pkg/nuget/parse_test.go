@@ -1,14 +1,14 @@
 package nuget
 
 import (
-"os"
-"path"
-"sort"
-"strings"
-"testing"
+	"os"
+	"path"
+	"sort"
+	"strings"
+	"testing"
 
-"github.com/aquasecurity/go-dep-parser/pkg/types"
-"github.com/kylelemons/godebug/pretty"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/kylelemons/godebug/pretty"
 )
 
 func TestParse(t *testing.T) {
@@ -31,6 +31,10 @@ func TestParse(t *testing.T) {
 		{
 			file:      "testdata/packages_lock_many.json",
 			libraries: NuGetMany,
+		},
+		{
+			file:      "testdata/packages_lock_legacy.json",
+			libraries: NuGetLegacy,
 		},
 	}
 
