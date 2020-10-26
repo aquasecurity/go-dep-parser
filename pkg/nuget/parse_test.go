@@ -17,20 +17,16 @@ func TestParse(t *testing.T) {
 		libraries []types.Library
 	}{
 		{
-			file:      "testdata/packages_lock_normal.json",
-			libraries: NuGetNormal,
+			file:      "testdata/packages_lock_simple.json",
+			libraries: NuGetSimple,
 		},
 		{
-			file:      "testdata/packages_lock_dup.json",
-			libraries: NuGetDuplicated,
+			file:      "testdata/packages_lock_subdependencies.json",
+			libraries: NuGetSubDependencies,
 		},
 		{
-			file:      "testdata/packages_lock_with_trans.json",
-			libraries: NuGetWithTransitive,
-		},
-		{
-			file:      "testdata/packages_lock_many.json",
-			libraries: NuGetMany,
+			file:      "testdata/packages_lock_complex.json",
+			libraries: NuGetComplex,
 		},
 		{
 			file:      "testdata/packages_lock_legacy.json",
