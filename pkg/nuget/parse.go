@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 
+	"golang.org/x/xerrors"
+
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -36,7 +38,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 	decoder := json.NewDecoder(r)
 
 	if err := decoder.Decode(&lockFile); err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("failed to decode packages.lock.json: %w", err)
 	}
 
 	var libraries []types.Library
