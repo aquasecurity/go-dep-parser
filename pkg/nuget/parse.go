@@ -19,8 +19,10 @@ import (
 
 type LockFile struct {
 	Version      int
-	Dependencies map[string]map[string]Dependency
+	Targets map[string]Dependencies `json:"dependencies"`
 }
+
+type Dependencies map[string]Dependency
 
 type Dependency struct {
 	Type         string
@@ -32,15 +34,15 @@ type Dependency struct {
 func Parse(r io.Reader) ([]types.Library, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
-	err := decoder.Decode(&lockFile)
-	if err != nil {
+
+	if err := decoder.Decode(&lockFile); err != nil {
 		return nil, err
 	}
 
 	var libraries []types.Library
 	unique := map[string]struct{}{}
 
-	for _, targetContent := range lockFile.Dependencies {
+	for _, targetContent := range lockFile.Targets {
 		// Add all direct dependencies first (as they will be resolved as the used package).
 		for topPkgName, topPkgContent := range targetContent {
 			if topPkgContent.Type == "Project" {
