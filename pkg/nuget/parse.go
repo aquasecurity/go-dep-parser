@@ -2,9 +2,9 @@ package nuget
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"io"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 // The lockfile that nuget uses (packages.lock.json) works basically like this:
@@ -41,26 +41,13 @@ func Parse(r io.Reader) ([]types.Library, error) {
 	unique := map[string]struct{}{}
 
 	for _, targetContent := range lockFile.Dependencies {
+		// Add all direct dependencies first (as they will be resolved as the used package).
 		for topPkgName, topPkgContent := range targetContent {
-			for pkgName, version := range topPkgContent.Dependencies {
-				symbol := fmt.Sprintf("%s@%s", pkgName, version)
-				if _, ok := unique[symbol]; ok {
-					continue
-				}
-
-				libraries = append(libraries, types.Library{
-					Name:    pkgName,
-					Version: version,
-				})
-				unique[symbol] = struct{}{}
-			}
-
 			if topPkgContent.Type == "Project" {
 				continue
 			}
 
-			symbol := fmt.Sprintf("%s@%s", topPkgName, topPkgContent)
-			if _, ok := unique[symbol]; ok {
+			if _, ok := unique[topPkgName]; ok {
 				continue
 			}
 
@@ -68,6 +55,22 @@ func Parse(r io.Reader) ([]types.Library, error) {
 				Name:    topPkgName,
 				Version: topPkgContent.Resolved,
 			})
+
+			unique[topPkgName] = struct{}{}
+		}
+		// Then add sub-dependencies that are not already resolved.
+		for _, topPkgContent := range targetContent {
+			for pkgName, version := range topPkgContent.Dependencies {
+				if _, ok := unique[pkgName]; ok {
+					continue
+				}
+
+				libraries = append(libraries, types.Library{
+					Name:    pkgName,
+					Version: version,
+				})
+				unique[pkgName] = struct{}{}
+			}
 		}
 	}
 
