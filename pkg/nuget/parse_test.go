@@ -25,8 +25,8 @@ func TestParse(t *testing.T) {
 			libraries: NuGetSubDependencies,
 		},
 		{
-			file:      "testdata/packages_lock_complex.json",
-			libraries: NuGetComplex,
+			file:      "testdata/packages_lock_multi.json",
+			libraries: NuGetMultiTarget,
 		},
 		{
 			file:      "testdata/packages_lock_legacy.json",

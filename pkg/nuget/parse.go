@@ -2,6 +2,7 @@ package nuget
 
 import (
     "encoding/json"
+    "fmt"
     "io"
 
     "golang.org/x/xerrors"
@@ -38,8 +39,9 @@ func Parse(r io.Reader) ([]types.Library, error) {
             if packageContent.Type == "Project" {
                 continue
             }
+            symbol := fmt.Sprintf("%s@%s", packageName, packageContent.Resolved)
 
-            if _, ok := unique[packageName]; ok {
+            if _, ok := unique[symbol]; ok {
                 continue
             }
 
@@ -48,7 +50,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
                 Version: packageContent.Resolved,
             })
 
-            unique[packageName] = struct{}{}
+            unique[symbol] = struct{}{}
         }
     }
 
