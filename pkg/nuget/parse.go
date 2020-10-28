@@ -2,7 +2,6 @@ package nuget
 
 import (
     "encoding/json"
-    "fmt"
     "io"
 
     "golang.org/x/xerrors"
@@ -30,28 +29,25 @@ func Parse(r io.Reader) ([]types.Library, error) {
         return nil, xerrors.Errorf("failed to decode packages.lock.json: %w", err)
     }
 
-    var libraries []types.Library
-    unique := map[string]struct{}{}
-
+    uniqueLibs := map[types.Library]struct{}{}
     for _, targetContent := range lockFile.Targets {
         for packageName, packageContent := range targetContent {
             // If package type is "project", it is the actual project, and we skip it.
             if packageContent.Type == "Project" {
                 continue
             }
-            symbol := fmt.Sprintf("%s@%s", packageName, packageContent.Resolved)
 
-            if _, ok := unique[symbol]; ok {
-                continue
-            }
-
-            libraries = append(libraries, types.Library{
+            lib:= types.Library{
                 Name:    packageName,
                 Version: packageContent.Resolved,
-            })
-
-            unique[symbol] = struct{}{}
+            }
+            uniqueLibs[lib] = struct{}{}
         }
+    }
+
+    var libraries []types.Library
+    for lib := range uniqueLibs{
+        libraries = append(libraries, lib)
     }
 
     return libraries, nil
