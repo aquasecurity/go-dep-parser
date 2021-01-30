@@ -30,7 +30,7 @@ func TestParse(t *testing.T) {
 			libraries: GemspecMalformed,
 		},
 		{
-			file:      "testdata/malformed00.gemspec",
+			file:      "testdata/malformed01.gemspec",
 			libraries: GemspecMalformed,
 		},
 	}
