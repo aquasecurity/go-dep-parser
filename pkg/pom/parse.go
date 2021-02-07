@@ -379,18 +379,15 @@ func (p parser) tryRepository(groupID, artifactID, version string) (*pom, error)
 	paths = append(paths, fmt.Sprintf("%s-%s.pom", artifactID, version))
 
 	// Search local remoteRepositories
-	pom, err := p.loadPOMFromLocalRepository(paths)
+	loaded, err := p.loadPOMFromLocalRepository(paths)
 	if err == nil {
-		return pom, nil
+		return loaded, nil
 	}
 
 	// Search remote remoteRepositories
-	pom, err = p.fetchPOMFromRemoteRepository(paths)
-	if err != nil {
-		fmt.Println(err)
-	}
+	loaded, err = p.fetchPOMFromRemoteRepository(paths)
 	if err == nil {
-		return pom, nil
+		return loaded, nil
 	}
 
 	return nil, xerrors.Errorf("%s:%s:%s was not found in local/remote repositories", groupID, artifactID, version)
@@ -437,11 +434,11 @@ func (p parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
 }
 
 func parsePom(r io.Reader) (*pomXML, error) {
-	pom := &pomXML{}
+	parsed := &pomXML{}
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset.NewReaderLabel
-	if err := decoder.Decode(pom); err != nil {
+	if err := decoder.Decode(parsed); err != nil {
 		return nil, err
 	}
-	return pom, nil
+	return parsed, nil
 }
