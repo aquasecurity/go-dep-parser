@@ -3,7 +3,12 @@ package pom
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
+)
+
+var (
+	varRegexp = regexp.MustCompile(`\${(\S+?)}`)
 )
 
 type artifact struct {
@@ -76,18 +81,23 @@ func (v1 version) String() string {
 }
 
 func evaluateVariable(s string, props map[string]string) string {
-	// env.X: https://maven.apache.org/pom.html#Properties
-	// e.g. env.PATH
-	if strings.HasPrefix(s, "env.") {
-		return os.Getenv(strings.TrimPrefix(s, "env."))
+	if props == nil {
+		props = map[string]string{}
 	}
 
-	if props == nil {
-		return s
-	}
 	for _, m := range varRegexp.FindAllStringSubmatch(s, -1) {
-		v := evaluateVariable(props[m[1]], props)
-		s = strings.ReplaceAll(s, m[0], v)
+		var newValue string
+
+		// env.X: https://maven.apache.org/pom.html#Properties
+		// e.g. env.PATH
+		if strings.HasPrefix(m[1], "env.") {
+			newValue = os.Getenv(strings.TrimPrefix(m[1], "env."))
+		} else {
+			// <properties> might include another property.
+			// e.g. <animal.sniffer.skip>${skipTests}</animal.sniffer.skip>
+			newValue = evaluateVariable(props[m[1]], props)
+		}
+		s = strings.ReplaceAll(s, m[0], newValue)
 	}
 	return s
 }
