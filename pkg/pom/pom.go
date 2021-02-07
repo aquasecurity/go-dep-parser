@@ -94,15 +94,6 @@ func (p pom) repositories() []string {
 	return urls
 }
 
-func (p pom) dependencyManagement() map[string]string {
-	depManagement := map[string]string{}
-	for _, d := range p.content.DependencyManagement.Dependencies.Dependency {
-		key := fmt.Sprintf("%s:%s", d.GroupId, d.ArtifactId)
-		depManagement[key] = d.Version
-	}
-	return depManagement
-}
-
 type pomXML struct {
 	Parent     pomParent `xml:"parent"`
 	GroupId    string    `xml:"groupId"`
