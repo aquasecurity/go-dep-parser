@@ -34,9 +34,12 @@ type parser struct {
 }
 
 func newParser(filePath string) *parser {
-	// TODO: local repository should be configurable.
-	homeDir, _ := os.UserHomeDir()
-	localRepository := filepath.Join(homeDir, ".m2", "repository")
+	s := readSettings()
+	localRepository := s.LocalRepository
+	if localRepository == "" {
+		homeDir, _ := os.UserHomeDir()
+		localRepository = filepath.Join(homeDir, ".m2", "repository")
+	}
 
 	return &parser{
 		rootPath:           filepath.Clean(filePath),
