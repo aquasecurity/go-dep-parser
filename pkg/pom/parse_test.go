@@ -1,11 +1,13 @@
 package pom
 
 import (
-	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
-	"path"
+	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,146 +17,255 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	type args struct {
-		r io.Reader
-	}
 	tests := []struct {
 		name      string
 		inputFile string
+		local     bool
 		want      []types.Library
-		wantErr   bool
+		wantErr   string
 	}{
-		//{
-		//	name:      "cron-utils",
-		//	inputFile: "testdata/cron-utils.pom",
-		//	want: []types.Library{
-		//		{
-		//			Name:    "com.cronutils:cron-utils",
-		//			Version: "9.1.2",
-		//		},
-		//		{
-		//			Name:    "org.apache.commons:commons-lang3",
-		//			Version: "3.11",
-		//		},
-		//		{
-		//			Name:    "org.glassfish:javax.el",
-		//			Version: "3.0.0",
-		//		},
-		//		{
-		//			Name:    "org.slf4j:slf4j-api",
-		//			Version: "1.7.30",
-		//		},
-		//	},
-		//},
-		//{
-		//	name:      "jackson-databind",
-		//	inputFile: "testdata/jackson-databind.pom",
-		//	want: []types.Library{
-		//		{
-		//			Name:    "com.fasterxml.jackson.core:jackson-annotations",
-		//			Version: "2.9.10",
-		//		},
-		//		{
-		//			Name:    "com.fasterxml.jackson.core:jackson-core",
-		//			Version: "2.9.10",
-		//		},
-		//		{
-		//			Name:    "com.fasterxml.jackson.core:jackson-databind",
-		//			Version: "2.9.10.6",
-		//		},
-		//	},
-		//},
 		{
-			name:      "jenkins",
-			inputFile: "testdata/jenkins/pom.xml",
-			want:      []types.Library{},
+			name:      "local repository",
+			inputFile: filepath.Join("testdata", "happy", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:happy",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "remote repository",
+			inputFile: filepath.Join("testdata", "happy", "pom.xml"),
+			local:     false,
+			want: []types.Library{
+				{
+					Name:    "com.example:happy",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "inherit parent properties",
+			inputFile: filepath.Join("testdata", "parent-properties", "child", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "inherit parent dependencies",
+			inputFile: filepath.Join("testdata", "parent-dependencies", "child", "pom.xml"),
+			local:     false,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0-SNAPSHOT",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "inherit parent dependencyManagement",
+			inputFile: filepath.Join("testdata", "parent-dependency-management", "child", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "3.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "parent relativePath",
+			inputFile: filepath.Join("testdata", "parent-relative-path", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "parent in a remote repository",
+			inputFile: filepath.Join("testdata", "parent-remote-repository", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "org.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "soft requirement",
+			inputFile: filepath.Join("testdata", "soft-requirement", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:soft",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
+			},
+		},
+		{
+			name:      "hard requirement",
+			inputFile: filepath.Join("testdata", "hard-requirement", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:hard",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.4",
+				},
+			},
+		},
+		{
+			name:      "import dependencyManagement",
+			inputFile: filepath.Join("testdata", "import-dependency-management", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:import",
+					Version: "2.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "multi module",
+			inputFile: filepath.Join("testdata", "multi-module", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:aggregation",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "com.example:module",
+					Version: "1.1.1",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "parent not found",
+			inputFile: filepath.Join("testdata", "not-found-parent", "pom.xml"),
+			local:     true,
+			wantErr:   "com.example:parent:1.0.0 was not found in local/remote repositories",
+		},
+		{
+			name:      "dependency not found",
+			inputFile: filepath.Join("testdata", "not-found-dependency", "pom.xml"),
+			local:     true,
+			wantErr:   "org.example:example-not-found:999 was not found in local/remote repositories",
+		},
+		{
+			name:      "module not found",
+			inputFile: filepath.Join("testdata", "not-found-module", "pom.xml"),
+			local:     true,
+			wantErr:   "stat testdata/not-found-module/module: no such file or directory",
 		},
 	}
 	for _, tt := range tests {
-		t.Run(path.Base(tt.inputFile), func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			f, err := os.Open(tt.inputFile)
 			require.NoError(t, err)
+			defer f.Close()
+
+			var remoteRepos []string
+			if tt.local {
+				// for local repository
+				os.Setenv("MAVEN_HOME", "testdata")
+				defer os.Unsetenv("MAVEN_HOME")
+			} else {
+				// for remote repository
+				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					paths := strings.Split(r.URL.Path, "/")
+					filePath := filepath.Join(paths...)
+					filePath = filepath.Join("testdata", "repository", filePath)
+
+					f, err = os.Open(filePath)
+					if err != nil {
+						http.NotFound(w, r)
+						return
+					}
+					defer f.Close()
+
+					_, err = io.Copy(w, f)
+					require.NoError(t, err)
+				}))
+				remoteRepos = []string{ts.URL}
+			}
 
 			p := newParser(tt.inputFile)
+			p.remoteRepositories = remoteRepos
+
 			got, err := p.Parse(f)
-			require.NoError(t, err)
+			if tt.wantErr != "" {
+				require.NotNil(t, err)
+				assert.Contains(t, err.Error(), tt.wantErr)
+				return
+			}
+			assert.NoError(t, err)
 
 			sort.Slice(got, func(i, j int) bool {
 				return got[i].Name < got[j].Name
 			})
 
-			for _, lib := range got {
-				fmt.Println(lib)
-			}
-
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-func Test_evaluateVariable(t *testing.T) {
-	type args struct {
-		s     string
-		props map[string]string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "happy path",
-			args: args{
-				s: "${java.version}",
-				props: map[string]string{
-					"java.version": "1.7",
-				},
-			},
-			want: "1.7",
-		},
-		{
-			name: "two variables",
-			args: args{
-				s: "${foo.name}-${bar.name}",
-				props: map[string]string{
-					"foo.name": "aaa",
-					"bar.name": "bbb",
-				},
-			},
-			want: "aaa-bbb",
-		},
-		{
-			name: "same variables",
-			args: args{
-				s: "${foo.name}-${foo.name}",
-				props: map[string]string{
-					"foo.name": "aaa",
-				},
-			},
-			want: "aaa-aaa",
-		},
-		{
-			name: "nested variables",
-			args: args{
-				s: "${jackson.version.core}",
-				props: map[string]string{
-					"jackson.version":      "2.12.1",
-					"jackson.version.core": "${jackson.version}",
-				},
-			},
-			want: "2.12.1",
-		},
-		{
-			name: "no variable",
-			args: args{
-				s: "1.12",
-			},
-			want: "1.12",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := evaluateVariable(tt.args.s, tt.args.props)
 			assert.Equal(t, tt.want, got)
 		})
 	}
