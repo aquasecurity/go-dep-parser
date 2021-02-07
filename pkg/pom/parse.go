@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -20,10 +20,6 @@ import (
 
 const (
 	centralURL = "https://repo.maven.apache.org/maven2/"
-)
-
-var (
-	varRegexp = regexp.MustCompile(`\${(\S+?)}`)
 )
 
 type parser struct {
@@ -80,7 +76,6 @@ func (p *parser) parseRoot(root *pom) ([]types.Library, error) {
 	// Iterate direct and transitive dependencies
 	for !queue.IsEmpty() {
 		art := queue.dequeue()
-		fmt.Println(art.name(), art.Version.String())
 
 		// For soft requirements, skip dependency resolution that has already been resolved.
 		if v, ok := uniqArtifacts[art.name()]; ok {
@@ -106,14 +101,6 @@ func (p *parser) parseRoot(root *pom) ([]types.Library, error) {
 
 		// Resolve transitive dependencies later
 		queue.enqueue(result.dependencies...)
-
-		for _, d := range result.dependencies {
-			if d.ArtifactID == "jsch.agentproxy" && d.Version.String() == "0.0.6" {
-				fmt.Println("========================================")
-				fmt.Println(art.GroupID, art.ArtifactID, art.Version)
-				fmt.Println("========================================")
-			}
-		}
 
 		// Override the version
 		uniqArtifacts[art.name()] = art.Version
