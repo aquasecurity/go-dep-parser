@@ -406,13 +406,19 @@ func (p parser) loadPOMFromLocalRepository(paths []string) (*pom, error) {
 func (p parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
 	// try all remoteRepositories
 	for _, repo := range p.remoteRepositories {
-		url := repo + path.Join(paths...)
-		fmt.Println(url)
-		resp, err := http.Get(url)
+		repoURL, err := url.Parse(repo)
+		if err != nil {
+			continue
+		}
+
+		paths = append([]string{repoURL.Path}, paths...)
+		repoURL.Path = path.Join(paths...)
+
+		resp, err := http.Get(repoURL.String())
 		if err != nil || resp.StatusCode != http.StatusOK {
 			fmt.Println(paths)
 			if resp != nil {
-				fmt.Printf("%s returns %d\n", url, resp.StatusCode)
+				fmt.Printf("%s returns %d\n", repoURL, resp.StatusCode)
 			}
 			continue
 		}
