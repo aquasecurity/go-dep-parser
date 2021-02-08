@@ -15,6 +15,7 @@ type artifact struct {
 	GroupID    string
 	ArtifactID string
 	Version    version
+	Module     bool
 }
 
 func newArtifact(groupID, artifactID, version string, props map[string]string) artifact {

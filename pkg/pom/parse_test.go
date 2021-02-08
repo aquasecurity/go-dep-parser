@@ -202,6 +202,33 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			name:      "multi module soft requirement",
+			inputFile: filepath.Join("testdata", "multi-module-soft-requirement", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:aggregation",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "com.example:module1",
+					Version: "1.1.1",
+				},
+				{
+					Name:    "com.example:module2",
+					Version: "1.1.1",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+				},
+			},
+		},
+		{
 			name:      "parent not found",
 			inputFile: filepath.Join("testdata", "not-found-parent", "pom.xml"),
 			local:     true,

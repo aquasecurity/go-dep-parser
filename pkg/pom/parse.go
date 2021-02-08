@@ -46,36 +46,53 @@ func newParser(filePath string) *parser {
 }
 
 func (p *parser) Parse(r io.Reader) ([]types.Library, error) {
-	root, err := parsePom(r)
+	content, err := parsePom(r)
 	if err != nil {
 		return nil, err
 	}
 
-	return p.parseRoot(&pom{
+	root := &pom{
 		filePath: p.rootPath,
-		content:  root,
-	})
-}
+		content:  content,
+	}
 
-func (p *parser) parseRoot(root *pom) ([]types.Library, error) {
 	// Analyze root POM
 	result, err := p.analyze(root)
 	if err != nil {
 		return nil, err
 	}
 
+	// Cache root POM
+	p.cache.put(result.artifact, result)
+
+	return p.parseRoot(root.artifact())
+}
+
+func (p *parser) parseRoot(root artifact) ([]types.Library, error) {
 	// Prepare a queue for dependencies
 	queue := newArtifactQueue()
 
-	// Cache and enqueue root POM
-	p.cache.put(result.artifact, result)
-	queue.enqueue(result.artifact)
+	// Enqueue root POM
+	root.Module = false
+	queue.enqueue(root)
 
+	var libs []types.Library
 	uniqArtifacts := map[string]version{}
 
 	// Iterate direct and transitive dependencies
 	for !queue.IsEmpty() {
 		art := queue.dequeue()
+
+		// Modules should be handled separately so that they can have independent dependencies.
+		// It means multi-module allows for duplicate dependencies.
+		if art.Module {
+			moduleLibs, err := p.parseRoot(art)
+			if err != nil {
+				return nil, err
+			}
+			libs = append(libs, moduleLibs...)
+			continue
+		}
 
 		// For soft requirements, skip dependency resolution that has already been resolved.
 		if v, ok := uniqArtifacts[art.name()]; ok {
@@ -84,7 +101,7 @@ func (p *parser) parseRoot(root *pom) ([]types.Library, error) {
 			}
 		}
 
-		result, err = p.resolve(art)
+		result, err := p.resolve(art)
 		if err != nil {
 			return nil, xerrors.Errorf("resolve error (%s:%s): %w", art.name(), art.Version, err)
 		}
@@ -107,7 +124,6 @@ func (p *parser) parseRoot(root *pom) ([]types.Library, error) {
 	}
 
 	// Convert to []types.Library
-	var libs []types.Library
 	for name, version := range uniqArtifacts {
 		libs = append(libs, types.Library{
 			Name:    name,
@@ -131,6 +147,8 @@ func (p *parser) parseModule(currentPath, relativePath string) (artifact, error)
 	}
 
 	moduleArtifact := module.artifact()
+	moduleArtifact.Module = true
+
 	p.cache.put(moduleArtifact, result)
 
 	return moduleArtifact, nil
