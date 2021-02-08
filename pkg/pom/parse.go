@@ -48,7 +48,7 @@ func newParser(filePath string) *parser {
 func (p *parser) Parse(r io.Reader) ([]types.Library, error) {
 	content, err := parsePom(r)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("failed to parse POM: %w", err)
 	}
 
 	root := &pom{
@@ -59,7 +59,7 @@ func (p *parser) Parse(r io.Reader) ([]types.Library, error) {
 	// Analyze root POM
 	result, err := p.analyze(root)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("analyze error (%s): %w", p.rootPath, err)
 	}
 
 	// Cache root POM
@@ -103,14 +103,14 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, error) {
 
 		result, err := p.resolve(art)
 		if err != nil {
-			return nil, xerrors.Errorf("resolve error (%s:%s): %w", art.name(), art.Version, err)
+			return nil, xerrors.Errorf("resolve error (%s): %w", art, err)
 		}
 
 		// Parse, cache, and enqueue modules.
 		for _, relativePath := range result.modules {
 			moduleArtifact, err := p.parseModule(result.filePath, relativePath)
 			if err != nil {
-				return nil, err
+				return nil, xerrors.Errorf("module error (%s): %w", relativePath, err)
 			}
 
 			queue.enqueue(moduleArtifact)
@@ -124,10 +124,10 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, error) {
 	}
 
 	// Convert to []types.Library
-	for name, version := range uniqArtifacts {
+	for name, ver := range uniqArtifacts {
 		libs = append(libs, types.Library{
 			Name:    name,
-			Version: version.String(),
+			Version: ver.String(),
 		})
 	}
 
@@ -138,12 +138,12 @@ func (p *parser) parseModule(currentPath, relativePath string) (artifact, error)
 	// modulePath: "root/" + "module/" => "root/module"
 	module, err := p.openRelativePom(currentPath, relativePath)
 	if err != nil {
-		return artifact{}, err
+		return artifact{}, xerrors.Errorf("unable to open the relative path: %w", err)
 	}
 
 	result, err := p.analyze(module)
 	if err != nil {
-		return artifact{}, err
+		return artifact{}, xerrors.Errorf("analyze error: %w", err)
 	}
 
 	moduleArtifact := module.artifact()
@@ -162,11 +162,11 @@ func (p *parser) resolve(art artifact) (analysisResult, error) {
 
 	pomContent, err := p.tryRepository(art.GroupID, art.ArtifactID, art.Version.String())
 	if err != nil {
-		return analysisResult{}, err
+		return analysisResult{}, xerrors.Errorf("%s not found: %w", art, err)
 	}
 	result, err := p.analyze(pomContent)
 	if err != nil {
-		return analysisResult{}, err
+		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
 
 	p.cache.put(art, result)
@@ -193,7 +193,7 @@ func (p *parser) analyze(pom *pom) (analysisResult, error) {
 	// Parent
 	parent, err := p.parseParent(pom.filePath, pom.content.Parent)
 	if err != nil {
-		return analysisResult{}, err
+		return analysisResult{}, xerrors.Errorf("parent error: %w", err)
 	}
 
 	// Merge parent
@@ -263,12 +263,12 @@ func (p parser) parseParent(currentPath string, parent pomParent) (
 
 	parentPOM, err := p.retrieveParent(currentPath, parent.RelativePath, target)
 	if err != nil {
-		return analysisResult{}, err
+		return analysisResult{}, xerrors.Errorf("parent POM not found: %w", err)
 	}
 
 	result, err := p.analyze(parentPOM)
 	if err != nil {
-		return analysisResult{}, err
+		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
 
 	p.cache.put(target, result)
@@ -317,7 +317,7 @@ func (p parser) tryRelativePath(parentArtifact artifact, currentPath, relativePa
 
 	result, err := p.analyze(pom)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("analyze error: %w", err)
 	}
 
 	if !parentArtifact.equal(result.artifact) {
@@ -355,7 +355,7 @@ func (p parser) openRelativePom(currentPath, relativePath string) (*pom, error) 
 
 	pom, err := p.openPom(filePath)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("failed to open %s: %w", filePath, err)
 	}
 	return pom, nil
 }
@@ -363,12 +363,12 @@ func (p parser) openRelativePom(currentPath, relativePath string) (*pom, error) 
 func (p parser) openPom(filePath string) (*pom, error) {
 	f, err := os.Open(filePath)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("file open error (%s): %w", filePath, err)
 	}
 
 	content, err := parsePom(f)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("failed to parse the local POM: %w", err)
 	}
 	return &pom{
 		filePath: filePath,
@@ -423,7 +423,7 @@ func (p parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
 
 		content, err := parsePom(resp.Body)
 		if err != nil {
-			return nil, err
+			return nil, xerrors.Errorf("failed to parse the remote POM: %w", err)
 		}
 
 		return &pom{
@@ -439,7 +439,7 @@ func parsePom(r io.Reader) (*pomXML, error) {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset.NewReaderLabel
 	if err := decoder.Decode(parsed); err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("xml decode error: %w", err)
 	}
 	return parsed, nil
 }
