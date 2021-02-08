@@ -418,10 +418,6 @@ func (p parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
 
 		resp, err := http.Get(repoURL.String())
 		if err != nil || resp.StatusCode != http.StatusOK {
-			fmt.Println(paths)
-			if resp != nil {
-				fmt.Printf("%s returns %d\n", repoURL, resp.StatusCode)
-			}
 			continue
 		}
 
@@ -431,7 +427,7 @@ func (p parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
 		}
 
 		return &pom{
-			filePath: "", // from remote remoteRepositories
+			filePath: "", // from remote repositories
 			content:  content,
 		}, nil
 	}
