@@ -65,8 +65,11 @@ func (p pom) listProperties(val reflect.Value) map[string]string {
 		case reflect.Slice:
 			continue
 		case reflect.Map:
-			// TODO: Map should be supported
-			continue
+			m := val.Field(i)
+			for _, e := range m.MapKeys() {
+				v := m.MapIndex(e)
+				props[e.String()] = v.String()
+			}
 		case reflect.Struct:
 			nestedProps := p.listProperties(val.Field(i))
 			for k, v := range nestedProps {
