@@ -50,6 +50,10 @@ func (a artifact) name() string {
 	return fmt.Sprintf("%s:%s", a.GroupID, a.ArtifactID)
 }
 
+func (a artifact) String() string {
+	return fmt.Sprintf("%s:%s", a.name(), a.Version)
+}
+
 type version struct {
 	ver  string
 	hard bool
