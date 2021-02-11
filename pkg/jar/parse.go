@@ -139,6 +139,11 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 
 	log.Logger.Debug("No such POM in the central repositories", zap.String("file", fileName))
 
+	// Return when artifactId or version from the file name are empty
+	if fileProps.artifactID == "" || fileProps.version == "" {
+		return libs, nil
+	}
+
 	// Try to search groupId by artifactId via sonatype API
 	// When some artifacts have the same groupIds, it might result in false detection.
 	fileProps.groupID, err = searchByArtifactID(c, fileProps.artifactID)
