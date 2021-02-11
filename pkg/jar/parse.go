@@ -12,22 +12,31 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
+	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 const (
-	baseURL   = "http://search.maven.org/solrsearch/select"
-	idQuery   = `g:"%s"+AND+a:"%s"`
-	sha1Query = `1:"%s"`
+	baseURL         = "http://search.maven.org/solrsearch/select"
+	idQuery         = `g:"%s"+AND+a:"%s"`
+	artifactIdQuery = `a:"%s"+AND+p:"jar"`
+	sha1Query       = `1:"%s"`
+)
+
+var (
+	jarFileRegEx = regexp.MustCompile(`^([a-zA-Z0-9\._-]*[^-*])-(\d\S*(?:-SNAPSHOT)?).jar$`)
 )
 
 type conf struct {
-	baseURL string
+	baseURL      string
+	rootFilePath string
 }
 
 type Option func(*conf)
@@ -38,16 +47,22 @@ func WithURL(url string) Option {
 	}
 }
 
+func WithFilePath(filePath string) Option {
+	return func(c *conf) {
+		c.rootFilePath = filePath
+	}
+}
+
 func Parse(r io.Reader, opts ...Option) ([]types.Library, error) {
 	c := conf{baseURL: baseURL}
 	for _, opt := range opts {
 		opt(&c)
 	}
 
-	return parseArtifact(c, ioutil.NopCloser(r))
+	return parseArtifact(c, c.rootFilePath, ioutil.NopCloser(r))
 }
 
-func parseArtifact(c conf, r io.ReadCloser) ([]types.Library, error) {
+func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, error) {
 	defer r.Close()
 
 	b, err := ioutil.ReadAll(r)
@@ -81,7 +96,7 @@ func parseArtifact(c conf, r io.ReadCloser) ([]types.Library, error) {
 			}
 
 			// parse jar/war/ear recursively
-			innerLibs, err := parseArtifact(c, fr)
+			innerLibs, err := parseArtifact(c, fileInJar.Name, fr)
 			if err != nil {
 				return nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
@@ -105,8 +120,29 @@ func parseArtifact(c conf, r io.ReadCloser) ([]types.Library, error) {
 	}
 
 	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
-	p, err := searchSHA1(c, b)
+	p, err := searchBySHA1(c, b)
 	if err == nil {
+		return append(libs, p.library()), nil
+	}
+
+	fileName = filepath.Base(fileName)
+	if fileName != "" {
+		log.Logger.Debug("No such POM in the central repositories", zap.String("file", fileName))
+	}
+
+	// Try to extract artifactId and version from the file name
+	// e.g. spring-core-5.3.4-SNAPSHOT.jar => sprint-core, 5.3.4-SNAPSHOT
+	p = parseFileName(fileName)
+	if p.artifactID == "" || p.version == "" {
+		return libs, nil
+	}
+
+	// Try to search groupId by artifactId via sonatype API
+	// When some artifacts have the same groupIds, it might result in false detection.
+	p.groupID, err = searchByArtifactID(c, p.artifactID)
+	if err == nil {
+		log.Logger.Debug("POM was determined in a heuristic way", zap.String("file", fileName),
+			zap.String("artifact", p.String()))
 		libs = append(libs, p.library())
 	}
 
@@ -119,6 +155,18 @@ func isArtifact(name string) bool {
 		return true
 	}
 	return false
+}
+
+func parseFileName(fileName string) properties {
+	packageVersion := jarFileRegEx.FindStringSubmatch(fileName)
+	if len(packageVersion) != 3 {
+		return properties{}
+	}
+
+	return properties{
+		artifactID: packageVersion[1],
+		version:    packageVersion[2],
+	}
 }
 
 type properties struct {
@@ -163,6 +211,10 @@ func (p properties) library() types.Library {
 
 func (p properties) valid() bool {
 	return p.groupID != "" && p.artifactID != "" && p.version != ""
+}
+
+func (p properties) String() string {
+	return fmt.Sprintf("%s:%s:%s", p.groupID, p.artifactID, p.version)
 }
 
 type manifest struct {
@@ -220,11 +272,12 @@ type apiResponse struct {
 	Response struct {
 		NumFound int `json:"numFound"`
 		Docs     []struct {
-			ID         string `json:"id"`
-			GroupID    string `json:"g"`
-			ArtifactID string `json:"a"`
-			Version    string `json:"v"`
-			P          string `json:"p"`
+			ID           string `json:"id"`
+			GroupID      string `json:"g"`
+			ArtifactID   string `json:"a"`
+			Version      string `json:"v"`
+			P            string `json:"p"`
+			VersionCount int    `json:versionCount`
 		} `json:"docs"`
 	} `json:"response"`
 }
@@ -325,7 +378,7 @@ func exists(c conf, p properties) (bool, error) {
 	return res.Response.NumFound > 0, nil
 }
 
-func searchSHA1(c conf, data []byte) (properties, error) {
+func searchBySHA1(c conf, data []byte) (properties, error) {
 	h := sha1.New()
 	_, err := h.Write(data)
 	if err != nil {
@@ -372,4 +425,42 @@ func searchSHA1(c conf, data []byte) (properties, error) {
 		artifactID: d.ArtifactID,
 		version:    d.Version,
 	}, nil
+}
+
+func searchByArtifactID(c conf, artifactID string) (string, error) {
+	req, err := http.NewRequest("GET", c.baseURL, nil)
+	if err != nil {
+		return "", xerrors.Errorf("unable to initialize HTTP client: %w", err)
+	}
+
+	q := req.URL.Query()
+	q.Set("q", fmt.Sprintf(artifactIdQuery, artifactID))
+	q.Set("rows", "20")
+	q.Set("wt", "json")
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", xerrors.Errorf("artifactID search error: %w", err)
+	}
+	defer resp.Body.Close()
+
+	var res apiResponse
+	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return "", xerrors.Errorf("json decode error: %w", err)
+	}
+
+	if len(res.Response.Docs) == 0 {
+		return "", xerrors.Errorf("no artifact found: %s", artifactID)
+	}
+
+	// Some artifacts might have the same artifactId.
+	// e.g. "javax.servlet:jstl" and "jstl:jstl"
+	docs := res.Response.Docs
+	sort.Slice(docs, func(i, j int) bool {
+		return docs[i].VersionCount > docs[j].VersionCount
+	})
+	d := docs[0]
+
+	return d.GroupID, nil
 }

@@ -2,7 +2,6 @@ package jar_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -47,6 +46,11 @@ var (
 	jarTest = []types.Library{
 		{"org.springframework:spring-core", "5.3.3"},
 	}
+
+	// manually created
+	jarHeuristic = []types.Library{
+		{"com.example:heuristic", "1.0.0-SNAPSHOT"},
+	}
 )
 
 type apiResponse struct {
@@ -59,11 +63,12 @@ type response struct {
 }
 
 type doc struct {
-	ID         string `json:"id"`
-	GroupID    string `json:"g"`
-	ArtifactID string `json:"a"`
-	Version    string `json:"v"`
-	P          string `json:"p"`
+	ID           string `json:"id"`
+	GroupID      string `json:"g"`
+	ArtifactID   string `json:"a"`
+	Version      string `json:"v"`
+	P            string `json:"p"`
+	VersionCount int    `json:versionCount`
 }
 
 func TestParse(t *testing.T) {
@@ -82,6 +87,10 @@ func TestParse(t *testing.T) {
 		{
 			file: "testdata/test.jar",
 			want: jarTest,
+		},
+		{
+			file: "testdata/heuristic-1.0.0-SNAPSHOT.jar",
+			want: jarHeuristic,
 		},
 	}
 
@@ -104,6 +113,21 @@ func TestParse(t *testing.T) {
 					Version:    "5.3.3",
 				},
 			}
+		case strings.Contains(r.URL.Query().Get("q"), "heuristic"):
+			res.Response.Docs = []doc{
+				{
+					ID:           "org.springframework.heuristic",
+					GroupID:      "org.springframework",
+					ArtifactID:   "heuristic",
+					VersionCount: 10,
+				},
+				{
+					ID:           "com.example.heuristic",
+					GroupID:      "com.example",
+					ArtifactID:   "heuristic",
+					VersionCount: 100,
+				},
+			}
 		}
 		_ = json.NewEncoder(w).Encode(res)
 	}))
@@ -113,7 +137,7 @@ func TestParse(t *testing.T) {
 			f, err := os.Open(v.file)
 			require.NoError(t, err)
 
-			got, err := jar.Parse(f, jar.WithURL(ts.URL))
+			got, err := jar.Parse(f, jar.WithURL(ts.URL), jar.WithFilePath(v.file))
 			require.NoError(t, err)
 
 			sort.Slice(got, func(i, j int) bool {
@@ -122,9 +146,6 @@ func TestParse(t *testing.T) {
 			sort.Slice(v.want, func(i, j int) bool {
 				return v.want[i].Name < v.want[j].Name
 			})
-			for _, lib := range got {
-				fmt.Println(lib)
-			}
 
 			assert.Equal(t, v.want, got)
 		})
