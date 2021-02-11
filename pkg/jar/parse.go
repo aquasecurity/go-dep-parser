@@ -95,15 +95,13 @@ func parseArtifact(c conf, r io.ReadCloser) ([]types.Library, error) {
 	}
 
 	manifestProps := m.properties()
-	if !manifestProps.valid() {
-		return libs, nil
-	}
-
-	// Even if MANIFEST.MF is found, the groupId and artifactId might not be valid.
-	// We have to make sure that the artifact exists actually.
-	if ok, _ := exists(c, manifestProps); ok {
-		// If groupId and artifactId are valid, they will be returned.
-		return append(libs, manifestProps.library()), nil
+	if manifestProps.valid() {
+		// Even if MANIFEST.MF is found, the groupId and artifactId might not be valid.
+		// We have to make sure that the artifact exists actually.
+		if ok, _ := exists(c, manifestProps); ok {
+			// If groupId and artifactId are valid, they will be returned.
+			return append(libs, manifestProps.library()), nil
+		}
 	}
 
 	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
