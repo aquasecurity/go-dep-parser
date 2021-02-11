@@ -141,11 +141,11 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 
 	// Try to search groupId by artifactId via sonatype API
 	// When some artifacts have the same groupIds, it might result in false detection.
-	p.groupID, err = searchByArtifactID(c, p.artifactID)
+	fileProps.groupID, err = searchByArtifactID(c, fileProps.artifactID)
 	if err == nil {
 		log.Logger.Debug("POM was determined in a heuristic way", zap.String("file", fileName),
-			zap.String("artifact", p.String()))
-		libs = append(libs, p.library())
+			zap.String("artifact", fileProps.String()))
+		libs = append(libs, fileProps.library())
 	}
 
 	return libs, nil
