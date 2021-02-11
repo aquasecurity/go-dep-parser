@@ -25,8 +25,8 @@ import (
 
 const (
 	baseURL         = "http://search.maven.org/solrsearch/select"
-	idQuery         = `g:"%s"+AND+a:"%s"`
-	artifactIdQuery = `a:"%s"+AND+p:"jar"`
+	idQuery         = `g:"%s" AND a:"%s"`
+	artifactIdQuery = `a:"%s" AND p:"jar"`
 	sha1Query       = `1:"%s"`
 )
 
