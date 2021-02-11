@@ -20,7 +20,7 @@ import (
 var (
 	// cd testdata/testimage/maven && docker build -t test .
 	// docker run --rm --name test -it test bash
-	// mvn dependency:tree -Dscope=compile | awk '/:tree/,/BUILD SUCCESS/' | awk 'NR > 1 { print }' | head -n -2 | awk '{print $NF}' | awk -F":" '{printf("{\""$1":"$2"\", \""$4 "\"},\n")}'
+	// mvn dependency:tree -Dscope=compile -Dscope=runtime | awk '/:tree/,/BUILD SUCCESS/' | awk 'NR > 1 { print }' | head -n -2 | awk '{print $NF}' | awk -F":" '{printf("{\""$1":"$2"\", \""$4 "\"},\n")}'
 	jarMaven = []types.Library{
 		{"com.example:web-app", "1.0-SNAPSHOT"},
 		{"com.fasterxml.jackson.core:jackson-databind", "2.9.10.6"},
