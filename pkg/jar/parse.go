@@ -74,20 +74,32 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 		return nil, xerrors.Errorf("zip error: %w", err)
 	}
 
+	// Try to extract artifactId and version from the file name
+	// e.g. spring-core-5.3.4-SNAPSHOT.jar => sprint-core, 5.3.4-SNAPSHOT
+	fileName = filepath.Base(fileName)
+	fileProps := parseFileName(fileName)
+
 	var libs []types.Library
-	var props properties
 	var m manifest
+	var foundPomProps bool
+
 	for _, fileInJar := range zr.File {
 		switch {
 		case filepath.Base(fileInJar.Name) == "pom.properties":
-			props, err = parsePomProperties(fileInJar)
+			props, err := parsePomProperties(fileInJar)
 			if err != nil {
 				return nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
+			}
+			libs = append(libs, props.library())
+
+			// Check if the pom.properties is for the original JAR/WAR/EAR
+			if fileProps.artifactID == props.artifactID && fileProps.version == props.version {
+				foundPomProps = true
 			}
 		case filepath.Base(fileInJar.Name) == "MANIFEST.MF":
 			m, err = parseManifest(fileInJar)
 			if err != nil {
-				return nil, xerrors.Errorf("failed to parse MANIFEST.INF: %w", err)
+				return nil, xerrors.Errorf("failed to parse MANIFEST.MF: %w", err)
 			}
 		case isArtifact(fileInJar.Name):
 			fr, err := fileInJar.Open()
@@ -105,8 +117,8 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 	}
 
 	// If pom.properties is found, it should be preferred than MANIFEST.MF.
-	if props.valid() {
-		return append(libs, props.library()), nil
+	if foundPomProps {
+		return libs, nil
 	}
 
 	manifestProps := m.properties()
@@ -125,17 +137,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 		return append(libs, p.library()), nil
 	}
 
-	fileName = filepath.Base(fileName)
-	if fileName != "" {
-		log.Logger.Debug("No such POM in the central repositories", zap.String("file", fileName))
-	}
-
-	// Try to extract artifactId and version from the file name
-	// e.g. spring-core-5.3.4-SNAPSHOT.jar => sprint-core, 5.3.4-SNAPSHOT
-	p = parseFileName(fileName)
-	if p.artifactID == "" || p.version == "" {
-		return libs, nil
-	}
+	log.Logger.Debug("No such POM in the central repositories", zap.String("file", fileName))
 
 	// Try to search groupId by artifactId via sonatype API
 	// When some artifacts have the same groupIds, it might result in false detection.
@@ -231,7 +233,7 @@ type manifest struct {
 func parseManifest(f *zip.File) (manifest, error) {
 	file, err := f.Open()
 	if err != nil {
-		return manifest{}, xerrors.Errorf("unable to open MANIFEST.INF: %w", err)
+		return manifest{}, xerrors.Errorf("unable to open MANIFEST.MF: %w", err)
 	}
 	defer file.Close()
 

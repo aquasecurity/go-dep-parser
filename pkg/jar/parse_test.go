@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"path"
 	"sort"
 	"strings"
 	"testing"
@@ -21,7 +20,7 @@ var (
 	// cd testdata/testimage/maven && docker build -t test .
 	// docker run --rm --name test -it test bash
 	// mvn dependency:tree -Dscope=compile -Dscope=runtime | awk '/:tree/,/BUILD SUCCESS/' | awk 'NR > 1 { print }' | head -n -2 | awk '{print $NF}' | awk -F":" '{printf("{\""$1":"$2"\", \""$4 "\"},\n")}'
-	jarMaven = []types.Library{
+	wantMaven = []types.Library{
 		{"com.example:web-app", "1.0-SNAPSHOT"},
 		{"com.fasterxml.jackson.core:jackson-databind", "2.9.10.6"},
 		{"com.fasterxml.jackson.core:jackson-annotations", "2.9.10"},
@@ -35,7 +34,7 @@ var (
 	// cd testdata/testimage/gradle && docker build -t test .
 	// docker run --rm --name test -it test bash
 	// gradle app:dependencies --configuration implementation | grep "[+\]---" | cut -d" " -f2 | awk -F":" '{printf("{\""$1":"$2"\", \""$3"\"},\n")}'
-	jarGradle = []types.Library{
+	wantGradle = []types.Library{
 		{"commons-dbcp:commons-dbcp", "1.4"},
 		{"commons-pool:commons-pool", "1.6"},
 		{"log4j:log4j", "1.2.17"},
@@ -43,13 +42,22 @@ var (
 	}
 
 	// manually created
-	jarTest = []types.Library{
+	wantSHA1 = []types.Library{
 		{"org.springframework:spring-core", "5.3.3"},
 	}
 
 	// manually created
-	jarHeuristic = []types.Library{
+	wantHeuristic = []types.Library{
 		{"com.example:heuristic", "1.0.0-SNAPSHOT"},
+	}
+
+	// manually created
+	wantFatjar = []types.Library{
+		{"com.google.guava:failureaccess", "1.0.1"},
+		{"com.google.guava:guava", "29.0-jre"},
+		{"com.google.guava:listenablefuture", "9999.0-empty-to-avoid-conflict-with-guava"},
+		{"com.google.j2objc:j2objc-annotations", "1.3"},
+		{"org.apache.hadoop.thirdparty:hadoop-shaded-guava", "1.1.0-SNAPSHOT"},
 	}
 )
 
@@ -73,24 +81,34 @@ type doc struct {
 
 func TestParse(t *testing.T) {
 	vectors := []struct {
+		name string
 		file string // Test input file
 		want []types.Library
 	}{
 		{
+			name: "maven",
 			file: "testdata/maven.war",
-			want: jarMaven,
+			want: wantMaven,
 		},
 		{
+			name: "gradle",
 			file: "testdata/gradle.war",
-			want: jarGradle,
+			want: wantGradle,
 		},
 		{
+			name: "sha1 search",
 			file: "testdata/test.jar",
-			want: jarTest,
+			want: wantSHA1,
 		},
 		{
+			name: "artifactId search",
 			file: "testdata/heuristic-1.0.0-SNAPSHOT.jar",
-			want: jarHeuristic,
+			want: wantHeuristic,
+		},
+		{
+			name: "fat jar",
+			file: "testdata/hadoop-shaded-guava-1.1.0-SNAPSHOT.jar",
+			want: wantFatjar,
 		},
 	}
 
@@ -133,7 +151,7 @@ func TestParse(t *testing.T) {
 	}))
 
 	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
+		t.Run(v.name, func(t *testing.T) {
 			f, err := os.Open(v.file)
 			require.NoError(t, err)
 
