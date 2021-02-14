@@ -65,6 +65,8 @@ func Parse(r io.Reader, opts ...Option) ([]types.Library, error) {
 func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, error) {
 	defer r.Close()
 
+	log.Logger.Debug("Parsing Java artifacts...", zap.String("file", fileName))
+
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, xerrors.Errorf("unable to read the jar file: %w", err)
