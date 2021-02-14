@@ -4,12 +4,13 @@ import (
 	"go.uber.org/zap"
 )
 
-var Logger *zap.Logger
+var Logger *zap.SugaredLogger
 
 func init() {
-	Logger, _ = zap.NewProduction()
+	logger, _ := zap.NewProduction()
+	Logger = logger.Sugar()
 }
 
-func SetLogger(l *zap.Logger) {
+func SetLogger(l *zap.SugaredLogger) {
 	Logger = l
 }

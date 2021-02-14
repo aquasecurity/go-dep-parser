@@ -65,7 +65,7 @@ func Parse(r io.Reader, opts ...Option) ([]types.Library, error) {
 func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, error) {
 	defer r.Close()
 
-	log.Logger.Debug("Parsing Java artifacts...", zap.String("file", fileName))
+	log.Logger.Debugw("Parsing Java artifacts...", zap.String("file", fileName))
 
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -139,7 +139,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 		return append(libs, p.library()), nil
 	}
 
-	log.Logger.Debug("No such POM in the central repositories", zap.String("file", fileName))
+	log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
 
 	// Return when artifactId or version from the file name are empty
 	if fileProps.artifactID == "" || fileProps.version == "" {
@@ -150,7 +150,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 	// When some artifacts have the same groupIds, it might result in false detection.
 	fileProps.groupID, err = searchByArtifactID(c, fileProps.artifactID)
 	if err == nil {
-		log.Logger.Debug("POM was determined in a heuristic way", zap.String("file", fileName),
+		log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
 			zap.String("artifact", fileProps.String()))
 		libs = append(libs, fileProps.library())
 	}
