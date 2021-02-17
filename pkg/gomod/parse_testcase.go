@@ -8,15 +8,10 @@ var (
 	// mkdir repo
 	// cd repo
 	// go mod init github.com/org/repo
-	// go get github.com/stretchr/repoify
+	// go get golang.org/x/xerrors
 	// go list -m all | awk 'NR>1 {sub(/^v/, "", $2); sub("-.*", "", $2); printf("{\""$1"\", \""$2"\"},\n")}'
-	GoModTestify = []types.Library{
-		{"github.com/davecgh/go-spew", "1.1.0"},
-		{"github.com/pmezard/go-difflib", "1.0.0"},
-		{"github.com/stretchr/objx", "0.1.0"},
-		{"github.com/stretchr/testify", "1.7.0"},
-		{"gopkg.in/check.v1", "0.0.0"},
-		{"gopkg.in/yaml.v3", "3.0.0"},
+	GoModNormal = []types.Library{
+		{"golang.org/x/xerrors", "0.0.0"},
 	}
 
 	// docker run --name gomod --rm -it golang:1.15 bash
@@ -24,17 +19,25 @@ var (
 	// mkdir repo
 	// cd repo
 	// go mod init github.com/org/repo
+	// go get golang.org/x/xerrors
 	// go get github.com/urfave/cli
+	// go get github.com/stretchr/testify
+	// go get github.com/BurntSushi/toml
 	// go list -m all | awk 'NR>1 {sub(/^v/, "", $2); sub("-.*", "", $2); printf("{\""$1"\", \""$2"\"},\n")}'
-	GoModCLI = []types.Library{
+	GoModMany = []types.Library{
 		{"github.com/BurntSushi/toml", "0.3.1"},
 		{"github.com/cpuguy83/go-md2man/v2", "2.0.0"},
+		{"github.com/davecgh/go-spew", "1.1.0"},
 		{"github.com/pmezard/go-difflib", "1.0.0"},
 		{"github.com/russross/blackfriday/v2", "2.0.1"},
 		{"github.com/shurcooL/sanitized_anchor_name", "1.0.0"},
+		{"github.com/stretchr/objx", "0.1.0"},
+		{"github.com/stretchr/testify", "1.7.0"},
 		{"github.com/urfave/cli", "1.22.5"},
+		{"golang.org/x/xerrors", "0.0.0"},
 		{"gopkg.in/check.v1", "0.0.0"},
 		{"gopkg.in/yaml.v2", "2.2.2"},
+		{"gopkg.in/yaml.v3", "3.0.0"},
 	}
 
 	// docker run --name gomod --rm -it golang:1.15 bash

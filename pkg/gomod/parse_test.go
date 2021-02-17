@@ -17,12 +17,12 @@ func TestParse(t *testing.T) {
 		libraries []types.Library
 	}{
 		{
-			file:      "testdata/gomod_testify.sum",
-			libraries: GoModTestify,
+			file:      "testdata/gomod_normal.sum",
+			libraries: GoModNormal,
 		},
 		{
-			file:      "testdata/gomod_cli.sum",
-			libraries: GoModCLI,
+			file:      "testdata/gomod_many.sum",
+			libraries: GoModMany,
 		},
 		{
 			file:      "testdata/gomod_trivy.sum",
