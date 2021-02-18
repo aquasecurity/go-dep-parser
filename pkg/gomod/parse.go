@@ -19,7 +19,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		s := strings.Fields(line)
 		// go.sum records and sorts all non-major versions
 		// with the latest version as last entry
-		tmp[s[0]] = parseSemVer(s[1])
+		tmp[s[0]] = strings.TrimSuffix(strings.TrimPrefix(s[1], "v"), "/go.mod")
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
@@ -33,15 +33,4 @@ func Parse(r io.Reader) ([]types.Library, error) {
 	}
 
 	return libs, nil
-}
-
-// parseSemVer parses semver from go.sum
-// ignoring pseudo-version
-func parseSemVer(v string) string {
-	v = strings.TrimPrefix(v, "v")
-	vv := strings.Split(v, ".")
-	vv[2] = strings.Join(vv[2:], ".")
-	vv[2] = strings.TrimSuffix(vv[2], "/go.mod")
-
-	return strings.Join(vv[:3], ".")
 }
