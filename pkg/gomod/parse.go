@@ -3,7 +3,6 @@ package gomod
 import (
 	"bufio"
 	"io"
-	"strconv"
 	"strings"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
@@ -41,13 +40,8 @@ func Parse(r io.Reader) ([]types.Library, error) {
 func parseSemVer(v string) string {
 	v = strings.TrimPrefix(v, "v")
 	vv := strings.Split(v, ".")
-	for i, r := range vv[2] {
-		_, err := strconv.Atoi(string(r))
-		if err != nil {
-			vv[2] = vv[2][:i]
-			break
-		}
-	}
+	vv[2] = strings.Join(vv[2:], ".")
+	vv[2] = strings.TrimSuffix(vv[2], "/go.mod")
 
 	return strings.Join(vv[:3], ".")
 }
