@@ -27,10 +27,10 @@ type Dependency struct {
 	Dependencies map[string]Dependency
 }
 
-func parsePackageLocator(target string) (packagename,protocol string, err error) {
+func parsePackageLocator(target string) (packagename, protocol string, err error) {
 	capture := yarnLocatorRegexp.FindStringSubmatch(target)
 	if len(capture) < 2 {
-		return "","", xerrors.New("not package format")
+		return "", "", xerrors.New("not package format")
 	}
 	for i, group := range yarnLocatorRegexp.SubexpNames() {
 		switch group {
