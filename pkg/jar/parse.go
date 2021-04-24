@@ -31,7 +31,8 @@ const (
 )
 
 var (
-	jarFileRegEx = regexp.MustCompile(`^([a-zA-Z0-9\._-]*[^-*])-(\d\S*(?:-SNAPSHOT)?).jar$`)
+	jarFileRegEx        = regexp.MustCompile(`^([a-zA-Z0-9\._-]*[^-*])-(\d\S*(?:-SNAPSHOT)?).jar$`)
+	ArtifactNotFoundErr = xerrors.New("no artifact found")
 )
 
 type conf struct {
@@ -153,6 +154,8 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 		log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
 			zap.String("artifact", fileProps.String()))
 		libs = append(libs, fileProps.library())
+	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
+		return nil, xerrors.Errorf("failed to parse artifact: %w", err)
 	}
 
 	return libs, nil
@@ -418,7 +421,7 @@ func searchBySHA1(c conf, data []byte) (properties, error) {
 	}
 
 	if len(res.Response.Docs) == 0 {
-		return properties{}, xerrors.Errorf("no artifact found: %s", digest)
+		return properties{}, xerrors.Errorf("digest %s: %w", digest, ArtifactNotFoundErr)
 	}
 
 	// Some artifacts might have the same SHA-1 digests.
@@ -460,7 +463,7 @@ func searchByArtifactID(c conf, artifactID string) (string, error) {
 	}
 
 	if len(res.Response.Docs) == 0 {
-		return "", xerrors.Errorf("no artifact found: %s", artifactID)
+		return "", xerrors.Errorf("artifactID %s: %w", artifactID, ArtifactNotFoundErr)
 	}
 
 	// Some artifacts might have the same artifactId.
