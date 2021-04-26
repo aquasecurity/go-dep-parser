@@ -139,7 +139,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 	if err == nil {
 		return append(libs, p.library()), nil
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
-		return nil, xerrors.Errorf("failed to parse artifact: %w", err)
+		return nil, xerrors.Errorf("failed to search by SHA1: %w", err)
 	}
 
 	log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
@@ -157,7 +157,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 			zap.String("artifact", fileProps.String()))
 		libs = append(libs, fileProps.library())
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
-		return nil, xerrors.Errorf("failed to parse artifact: %w", err)
+		return nil, xerrors.Errorf("failed to search by artifact id: %w", err)
 	}
 
 	return libs, nil
