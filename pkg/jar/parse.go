@@ -138,6 +138,8 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 	p, err := searchBySHA1(c, b)
 	if err == nil {
 		return append(libs, p.library()), nil
+	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
+		return nil, xerrors.Errorf("failed to parse artifact: %w", err)
 	}
 
 	log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
