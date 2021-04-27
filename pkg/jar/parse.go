@@ -275,6 +275,12 @@ func parseManifest(f *zip.File) (manifest, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 
+		// Skip variables. e.g. Bundle-Name: %bundleName
+		ss := strings.Fields(line)
+		if len(ss) <= 1 || (len(ss) > 1 && strings.HasPrefix(ss[1], "%")) {
+			continue
+		}
+
 		// It is not determined which fields are present in each application.
 		// In some cases, none of them are included, in which case they cannot be detected.
 		switch {
