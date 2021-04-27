@@ -68,7 +68,8 @@ func Parse(r io.Reader, opts ...Option) ([]types.Library, error) {
 	// for HTTP retry
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = logger{}
-	retryClient.RetryWaitMin = 10 * time.Second
+	retryClient.RetryWaitMin = 20 * time.Second
+	retryClient.RetryWaitMax = 5 * time.Minute
 	retryClient.RetryMax = 5
 	client := retryClient.StandardClient()
 
