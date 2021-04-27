@@ -7,7 +7,12 @@ import "github.com/aquasecurity/go-dep-parser/pkg/log"
 type logger struct{}
 
 func (logger) Error(msg string, keysAndValues ...interface{}) {
-	log.Logger.Errorw(msg, keysAndValues...)
+	// Use Debugw to suppress errors on failure
+	if msg == "request failed" {
+		log.Logger.Debugw(msg, keysAndValues...)
+		return
+	}
+	log.Logger.Errorw(msg, keysAndValues)
 }
 
 func (logger) Info(msg string, keysAndValues ...interface{}) {
@@ -15,6 +20,10 @@ func (logger) Info(msg string, keysAndValues ...interface{}) {
 }
 
 func (logger) Debug(msg string, keysAndValues ...interface{}) {
+	// This message is displayed too much
+	if msg == "performing request" {
+		return
+	}
 	log.Logger.Debugw(msg, keysAndValues...)
 }
 
