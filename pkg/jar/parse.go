@@ -445,8 +445,7 @@ func searchBySHA1(c conf, data []byte) (properties, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("Status: %d\n", resp.StatusCode)
-		fmt.Printf("Header: %+v\n", resp.Header)
+		return properties{}, xerrors.Errorf("status %s from %s", resp.Status, req.URL.String())
 	}
 
 	var res apiResponse
@@ -492,8 +491,7 @@ func searchByArtifactID(c conf, artifactID string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("Status: %d\n", resp.StatusCode)
-		fmt.Printf("Header: %+v\n", resp.Header)
+		return "", xerrors.Errorf("status %s from %s", resp.Status, req.URL.String())
 	}
 
 	var res apiResponse
