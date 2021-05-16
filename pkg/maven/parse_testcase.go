@@ -27,18 +27,18 @@ var (
 	*/
 	// mvn dependency:list -DoutputFile=dependency.txt
 	/*
-			cat dependency.txt | grep -v "^\s*$" | grep -v "The following files have been resolved" | \
-		  		awk '
-		  		  {
-		  		    cnt=split($1, path, ":")
-		  		    if(cnt == 5){
-		  		      print "{\"" path[1] ":" path[2] "\", \"" path[4] "\"},"
-		  		    }
-		  		    if(cnt == 6){
-		  		      print "{\"" path[1] ":" path[2] "\", \"" path[5] "\"},"
-		  		    }
-		  		  }
-		  		'
+		cat dependency.txt | grep -v "^\s*$" | grep -v "The following files have been resolved" | \
+			awk '
+			  {
+			    cnt=split($1, path, ":")
+			    if(cnt == 5){
+			      print "{\"" path[1] ":" path[2] "\", \"" path[4] "\"},"
+			    }
+			    if(cnt == 6){
+			      print "{\"" path[1] ":" path[2] "\", \"" path[5] "\"},"
+			    }
+			  }
+			'
 	*/
 	MavenNormal = []types.Library{
 		{"org.springframework:spring-jcl", "5.0.1.RELEASE"},
@@ -50,18 +50,18 @@ var (
 	// cd hadoop/hadoop-hdfs-project/hadoop-hdfs-nfs/
 	// mvn dependency:list -DoutputFile=dependency.txt
 	/*
-			cat dependency.txt | grep -v "^\s*$" | grep -v "The following files have been resolved" | \
-		  		awk '
-		  		  {
-		  		    cnt=split($1, path, ":")
-		  		    if(cnt == 5){
-		  		      print "{\"" path[1] ":" path[2] "\", \"" path[4] "\"},"
-		  		    }
-		  		    if(cnt == 6){
-		  		      print "{\"" path[1] ":" path[2] "\", \"" path[5] "\"},"
-		  		    }
-		  		  }
-		  		'
+		cat dependency.txt | grep -v "^\s*$" | grep -v "The following files have been resolved" | \
+			awk '
+			  {
+			    cnt=split($1, path, ":")
+			    if(cnt == 5){
+			      print "{\"" path[1] ":" path[2] "\", \"" path[4] "\"},"
+			    }
+			    if(cnt == 6){
+			      print "{\"" path[1] ":" path[2] "\", \"" path[5] "\"},"
+			    }
+			  }
+			'
 	*/
 	MavenHadoopHDFS = []types.Library{
 		{"org.apache.hadoop:hadoop-annotations", "3.4.0-SNAPSHOT"},
@@ -182,18 +182,18 @@ var (
 	// cd hadoop/hadoop-cloud-storage-project
 	// mvn dependency:list -DoutputFile=dependency.txt
 	/*
-			cat dependency.txt | grep -v "^\s*$" | grep -v "The following files have been resolved" | \
-		  		awk '
-		  		  {
-		  		    cnt=split($1, path, ":")
-		  		    if(cnt == 5){
-		  		      print "{\"" path[1] ":" path[2] "\", \"" path[4] "\"},"
-		  		    }
-		  		    if(cnt == 6){
-		  		      print "{\"" path[1] ":" path[2] "\", \"" path[5] "\"},"
-		  		    }
-		  		  }
-		  		'
+		cat dependency.txt | grep -v "^\s*$" | grep -v "The following files have been resolved" | \
+			awk '
+			  {
+			    cnt=split($1, path, ":")
+			    if(cnt == 5){
+			      print "{\"" path[1] ":" path[2] "\", \"" path[4] "\"},"
+			    }
+			    if(cnt == 6){
+			      print "{\"" path[1] ":" path[2] "\", \"" path[5] "\"},"
+			    }
+			  }
+			'
 	*/
 	MavenHadoopCloudStorage = []types.Library{
 		{"org.apache.hadoop:hadoop-annotations", "3.4.0-SNAPSHOT"},
