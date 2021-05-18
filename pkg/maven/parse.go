@@ -60,7 +60,9 @@ func Parse(r io.Reader) ([]types.Library, error) {
 			return []types.Library{}, nil
 		}
 
-		artifact, err := parseArtifact(strings.Fields(line)[0])
+		// Replace Escape code
+		as := strings.Fields(strings.ReplaceAll(line, "\x1b", " "))
+		artifact, err := parseArtifact(as[0])
 		if err != nil {
 			return nil, xerrors.Errorf("failed to parse artifact: %w", err)
 		}

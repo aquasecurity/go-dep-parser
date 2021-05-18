@@ -303,4 +303,9 @@ var (
 		{"org.apache.logging.log4j:log4j-api", "2.12.0"},
 	}
 	MavenNone = []types.Library{}
+
+	MavenClassifier = []types.Library{
+		{"org.springframework:spring-jcl", "5.0.1.RELEASE"},
+		{"org.springframework:spring-core", "5.0.1.RELEASE"},
+	}
 )

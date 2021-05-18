@@ -32,6 +32,10 @@ func TestParse(t *testing.T) {
 			file: "testdata/none.txt",
 			want: MavenNone,
 		},
+		{
+			file: "testdata/classifier.txt",
+			want: MavenClassifier,
+		},
 	}
 
 	for _, v := range vectors {
