@@ -15,6 +15,14 @@ const (
 	resolvedSection = "The following files have been resolved:"
 )
 
+var scopes = []string{
+	"compile",
+	"provided",
+	"runtime",
+	"test",
+	"system",
+}
+
 type Artifact struct {
 	GroupID    string
 	ArtifactID string
@@ -83,8 +91,13 @@ func parseArtifact(s string) (Artifact, error) {
 	case 4:
 		artifact.Version = ss[3]
 	case 5:
-		artifact.Version = ss[3]
-		artifact.Scope = ss[4]
+		if isValidScope(ss[4]) {
+			artifact.Version = ss[3]
+			artifact.Scope = ss[4]
+		} else {
+			artifact.Classifier = ss[3]
+			artifact.Version = ss[4]
+		}
 	case 6:
 		artifact.Classifier = ss[3]
 		artifact.Version = ss[4]
@@ -92,4 +105,13 @@ func parseArtifact(s string) (Artifact, error) {
 	}
 
 	return artifact, nil
+}
+
+func isValidScope(s string) bool {
+	for _, scope := range scopes {
+		if s == scope {
+			return true
+		}
+	}
+	return false
 }
