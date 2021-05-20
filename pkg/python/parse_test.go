@@ -3,8 +3,6 @@ package python
 import (
 	"os"
 	"path"
-	"sort"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,12 +13,24 @@ import (
 
 func TestParse(t *testing.T) {
 	vectors := []struct {
-		file string // Test input file
+		file string
 		want []types.Library
 	}{
 		{
 			file: "testdata/requirements_flask.txt",
 			want: requirementsFlask,
+		},
+		{
+			file: "testdata/requirements_comments.txt",
+			want: requirementsComments,
+		},
+		{
+			file: "testdata/requirements_spaces.txt",
+			want: requirementsSpaces,
+		},
+		{
+			file: "testdata/requirements_no_version.txt",
+			want: requirementsNoVersion,
 		},
 	}
 
@@ -31,22 +41,6 @@ func TestParse(t *testing.T) {
 
 			got, err := Parse(f)
 			require.NoError(t, err)
-
-			sort.Slice(got, func(i, j int) bool {
-				ret := strings.Compare(got[i].Name, got[j].Name)
-				if ret == 0 {
-					return got[i].Version < got[j].Version
-				}
-				return ret < 0
-			})
-
-			sort.Slice(v.want, func(i, j int) bool {
-				ret := strings.Compare(v.want[i].Name, v.want[j].Name)
-				if ret == 0 {
-					return v.want[i].Version < v.want[j].Version
-				}
-				return ret < 0
-			})
 
 			assert.Equal(t, v.want, got)
 		})
