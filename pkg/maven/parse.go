@@ -2,7 +2,6 @@ package maven
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strings"
 
@@ -81,8 +80,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 func parseArtifact(s string) (Artifact, error) {
 	ss := strings.Split(s, separator)
 	if len(ss) < 4 {
-		fmt.Println(s)
-		return Artifact{}, xerrors.New("invalid format error")
+		return Artifact{}, xerrors.Errorf("invalid format: %s", s)
 	}
 	artifact := Artifact{
 		GroupID:    ss[0],
