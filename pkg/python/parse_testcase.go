@@ -29,4 +29,8 @@ var (
 	requirementsNoVersion = []types.Library{
 		{"Flask", "2.0.0"},
 	}
+
+	requirementsOperator = []types.Library{
+		{"Django", "2.3.4"},
+	}
 )
