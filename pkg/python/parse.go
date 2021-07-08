@@ -11,14 +11,16 @@ import (
 )
 
 const commentRune string = "#"
+const endColon string = ";"
 
 func Parse(r io.Reader) ([]types.Library, error) {
 	scanner := bufio.NewScanner(r)
 	var libs []types.Library
 	for scanner.Scan() {
 		line := scanner.Text()
-		stripAllSpaces(&line)
-		stripComments(&line)
+		line = strings.ReplaceAll(line, " ", "")
+		line = rStripByKey(line, commentRune)
+		line = rStripByKey(line, endColon)
 		s := strings.Split(line, "==")
 		if len(s) != 2 {
 			continue
@@ -34,12 +36,9 @@ func Parse(r io.Reader) ([]types.Library, error) {
 	return libs, nil
 }
 
-func stripComments(line *string) {
-	if pos := strings.IndexAny(*line, commentRune); pos >= 0 {
-		*line = strings.TrimRightFunc((*line)[:pos], unicode.IsSpace)
+func rStripByKey(line string, key string) string {
+	if pos := strings.IndexAny(line, key); pos >= 0 {
+		line = strings.TrimRightFunc((line)[:pos], unicode.IsSpace)
 	}
-}
-
-func stripAllSpaces(line *string) {
-	*line = strings.ReplaceAll(*line, " ", "")
+	return line
 }

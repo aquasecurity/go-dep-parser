@@ -32,5 +32,6 @@ var (
 
 	requirementsOperator = []types.Library{
 		{"Django", "2.3.4"},
+		{"SomeProject", "5.4"},
 	}
 )
