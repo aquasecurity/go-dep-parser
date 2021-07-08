@@ -1,4 +1,4 @@
-package python
+package pip
 
 import "github.com/aquasecurity/go-dep-parser/pkg/types"
 

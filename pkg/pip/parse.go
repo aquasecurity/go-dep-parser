@@ -1,4 +1,4 @@
-package python
+package pip
 
 import (
 	"bufio"
@@ -10,8 +10,10 @@ import (
 	"golang.org/x/xerrors"
 )
 
-const commentRune string = "#"
-const endColon string = ";"
+const (
+	commentMarker string = "#"
+	endColon      string = ";"
+)
 
 func Parse(r io.Reader) ([]types.Library, error) {
 	scanner := bufio.NewScanner(r)
@@ -19,7 +21,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		line = strings.ReplaceAll(line, " ", "")
-		line = rStripByKey(line, commentRune)
+		line = rStripByKey(line, commentMarker)
 		line = rStripByKey(line, endColon)
 		s := strings.Split(line, "==")
 		if len(s) != 2 {
