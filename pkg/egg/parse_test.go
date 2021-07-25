@@ -16,12 +16,24 @@ func TestParse(t *testing.T) {
 		want []types.Library
 	}{
 		{
-			file: "testdata/Python-2.7.egg-info",
-			want: EggEggInfo,
+			file: "testdata/setuptools-51.3.3-py3.8.egg-info.PKG-INFO",
+
+			// docker run --name python --rm -it python:3.9-alpine sh
+			// apk add py3-setuptools
+			// cat /usr/lib/python3.8/site-packages/setuptools-51.3.3-py3.8.egg-info/PKG-INFO | awk 'NR==2,NR==3' | awk 'BEGIN {FS=" "} {print $2}' | awk '!(NR%2){printf("{\""p"\", \""$0"\"},\n")}{p=$0}'
+			want: []types.Library{
+				{"setuptools", "51.3.3"},
+			},
 		},
 		{
-			file: "testdata/awscli-1.19.12-py3.7.egg-info.PKG-INFO",
-			want: EggEggInfoPkgInfo,
+			file: "testdata/six-1.15.0-py3.8.egg-info",
+
+			// docker run --name python --rm -it python:3.9-alpine sh
+			// apk add py3-setuptools
+			// cat /usr/lib/python3.8/site-packages/six-1.15.0-py3.8.egg-info | awk 'NR==2,NR==3' | awk 'BEGIN {FS=" "} {print $2}' | awk '!(NR%2){printf("{\""p"\", \""$0"\"},\n")}{p=$0}'
+			want: []types.Library{
+				{"six", "1.15.0"},
+			},
 		},
 	}
 
