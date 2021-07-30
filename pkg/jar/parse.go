@@ -64,7 +64,7 @@ func WithHTTPClient(client *http.Client) Option {
 	}
 }
 
-func Parse(r io.Reader, opts ...Option) ([]types.Library, error) {
+func Parse(r io.Reader, opts ...Option) ([]types.EmbeddedLibrary, error) {
 	// for HTTP retry
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = logger{}
@@ -81,10 +81,18 @@ func Parse(r io.Reader, opts ...Option) ([]types.Library, error) {
 		opt(&c)
 	}
 
-	return parseArtifact(c, c.rootFilePath, ioutil.NopCloser(r))
+	return parseArtifact(c, c.rootFilePath, ioutil.NopCloser(r), []string{c.rootFilePath})
 }
 
-func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, error) {
+func asEmbeddedLibrary(parentDependencies []string, lib types.Library) types.EmbeddedLibrary {
+	return types.EmbeddedLibrary{
+		ParentDependencies: parentDependencies,
+		Name:               lib.Name,
+		Version:            lib.Version,
+	}
+}
+
+func parseArtifact(c conf, fileName string, r io.ReadCloser, parentDependencies []string) ([]types.EmbeddedLibrary, error) {
 	defer r.Close()
 
 	log.Logger.Debugw("Parsing Java artifacts...", zap.String("file", fileName))
@@ -103,7 +111,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 	fileName = filepath.Base(fileName)
 	fileProps := parseFileName(fileName)
 
-	var libs []types.Library
+	var libs []types.EmbeddedLibrary
 	var m manifest
 	var foundPomProps bool
 
@@ -114,7 +122,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 			if err != nil {
 				return nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
-			libs = append(libs, props.library())
+			libs = append(libs, asEmbeddedLibrary(parentDependencies, props.library()))
 
 			// Check if the pom.properties is for the original JAR/WAR/EAR
 			if fileProps.artifactID == props.artifactID && fileProps.version == props.version {
@@ -132,7 +140,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 			}
 
 			// parse jar/war/ear recursively
-			innerLibs, err := parseArtifact(c, fileInJar.Name, fr)
+			innerLibs, err := parseArtifact(c, fileInJar.Name, fr, append(parentDependencies, filepath.Base(fileInJar.Name)))
 			if err != nil {
 				return nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
@@ -151,14 +159,14 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 		// We have to make sure that the artifact exists actually.
 		if ok, _ := exists(c, manifestProps); ok {
 			// If groupId and artifactId are valid, they will be returned.
-			return append(libs, manifestProps.library()), nil
+			return append(libs, asEmbeddedLibrary(parentDependencies, manifestProps.library())), nil
 		}
 	}
 
 	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
 	p, err := searchBySHA1(c, b)
 	if err == nil {
-		return append(libs, p.library()), nil
+		return append(libs, asEmbeddedLibrary(parentDependencies, p.library())), nil
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
 		return nil, xerrors.Errorf("failed to search by SHA1: %w", err)
 	}
@@ -176,7 +184,7 @@ func parseArtifact(c conf, fileName string, r io.ReadCloser) ([]types.Library, e
 	if err == nil {
 		log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
 			zap.String("artifact", fileProps.String()))
-		libs = append(libs, fileProps.library())
+		libs = append(libs, asEmbeddedLibrary(parentDependencies, fileProps.library()))
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
 		return nil, xerrors.Errorf("failed to search by artifact id: %w", err)
 	}
