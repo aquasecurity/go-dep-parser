@@ -36,6 +36,7 @@ var (
 	}
 
 	// mcr.microsoft.com/dotnet/sdk:latest
+	// apt -y update && apt -y install jq
 	// cd /usr/local/src
 	// dotnet new console
 	// dotnet add package Newtonsoft.Json
@@ -48,6 +49,7 @@ var (
 	}
 
 	// docker run --rm -i -t mcr.microsoft.com/dotnet/sdk:latest
+	// apt -y update && apt -y install jq
 	// cd /usr/local/src
 	// dotnet new classlib -f net5.0
 	// sed -i 's~TargetFramework>net5.0</TargetFramework~TargetFrameworks>net4.0;netstandard2.0;netstandard1.0;net35;net2.0</TargetFrameworks~' src.csproj
