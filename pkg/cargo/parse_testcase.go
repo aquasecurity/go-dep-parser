@@ -3,28 +3,28 @@ package cargo
 import "github.com/aquasecurity/go-dep-parser/pkg/types"
 
 var (
-	// docker run --name cargo --rm -it rust:1.34 bash
+	// docker run --name cargo --rm -it rust:1.45 bash
+	// apt -y update && apt -y install jq
 	// export USER=cargo
 	// cargo install cargo-edit
-	// cargo init normal
+	// cargo init normal && cd normal
 	// cargo add libc
 	// cargo update
-	// cat Cargo.lock| grep checksum | awk  '{printf("{\""$2"\", \""$3"\", \"\"},\n")}'
-	// # Add normal package {"normal", "0.1.0"},
-	CargoNormal = []types.Library{
+	// cargo metadata  | jq -rc '.packages[] | "{\"\(.name)\", \"\(.version)\", \"\"},"'
+	cargoNormal = []types.Library{
 		{"normal", "0.1.0", ""},
 		{"libc", "0.2.54", ""},
 	}
 
-	// docker run --name cargo --rm -it rust:1.34 bash
+	// docker run --name cargo --rm -it rust:1.45 bash
+	// apt -y update && apt -y install jq
 	// export USER=cargo
 	// cargo install cargo-edit
-	// cargo init many
+	// cargo init many && cd many
 	// cargo add rand bitflags lazy_static log serde syn regex quote handlebars rocket
 	// cargo update
-	// cat Cargo.lock| grep checksum | awk  '{printf("{\""$2"\", \""$3"\", \"\"},\n")}'
-	// # Add many package {"many", "0.1.0"},
-	CargoMany = []types.Library{
+	// cargo metadata  | jq -rc '.packages[] | "{\"\(.name)\", \"\(.version)\", \"\"},"'
+	cargoMany = []types.Library{
 		{"many", "0.1.0", ""},
 		{"aho-corasick", "0.7.3", ""},
 		{"autocfg", "0.1.2", ""},
@@ -126,15 +126,15 @@ var (
 		{"yansi", "0.5.0", ""},
 	}
 
-	// docker run --name cargo --rm -it rust:1.34 bash
+	// docker run --name cargo --rm -it rust:1.45 bash
+	// apt -y update && apt -y install jq
 	// export USER=cargo
 	// cargo install cargo-edit
-	// cargo init web
+	// cargo init web && cd web
 	// cargo add nickel
 	// cargo update
-	// cat Cargo.lock| grep checksum | awk  '{printf("{\""$2"\", \""$3"\"},\n")}'
-	// # Add web package {"web", "0.1.0"},
-	CargoNickel = []types.Library{
+	// cargo metadata  | jq -rc '.packages[] | "{\"\(.name)\", \"\(.version)\", \"\"},"'
+	cargoNickel = []types.Library{
 		{"web", "0.1.0", ""},
 		{"aho-corasick", "0.7.3", ""},
 		{"base64", "0.9.3", ""},
