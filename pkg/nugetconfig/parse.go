@@ -4,16 +4,10 @@ import (
 	"encoding/xml"
 	"io"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
-
-type Dependencies map[string]Dependency
-
-type Dependency struct {
-	Type     string
-	Resolved string
-}
 
 type cfgPackageReference struct {
 	XMLName         xml.Name `xml:"package"`
@@ -30,28 +24,27 @@ type config struct {
 
 func Parse(r io.Reader) ([]types.Library, error) {
 	var cfgData config
-	uniqueLibs := map[types.Library]struct{}{}
 	if err := xml.NewDecoder(r).Decode(&cfgData); err != nil {
 		return nil, xerrors.Errorf("failed to decode .config file: %w", err)
 	}
 
-	for _, cfgPackageReference := range cfgData.Packages {
-		name := cfgPackageReference.ID
-		version := cfgPackageReference.Version
-		isDevDependency := cfgPackageReference.DevDependency
-		if name != "" && !isDevDependency {
-			lib := types.Library{
-				Name:    name,
-				Version: version,
-			}
-			uniqueLibs[lib] = struct{}{}
+	uniqueLibs := map[types.Library]struct{}{}
+	for _, pkg := range cfgData.Packages {
+		if pkg.ID == "" || pkg.DevDependency {
+			continue
 		}
+
+		lib := types.Library{
+			Name:    pkg.ID,
+			Version: pkg.Version,
+		}
+		uniqueLibs[lib] = struct{}{}
 	}
 
-	var libraries []types.Library
+	var libs []types.Library
 	for lib := range uniqueLibs {
-		libraries = append(libraries, lib)
+		libs = append(libs, lib)
 	}
 
-	return libraries, nil
+	return libs, nil
 }

@@ -4,11 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/nugetconfig"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/aquasecurity/go-dep-parser/pkg/nugetconfig"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
