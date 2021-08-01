@@ -20,7 +20,8 @@ func TestParse(t *testing.T) {
 
 			// docker run --name python --rm -it python:3.9-alpine sh
 			// apk add py3-setuptools
-			// cat /usr/lib/python3.8/site-packages/setuptools-51.3.3-py3.8.egg-info/PKG-INFO | awk 'NR==2,NR==3' | awk 'BEGIN {FS=" "} {print $2}' | awk '!(NR%2){printf("{\""p"\", \""$0"\"},\n")}{p=$0}'
+			// cd /usr/lib/python3.9/site-packages/setuptools-52.0.0-py3.9.egg-info/
+			// cat PKG-INFO | grep -e "^Name:" -e "^Version:" | cut -d" " -f2 | tr "\n" " " | awk '{printf("\{\""$1"\", \""$2"\", \"\"\}\n")}'
 			want: []types.Library{
 				{"setuptools", "51.3.3", ""},
 			},
@@ -30,7 +31,8 @@ func TestParse(t *testing.T) {
 
 			// docker run --name python --rm -it python:3.9-alpine sh
 			// apk add py3-setuptools
-			// cat /usr/lib/python3.8/site-packages/six-1.15.0-py3.8.egg-info | awk 'NR==2,NR==3' | awk 'BEGIN {FS=" "} {print $2}' | awk '!(NR%2){printf("{\""p"\", \""$0"\"},\n")}{p=$0}'
+			// cd /usr/lib/python3.9/site-packages/
+			// cat six-1.15.0-py3.9.egg-info | grep -e "^Name:" -e "^Version:" | cut -d" " -f2 | tr "\n" " " | awk '{printf("\{\""$1"\", \""$2"\", \"\"\}\n")}'
 			want: []types.Library{
 				{"six", "1.15.0", ""},
 			},
