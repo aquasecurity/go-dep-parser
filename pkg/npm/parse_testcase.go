@@ -7,7 +7,7 @@ var (
 	// npm init --force
 	// npm install --save promise jquery
 	// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
-	NpmNormal = []types.Library{
+	npmNormal = []types.Library{
 		{"asap", "2.0.6", ""},
 		{"jquery", "3.4.0", ""},
 		{"promise", "8.0.3", ""},
@@ -17,7 +17,7 @@ var (
 	// npm init --force
 	// npm install --save react redux
 	// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
-	NpmReact = []types.Library{
+	npmReact = []types.Library{
 		{"asap", "2.0.6", ""},
 		{"jquery", "3.4.0", ""},
 		{"js-tokens", "4.0.0", ""},
@@ -37,7 +37,7 @@ var (
 	// npm install --save react redux
 	// npm install --save-dev mocha
 	// npm ls -prod | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
-	NpmWithDev = []types.Library{
+	npmWithDev = []types.Library{
 		{"asap", "2.0.6", ""},
 		{"jquery", "3.4.0", ""},
 		{"js-tokens", "4.0.0", ""},
@@ -58,7 +58,7 @@ var (
 	// npm install --save-dev mocha
 	// npm install --save lodash request chalk commander express async axios vue
 	// npm ls -prod | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
-	NpmMany = []types.Library{
+	npmMany = []types.Library{
 		{"accepts", "1.3.6", ""},
 		{"ajv", "6.10.0", ""},
 		{"ansi-styles", "3.2.1", ""},
@@ -181,7 +181,7 @@ var (
 	}
 
 	// manually created
-	NpmNested = []types.Library{
+	npmNested = []types.Library{
 		{"debug", "2.0.0", ""},
 		{"debug", "2.6.9", ""},
 		{"ms", "0.6.2", ""},
