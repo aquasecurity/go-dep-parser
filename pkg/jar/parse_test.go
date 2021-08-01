@@ -19,6 +19,7 @@ import (
 var (
 	// cd testdata/testimage/maven && docker build -t test .
 	// docker run --rm --name test -it test bash
+	// mvn dependency:list
 	// mvn dependency:tree -Dscope=compile -Dscope=runtime | awk '/:tree/,/BUILD SUCCESS/' | awk 'NR > 1 { print }' | head -n -2 | awk '{print $NF}' | awk -F":" '{printf("{\""$1":"$2"\", \""$4 "\", \"\"},\n")}'
 	wantMaven = []types.Library{
 		{"com.example:web-app", "1.0-SNAPSHOT", ""},
