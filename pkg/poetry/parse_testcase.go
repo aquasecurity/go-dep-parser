@@ -3,11 +3,14 @@ package poetry
 import "github.com/aquasecurity/go-dep-parser/pkg/types"
 
 var (
-	// docker run --name poetry  --rm -it  jonatkinson/python-poetry:3.7
-	// poetry new normal
+	// docker run --name pipenv --rm -it python:3.9-alpine sh
+	// apk add curl
+	// curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+	// export PATH=/root/.poetry/bin/:$PATH
+	// poetry new normal && cd normal
 	// poetry add pypi
 	// poetry show -a | awk '{gsub(/\(!\)/, ""); printf("{\""$1"\", \""$2"\", \"\"},\n") }'
-	PoetryNormal = []types.Library{
+	poetryNormal = []types.Library{
 		{"atomicwrites", "1.3.0", ""},
 		{"attrs", "19.1.0", ""},
 		{"colorama", "0.4.1", ""},
@@ -19,10 +22,13 @@ var (
 		{"six", "1.12.0", ""},
 	}
 
-	// docker run --name poetry  --rm -it  jonatkinson/python-poetry:3.7
+	// docker run --name pipenv --rm -it python:3.9-alpine sh
+	// apk add curl
+	// curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+	// export PATH=/root/.poetry/bin/:$PATH
 	// Use https://github.com/sdispater/poetry/blob/master/poetry.lock
 	// poetry show -a | awk '{gsub(/\(!\)/, ""); printf("{\""$1"\", \""$2"\", \"\"},\n") }'
-	PoetryMany = []types.Library{
+	poetryMany = []types.Library{
 		{"appdirs", "1.4.3", ""},
 		{"aspy.yaml", "1.2.0", ""},
 		{"atomicwrites", "1.3.0", ""},
@@ -103,11 +109,14 @@ var (
 		{"zipp", "0.5.1", ""},
 	}
 
-	// docker run --name poetry  --rm -it  jonatkinson/python-poetry:3.7
-	// poetry new flask
+	// docker run --name pipenv --rm -it python:3.9-alpine sh
+	// apk add curl
+	// curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+	// export PATH=/root/.poetry/bin/:$PATH
+	// poetry new web && cd web
 	// poetry add flask
 	// poetry show -a | awk '{gsub(/\(!\)/, ""); printf("{\""$1"\", \""$2"\", \"\"},\n") }'
-	PoetryFlask = []types.Library{
+	poetryFlask = []types.Library{
 		{"atomicwrites", "1.3.0", ""},
 		{"attrs", "19.1.0", ""},
 		{"click", "7.0", ""},
