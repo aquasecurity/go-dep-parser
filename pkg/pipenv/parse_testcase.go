@@ -3,12 +3,13 @@ package pipenv
 import "github.com/aquasecurity/go-dep-parser/pkg/types"
 
 var (
-	// docker run --name pipenv --rm -it python:3.7-alpine bash
+	// docker run --name pipenv --rm -it python:3.9-alpine sh
+	// apk add jq
 	// mkdir app && cd /app
 	// pip install pipenv
 	// pipenv install requests pyyaml
 	// pipenv graph --json | jq -rc '.[] | "{\"\(.package.package_name | ascii_downcase)\", \"\(.package.installed_version)\", \"\"},"'
-	PipenvNormal = []types.Library{
+	pipenvNormal = []types.Library{
 		{"urllib3", "1.24.2", ""},
 		{"requests", "2.21.0", ""},
 		{"pyyaml", "5.1", ""},
@@ -17,12 +18,13 @@ var (
 		{"certifi", "2019.3.9", ""},
 	}
 
-	// docker run --name pipenv --rm -it python:3.7-alpine bash
+	// docker run --name pipenv --rm -it python:3.9-alpine bash
+	// apk add jq
 	// mkdir app && cd /app
 	// pip install pipenv
 	// pipenv install requests pyyaml django djangorestframework
 	// pipenv graph --json | jq -rc '.[] | "{\"\(.package.package_name | ascii_downcase)\", \"\(.package.installed_version)\", \"\"},"'
-	PipenvDjango = []types.Library{
+	pipenvDjango = []types.Library{
 		{"urllib3", "1.24.2", ""},
 		{"sqlparse", "0.3.0", ""},
 		{"requests", "2.21.0", ""},
@@ -35,12 +37,13 @@ var (
 		{"certifi", "2019.3.9", ""},
 	}
 
-	// docker run --name pipenv --rm -it python:3.7-alpine bash
+	// docker run --name pipenv --rm -it python:3.9-alpine bash
+	// apk add jq
 	// mkdir app && cd /app
 	// pip install pipenv
 	// pipenv install requests pyyaml django djangorestframework six botocore python-dateutil simplejson setuptools pyasn1 awscli jinja2
 	// pipenv graph --json | jq -rc '.[] | "{\"\(.package.package_name | ascii_downcase)\", \"\(.package.installed_version)\", \"\"},"'
-	PipenvMany = []types.Library{
+	pipenvMany = []types.Library{
 		{"urllib3", "1.24.2", ""},
 		{"sqlparse", "0.3.0", ""},
 		{"six", "1.12.0", ""},
