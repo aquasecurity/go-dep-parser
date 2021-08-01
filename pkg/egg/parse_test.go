@@ -20,11 +20,9 @@ func TestParse(t *testing.T) {
 
 			// docker run --name python --rm -it python:3.9-alpine sh
 			// apk add py3-setuptools
-			// cat /usr/lib/python3.8/site-packages/setuptools-51.3.3-py3.8.egg-info/PKG-INFO | awk  '/^Name:|^Version:|^License:/{print}' | tr -d '\n' |    \
-			// sed "s/Name: /\n/g" | sed "s/Version: /:/g" | sed  "s/License: /:/g" | sed '1d' |  \
-			// awk '{split($0,a,":"); printf("{\"%s\", \"%s\", \"%s\"}\n", a[1], a[2], a[3])}'
+			// cat /usr/lib/python3.8/site-packages/setuptools-51.3.3-py3.8.egg-info/PKG-INFO | awk 'NR==2,NR==3' | awk 'BEGIN {FS=" "} {print $2}' | awk '!(NR%2){printf("{\""p"\", \""$0"\"},\n")}{p=$0}'
 			want: []types.Library{
-				{"setuptools", "51.3.3", "UNKNOWN"},
+				{"setuptools", "51.3.3", ""},
 			},
 		},
 		{
@@ -32,11 +30,9 @@ func TestParse(t *testing.T) {
 
 			// docker run --name python --rm -it python:3.9-alpine sh
 			// apk add py3-setuptools
-			// cat /usr/lib/python3.8/site-packages/six-1.15.0-py3.8.egg-info | awk  '/^Name:|^Version:|^License:/{print}' | tr -d '\n' |    \
-			// sed "s/Name: /\n/g" | sed "s/Version: /:/g" | sed  "s/License: /:/g" | sed '1d' |  \
-			// awk '{split($0,a,":"); printf("{\"%s\", \"%s\", \"%s\"}\n", a[1], a[2], a[3])}'
+			// cat /usr/lib/python3.8/site-packages/six-1.15.0-py3.8.egg-info | awk 'NR==2,NR==3' | awk 'BEGIN {FS=" "} {print $2}' | awk '!(NR%2){printf("{\""p"\", \""$0"\"},\n")}{p=$0}'
 			want: []types.Library{
-				{"six", "1.15.0", "MIT"},
+				{"six", "1.15.0", ""},
 			},
 		},
 	}
