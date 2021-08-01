@@ -4,10 +4,10 @@ import "github.com/aquasecurity/go-dep-parser/pkg/types"
 
 var (
 	// docker run --name composer --rm -it node:12-alpine sh
-	// yarn init
+	// yarn init -y
 	// yarn add promise jquery
 	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
-	YarnNormal = []types.Library{
+	yarnNormal = []types.Library{
 		{"asap", "2.0.6", ""},
 		{"jquery", "3.4.1", ""},
 		{"promise", "8.0.3", ""},
@@ -16,7 +16,7 @@ var (
 	// ... and
 	// yarn add react redux
 	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
-	YarnReact = []types.Library{
+	yarnReact = []types.Library{
 		{"asap", "2.0.6", ""},
 		{"jquery", "3.4.1", ""},
 		{"js-tokens", "4.0.0", ""},
@@ -34,7 +34,7 @@ var (
 	// ... and
 	// yarn add -D mocha
 	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}' | sort | uniq
-	YarnWithDev = []types.Library{
+	yarnWithDev = []types.Library{
 		{"ansi-colors", "3.2.3", ""},
 		{"ansi-regex", "2.1.1", ""},
 		{"ansi-regex", "3.0.0", ""},
@@ -168,7 +168,7 @@ var (
 	// ... and
 	// yarn add lodash request chalk commander express async axios vue
 	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}' | sort | uniq
-	YarnMany = []types.Library{
+	yarnMany = []types.Library{
 		{"accepts", "1.3.7", ""},
 		{"ajv", "6.10.0", ""},
 		{"ansi-colors", "3.2.3", ""},
@@ -397,9 +397,8 @@ var (
 		{"yargs-unparser", "1.5.0", ""},
 	}
 
-	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
-	// yarn list | grep -E -o "@.+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\"@"$2"\", \""$3"\", \"\"},\n")}' | sort | uniq
-	YarnRealWorld = []types.Library{
+	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}' | sort | uniq
+	yarnRealWorld = []types.Library{
 		{"@babel/code-frame", "7.0.0", ""},
 		{"@babel/code-frame", "7.0.0-beta.44", ""},
 		{"@babel/core", "7.1.0", ""},
@@ -2322,7 +2321,8 @@ var (
 	// apk add git
 	// yarn init
 	// yarn add promise jquery
-	YarnV2Normal = []types.Library{
+	// yarn info --recursive --dependents --json | jq -r .value | grep -v workspace | awk -F'[@:]' '{printf("{\""$1"\", \""$3"\", \"\"},\n")}'
+	yarnV2Normal = []types.Library{
 		{"asap", "2.0.6", ""},
 		{"jquery", "3.5.1", ""},
 		{"promise", "8.1.0", ""},
@@ -2330,7 +2330,8 @@ var (
 
 	// ... and
 	// yarn add react redux
-	YarnV2React = []types.Library{
+	// yarn info --recursive --dependents --json | jq -r .value | grep -v workspace | awk -F'[@:]' '{printf("{\""$1"\", \""$3"\", \"\"},\n")}'
+	yarnV2React = []types.Library{
 		{"asap", "2.0.6", ""},
 		{"jquery", "3.5.1", ""},
 		{"js-tokens", "4.0.0", ""},
@@ -2346,7 +2347,8 @@ var (
 
 	// ... and
 	// yarn add -D mocha
-	YarnV2WithDev = []types.Library{
+	// yarn info --recursive --dependents --json | jq -r .value | grep -v workspace | awk -F'[@:]' '{printf("{\""$1"\", \""$3"\", \"\"},\n")}'
+	yarnV2WithDev = []types.Library{
 		{"@types/color-name", "1.1.1", ""},
 		{"abbrev", "1.1.1", ""},
 		{"ajv", "6.12.4", ""},
@@ -2566,7 +2568,8 @@ var (
 
 	// ... and
 	// yarn add lodash request chalk commander express async axios vue
-	YarnV2Many = []types.Library{
+	// yarn info --recursive --dependents --json | jq -r .value | grep -v workspace | awk -F'[@:]' '{printf("{\""$1"\", \""$3"\", \"\"},\n")}'
+	yarnV2Many = []types.Library{
 		{"@types/color-name", "1.1.1", ""},
 		{"abbrev", "1.1.1", ""},
 		{"accepts", "1.3.7", ""},
