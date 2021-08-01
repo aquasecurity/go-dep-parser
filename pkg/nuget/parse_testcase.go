@@ -4,25 +4,27 @@ import "github.com/aquasecurity/go-dep-parser/pkg/types"
 
 var (
 	// docker run --rm -i -t mcr.microsoft.com/dotnet/sdk:latest
+	// apt -y update && apt -y install jq
 	// cd /usr/local/src
 	// dotnet new mvc
 	// dotnet add package Newtonsoft.Json
 	// dotnet add package NuGet.Frameworks
 	// dotnet restore --use-lock-file
-	// cat packages.lock.json | jq -rc '.dependencies[] | keys[] as $k | "{\"\($k)\", \"\(.[$k] | .resolved)\", ""},"'
-	NuGetSimple = []types.Library{
+	// cat packages.lock.json | jq -rc '.dependencies[] | keys[] as $k | "{\"\($k)\", \"\(.[$k] | .resolved)\", \"\"},"'
+	nuGetSimple = []types.Library{
 		{"Newtonsoft.Json", "12.0.3", ""},
 		{"NuGet.Frameworks", "5.7.0", ""},
 	}
 
 	// docker run --rm -i -t mcr.microsoft.com/dotnet/sdk:latest
+	// apt -y update && apt -y install jq
 	// cd /usr/local/src
 	// dotnet new webapi
 	// dotnet add package Newtonsoft.Json
 	// dotnet add package NuGet.Frameworks
 	// dotnet restore --use-lock-file
 	// cat packages.lock.json | jq -rc '.dependencies[] | keys[] as $k | "{\"\($k)\", \"\(.[$k] | .resolved)\", \"\"},"'
-	NuGetSubDependencies = []types.Library{
+	nuGetSubDependencies = []types.Library{
 		{"Microsoft.Extensions.ApiDescription.Server", "3.0.0", ""},
 		{"Microsoft.OpenApi", "1.1.4", ""},
 		{"Newtonsoft.Json", "12.0.3", ""},
@@ -40,7 +42,7 @@ var (
 	// dotnet add package AWSSDK.Core
 	// dotnet restore --use-lock-file
 	// cat packages.lock.json | jq -rc '.dependencies[] | keys[] as $k | "{\"\($k)\", \"\(.[$k] | .resolved)\", \"\"},"'
-	NuGetLegacy = []types.Library{
+	nuGetLegacy = []types.Library{
 		{"AWSSDK.Core", "3.5.1.30", ""},
 		{"Newtonsoft.Json", "12.0.3", ""},
 	}
@@ -53,7 +55,7 @@ var (
 	// dotnet restore --use-lock-file
 	// dotnet add package AWSSDK.Core
 	// cat packages.lock.json | jq -rc '.dependencies[] | keys[] as $k | "{\"\($k)\", \"\(.[$k] | .resolved)\", \"\"},"' | sort -u
-	NuGetMultiTarget = []types.Library{
+	nuGetMultiTarget = []types.Library{
 		{"AWSSDK.Core", "3.5.1.30", ""},
 		{"Microsoft.Bcl.AsyncInterfaces", "1.1.0", ""},
 		{"Microsoft.CSharp", "4.3.0", ""},
