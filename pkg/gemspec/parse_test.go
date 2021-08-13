@@ -12,29 +12,30 @@ import (
 )
 
 func TestParse(t *testing.T) {
+	emptyLib := *new(types.Library)
 	vectors := []struct {
 		file string // Test input file
-		want []types.Library
+		want types.Library
 	}{
 		{
 			file: "testdata/rubygems-update.gemspec",
-			want: RubyGemUpdate,
+			want: types.Library{"rubygems-update", "3.0.3", "2-clauseBSDL,Ruby"},
 		},
 		{
 			file: "testdata/binary_json-2.3.0.gemspec",
-			want: nil,
+			want: emptyLib,
 		},
 		{
-			file: "testdata/json-java-name.gemspec",
-			want: nil,
+			file: "testdata/net-ftp-0.1.1.gemspec",
+			want: types.Library{"net-ftp", "0.1.1", "Ruby"},
 		},
 		{
-			file: "testdata/json-java.gemspec",
-			want: nil,
+			file: "testdata/matrix-0.3.1/local.gemspec",
+			want: types.Library{"matrix", "0.3.1", "Ruby"},
 		},
 		{
 			file: "testdata/json-2.3.0.gemspec",
-			want: JsonGem,
+			want: types.Library{"json", "2.3.0", "Ruby"},
 		},
 	}
 

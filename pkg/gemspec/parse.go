@@ -3,6 +3,7 @@ package gemspec
 import (
 	"bufio"
 	"io"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -15,16 +16,16 @@ import (
 var (
 	bwQuotes         = regexp.MustCompile(`['|"](.*?)['|"]`)
 	gemSpec          = ".gemspec"
-	gemStr           = ".name = "
-	gemStrVer        = ".version = "
-	gemStrLic        = ".licenses = "
+	gemNameReg       = regexp.MustCompile(`(\.name)(\s|\t)*=(\s|\t)*('|")[a-zA-Z0-9_\-]*('|")`)
+	gemVerReg        = regexp.MustCompile(`(\.version)(\s|\t)*=(\s|\t)*('|")[a-zA-Z0-9.]*('|")`)
+	gemStrLic        = regexp.MustCompile(`(\.licenses)(\s|\t)*=(\s|\t)*\[.*\]`)
 	packageNameRegEx = regexp.MustCompile(`^[a-zA-Z0-9_\-]+$`)
-	versionRegEx     = regexp.MustCompile(`^[0-9.]+$`)
+	versionRegEx     = regexp.MustCompile(`^[a-zA-Z0-9.]+$`)
 	fileNameVersion  = regexp.MustCompile(`^([\w_.\-]+)-([0-9.]+)$`)
 )
 
-func Parse(r io.Reader, filePath string) ([]types.Library, error) {
-	var libs []types.Library
+func Parse(r io.Reader, filePath string) (types.Library, error) {
+	var lib types.Library
 	scanner := bufio.NewScanner(r)
 	var gemName string
 	var gemVersion string
@@ -33,16 +34,16 @@ func Parse(r io.Reader, filePath string) ([]types.Library, error) {
 		line := scanner.Text()
 		// check if the file is binary or not, if binary return
 		if !utf8.ValidString(line) {
-			return libs, nil
+			return lib, nil
 		}
 		quotesList := bwQuotes.FindStringSubmatch(line)
 		if len(quotesList) > 1 {
 			line = strings.TrimSpace(line)
-			if strings.Contains(line, gemStr) {
+			if gemName == "" && gemNameReg.MatchString(line) {
 				gemName = quotesList[1]
-			} else if strings.Contains(line, gemStrVer) {
+			} else if gemVersion == "" && gemVerReg.MatchString(line) {
 				gemVersion = quotesList[1]
-			} else if strings.Contains(line, gemStrLic) {
+			} else if gemStrLic.MatchString(line) {
 				licenseList := bwQuotes.FindAllStringSubmatch(line, -1)
 				for _, license := range licenseList {
 					licenses = append(licenses, strings.Replace(license[1], " ", "", -1))
@@ -52,53 +53,48 @@ func Parse(r io.Reader, filePath string) ([]types.Library, error) {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, xerrors.Errorf("scan error: %w", err)
+		return lib, xerrors.Errorf("scan error: %w", err)
 	}
-	isVersionFound := false
-	isPkgNameFound := false
-	if packageNameRegEx.MatchString(gemName) {
-		isPkgNameFound = true
-	}
-	if versionRegEx.MatchString(gemVersion) {
-		isVersionFound = true
-	}
-	// If still we did not find the name from file or if package name has special characters,
+
+	// If still we did not find the name from file, if variable are refered in gemspec
 	// try to take the name and version from gemspec file.
 	// Else take name from previous directory
 	dirPath, fileName := filepath.Split(filePath)
-	if !isPkgNameFound || !isVersionFound {
-		packageName := strings.TrimSuffix(fileName, gemSpec)
-		packageNameVersion := fileNameVersion.FindStringSubmatch(packageName)
-		if !isPkgNameFound && len(packageNameVersion) >= 3 && packageNameRegEx.MatchString(packageNameVersion[1]) {
-			isPkgNameFound = true
-			gemName = packageNameVersion[1]
+	if gemName == "" || gemVersion == "" {
+		name, version := getInfoFromDir(strings.TrimSuffix(fileName, gemSpec))
+		if name == "" || version == "" {
+			// refer 1 more previous directory
+			dirs := strings.Split(dirPath, string(os.PathSeparator))
+			if len(dirs) >= 2 {
+				name, version = getInfoFromDir(dirs[len(dirs)-2])
+			}
 		}
-		if !isVersionFound && len(packageNameVersion) >= 3 && versionRegEx.MatchString(packageNameVersion[2]) {
-			isVersionFound = true
-			gemVersion = packageNameVersion[2]
+		if !(name == "" || version == "") {
+			gemName = name
+			gemVersion = version
 		}
 	}
-	// Version is not as per standards then, take the version from directory name.
-	if !isPkgNameFound || !isVersionFound {
 
-		_, prevDirectory := filepath.Split(strings.TrimSuffix(dirPath, "/"))
-		packageNameVersion := fileNameVersion.FindStringSubmatch(prevDirectory)
-		if !isPkgNameFound && len(packageNameVersion) >= 3 && packageNameRegEx.MatchString(packageNameVersion[1]) {
-			isPkgNameFound = true
-			gemName = packageNameVersion[1]
-		}
-		if !isVersionFound && len(packageNameVersion) >= 3 && versionRegEx.MatchString(packageNameVersion[2]) {
-			isVersionFound = true
-			gemVersion = packageNameVersion[2]
-		}
-	}
-	if isPkgNameFound && isVersionFound {
-		libs = append(libs, types.Library{
+	if gemName != "" && gemVersion != "" {
+		lib = types.Library{
 			Name:    gemName,
 			Version: gemVersion,
 			License: strings.Join(licenses, ","),
-		})
+		}
 	}
+	return lib, nil
+}
 
-	return libs, nil
+func getInfoFromDir(dir string) (gemName string, gemVersion string) {
+	// parses dir names like /net-imap-0.1.1
+	packageNameVersion := fileNameVersion.FindStringSubmatch(dir)
+	if len(packageNameVersion) >= 3 {
+		if packageNameRegEx.MatchString(packageNameVersion[1]) {
+			gemName = packageNameVersion[1]
+		}
+		if versionRegEx.MatchString(packageNameVersion[2]) {
+			gemVersion = packageNameVersion[2]
+		}
+	}
+	return
 }
