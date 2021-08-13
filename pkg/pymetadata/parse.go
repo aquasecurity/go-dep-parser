@@ -1,4 +1,4 @@
-package wheel
+package pymetadata
 
 import (
 	"bufio"
@@ -9,9 +9,6 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// Parse parses METADATA file for library Name and Version
-// currently does not parse its possible dependencies
-// https://packaging.python.org/specifications/core-metadata/#requires-dist-multiple-use
 func Parse(r io.Reader) ([]types.Library, error) {
 	var libs []types.Library
 	rd := textproto.NewReader(bufio.NewReader(r))
