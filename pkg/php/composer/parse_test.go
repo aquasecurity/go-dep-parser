@@ -46,27 +46,3 @@ func TestParse(t *testing.T) {
 		})
 	}
 }
-
-func TestParseWordPress(t *testing.T) {
-	vectors := []struct {
-		file string // Test input file
-		want []types.Library
-	}{
-		{
-			file: "testdata/wp-includes/version.php",
-			want: Wordpress,
-		},
-	}
-
-	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
-			f, err := os.Open(v.file)
-			require.NoError(t, err)
-
-			got, err := ParseWordPress(f)
-			require.NoError(t, err)
-
-			assert.Equal(t, v.want, got)
-		})
-	}
-}

@@ -104,9 +104,4 @@ var (
 		{"symfony/symfony", "v4.2.7", ""},
 		{"twig/twig", "v2.9.0", ""},
 	}
-
-	// Simple wordpress resource
-	Wordpress = []types.Library{
-		{"wordpress", "4.9.4-alpha", ""},
-	}
 )

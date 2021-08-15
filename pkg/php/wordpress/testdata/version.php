@@ -8,6 +8,12 @@
  * @since 1.1.0
  */
 
+ // $wp_version = '4.5.6-alpha';
+
+ /* 
+    $wp_version = '4.5.6-alpha';
+ */
+
 /**
  * The WordPress version string.
  *
