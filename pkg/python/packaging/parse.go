@@ -1,27 +1,27 @@
-package pymetadata
+package packaging
 
 import (
 	"bufio"
 	"io"
 	"net/textproto"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-func Parse(r io.Reader) ([]types.Library, error) {
-	var libs []types.Library
+// Parse parses egg and wheel metadata.
+// e.g. .egg-info/PKG-INFO and dist-info/METADATA
+func Parse(r io.Reader) (types.Library, error) {
 	rd := textproto.NewReader(bufio.NewReader(r))
 	h, err := rd.ReadMIMEHeader()
 	if err != nil && err != io.EOF {
-		return libs, xerrors.Errorf("read MIME error: %w", err)
+		return types.Library{}, xerrors.Errorf("read MIME error: %w", err)
 	}
 
-	libs = append(libs, types.Library{
+	return types.Library{
 		Name:    h.Get("Name"),
 		Version: h.Get("Version"),
 		License: h.Get("License"),
-	})
-
-	return libs, nil
+	}, nil
 }
