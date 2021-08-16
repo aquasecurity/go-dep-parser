@@ -24,7 +24,6 @@ func TestParseWordPress(t *testing.T) {
 		},
 		{
 			file:    "testdata/versionFail.php",
-			want:    *new(types.Library),
 			wantErr: "version.php could not be parsed",
 		},
 	}
