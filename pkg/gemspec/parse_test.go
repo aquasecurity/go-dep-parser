@@ -42,9 +42,7 @@ func TestParse(t *testing.T) {
 				t.Fatalf("Open() error: %v", err)
 			}
 			libList, err := Parse(f)
-			if err != nil {
-				t.Fatalf("Parse() error: %v", err)
-			}
+			reruire.NoError(t, err)
 
 			if len(libList) != len(v.libraries) {
 				t.Fatalf("lib length: got %v, want %v", len(libList), len(v.libraries))
