@@ -38,7 +38,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("failed to parse gemspec: %w", err)
 	}
 	return libs, nil
 }
