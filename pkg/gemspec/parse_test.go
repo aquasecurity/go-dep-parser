@@ -42,19 +42,7 @@ func TestParse(t *testing.T) {
 			libList, err := Parse(f)
 			reruire.NoError(t, err)
 
-			if len(libList) != len(v.libraries) {
-				t.Fatalf("lib length: got %v, want %v", len(libList), len(v.libraries))
-			}
-
-			for i, got := range libList {
-				want := v.libraries[i]
-				if want.Name != got.Name {
-					t.Errorf("%d: Name: got %s, want %s", i, got.Name, want.Name)
-				}
-				if want.Version != got.Version {
-					t.Errorf("%d: Version: got %s, want %s", i, got.Version, want.Version)
-				}
-			}
+			assert.Equal(t, v.want, got)
 		})
 	}
 }
