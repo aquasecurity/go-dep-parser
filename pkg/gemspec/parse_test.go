@@ -38,9 +38,7 @@ func TestParse(t *testing.T) {
 	for _, v := range vectors {
 		t.Run(path.Base(v.file), func(t *testing.T) {
 			f, err := os.Open(v.file)
-			if err != nil {
-				t.Fatalf("Open() error: %v", err)
-			}
+			require.NoError(t, err)
 			libList, err := Parse(f)
 			reruire.NoError(t, err)
 
