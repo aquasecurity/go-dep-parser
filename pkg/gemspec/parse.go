@@ -28,8 +28,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		} else {
 			if strings.Contains(line, fmt.Sprintf("%s.name", constructorVar)) {
 				gemspecLib.Name = parseAttributeValue(line)
-			}
-			if strings.Contains(line, fmt.Sprintf("%s.version", constructorVar)) {
+			} else if strings.Contains(line, fmt.Sprintf("%s.version", constructorVar)) {
 				gemspecLib.Version = parseAttributeValue(line)
 			}
 		}
