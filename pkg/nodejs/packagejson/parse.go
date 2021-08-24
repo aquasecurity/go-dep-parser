@@ -3,7 +3,6 @@ package packagejson
 import (
 	"encoding/json"
 	"io"
-	"strings"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
@@ -12,11 +11,10 @@ import (
 type packageJSON struct {
 	Name    string      `json:"name"`
 	Version string      `json:"version"`
-	SHA     string      `json:"_shasum"`
 	License interface{} `json:"license"`
 }
 
-type legacyLicense struct {
+type LegacyLicense struct {
 	Type string `json:"type"`
 	Url  string `json:"url"`
 }
@@ -30,7 +28,7 @@ func Parse(r io.Reader) (types.Library, error) {
 
 	var lib types.Library
 	// the license isn't always a string, check for legacy struct if not string
-	license := parseLicense(data.License)
+	license := ParseLicense(data.License)
 	if data.Name != "" && data.Version != "" {
 		lib = types.Library{
 			Name:    data.Name,
@@ -41,15 +39,10 @@ func Parse(r io.Reader) (types.Library, error) {
 	return lib, nil
 }
 
-func parseLicense(val interface{}) string {
+func ParseLicense(val interface{}) string {
 	license, ok := val.(string)
-	if ok {
-		license = strings.ReplaceAll(license, " OR ", " | ")
-		license = strings.ReplaceAll(license, " AND ", ", ")
-		license = strings.ReplaceAll(license, " WITH ", " with ")
-		license = strings.TrimLeft(license, "SEE LICENSE IN ")
-	} else {
-		legacyLicenseInst, ok := val.(legacyLicense)
+	if !ok {
+		legacyLicenseInst, ok := val.(LegacyLicense)
 		if ok {
 			license = legacyLicenseInst.Type
 		}
