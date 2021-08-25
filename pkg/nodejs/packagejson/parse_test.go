@@ -18,7 +18,7 @@ func TestParse(t *testing.T) {
 		want types.Library
 	}{
 		{
-			file: "package.json",
+			file: "testdata/package.json",
 
 			// docker run --name composer --rm -it node:12-alpine sh
 			// npm init --force

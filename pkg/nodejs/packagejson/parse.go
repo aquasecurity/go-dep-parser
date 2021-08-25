@@ -40,12 +40,11 @@ func Parse(r io.Reader) (types.Library, error) {
 }
 
 func ParseLicense(val interface{}) string {
-	license, ok := val.(string)
-	if !ok {
-		legacyLicenseInst, ok := val.(LegacyLicense)
-		if ok {
-			license = legacyLicenseInst.Type
-		}
+	switch v := val.(type) {
+	case string:
+		return v
+	case LegacyLicense:
+		return v.Type
 	}
-	return license
+	return ""
 }
