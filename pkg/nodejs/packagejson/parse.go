@@ -14,11 +14,6 @@ type packageJSON struct {
 	License interface{} `json:"license"`
 }
 
-type LegacyLicense struct {
-	Type string `json:"type"`
-	Url  string `json:"url"`
-}
-
 func Parse(r io.Reader) (types.Library, error) {
 	var data packageJSON
 	err := json.NewDecoder(r).Decode(&data)
@@ -43,8 +38,10 @@ func ParseLicense(val interface{}) string {
 	switch v := val.(type) {
 	case string:
 		return v
-	case LegacyLicense:
-		return v.Type
+	case map[string]interface{}:
+		if license, ok := v["type"]; ok {
+			return license.(string)
+		}
 	}
 	return ""
 }
