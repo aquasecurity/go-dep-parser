@@ -3,16 +3,11 @@ package wordpress
 import (
 	"bufio"
 	"io"
-	"regexp"
 	"strings"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
-)
 
-var (
-	wpVersionRegex = regexp.MustCompile(`(\$wp_version\s*=\s*['"])(.*)(['"]\s*;)`)
-	commentRegex   = regexp.MustCompile(`(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)`)
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 func Parse(r io.Reader) (lib types.Library, err error) {
@@ -27,11 +22,23 @@ func Parse(r io.Reader) (lib types.Library, err error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if strings.HasPrefix(line, "/*") {
-			continue
+		// Remove comment
+		commentIndex := strings.Index(line, "//")
+		if commentIndex != -1 {
+			line = line[:commentIndex]
 		}
-		if isComment && strings.HasSuffix(line, "*/") {
+
+		line = strings.TrimSpace(line)
+
+		// Handle comment
+		switch {
+		case strings.HasPrefix(line, "/*"):
+			isComment = true
+			continue
+		case isComment && strings.HasSuffix(line, "*/"):
 			isComment = false
+			continue
+		case isComment:
 			continue
 		}
 
@@ -44,21 +51,28 @@ func Parse(r io.Reader) (lib types.Library, err error) {
 		if len(ss) != 2 || strings.TrimSpace(ss[0]) != "$wp_version" {
 			continue
 		}
+
+		// Each variable must end with ";".
 		end := strings.Index(ss[1], ";")
 		if end == -1 {
 			continue
 		}
 
-		version = strings.Trim(strings.TrimSpace(ss[1][0:end]), `'"`)
+		// Remove ";" and white space.
+		version = strings.TrimSpace(ss[1][:end])
+
+		// Remove single and double quotes.
+		version = strings.Trim(version, `'"`)
+
 		break
 	}
-	if err := scanner.Err(); err != nil || version == "" {
+
+	if err = scanner.Err(); err != nil || version == "" {
 		return types.Library{}, xerrors.New("version.php could not be parsed")
 	}
 
 	return types.Library{
 		Name:    "wordpress",
 		Version: version,
-		License: "",
 	}, nil
 }

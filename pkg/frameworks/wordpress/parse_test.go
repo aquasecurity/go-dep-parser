@@ -18,9 +18,11 @@ func TestParseWordPress(t *testing.T) {
 		wantErr string
 	}{
 		{
-			file:    "testdata/version.php",
-			want:    types.Library{"wordpress", "4.9.4-alpha", ""},
-			wantErr: "",
+			file: "testdata/version.php",
+			want: types.Library{
+				Name:    "wordpress",
+				Version: "4.9.4-alpha",
+			},
 		},
 		{
 			file:    "testdata/versionFail.php",
@@ -35,12 +37,13 @@ func TestParseWordPress(t *testing.T) {
 
 			got, err := Parse(f)
 			if tt.wantErr != "" {
-				require.NotNil(t, err)
+				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.wantErr)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, tt.want, got)
+				return
 			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
