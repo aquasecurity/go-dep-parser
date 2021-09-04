@@ -53,7 +53,7 @@ func TestParse(t *testing.T) {
 			// npm install --save promise jquery
 			// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\"},\n")}'
 			want:    types.Library{},
-			wantErr: "decode error: ",
+			wantErr: "JSON decode error",
 		},
 	}
 
@@ -64,7 +64,7 @@ func TestParse(t *testing.T) {
 
 			got, err := packagejson.Parse(f)
 			if v.wantErr != "" {
-				require.NotNil(t, err)
+				require.Error(t, err)
 				assert.Contains(t, err.Error(), v.wantErr)
 				return
 			}

@@ -18,23 +18,22 @@ func Parse(r io.Reader) (types.Library, error) {
 	var data packageJSON
 	err := json.NewDecoder(r).Decode(&data)
 	if err != nil {
-		return types.Library{}, xerrors.Errorf("decode error: %w", err)
+		return types.Library{}, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
-	var lib types.Library
-	// the license isn't always a string, check for legacy struct if not string
-	license := ParseLicense(data.License)
-	if data.Name != "" && data.Version != "" {
-		lib = types.Library{
-			Name:    data.Name,
-			Version: data.Version,
-			License: license,
-		}
+	if data.Name == "" || data.Version == "" {
+		return types.Library{}, xerrors.Errorf("unable to parse package.json: %w", err)
 	}
-	return lib, nil
+
+	return types.Library{
+		Name:    data.Name,
+		Version: data.Version,
+		License: parseLicense(data.License),
+	}, nil
 }
 
-func ParseLicense(val interface{}) string {
+func parseLicense(val interface{}) string {
+	// the license isn't always a string, check for legacy struct if not string
 	switch v := val.(type) {
 	case string:
 		return v
