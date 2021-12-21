@@ -47,8 +47,6 @@ func (p pom) projectProperties() map[string]string {
 		projectProperties[k] = v
 	}
 
-	fmt.Println(projectProperties)
-
 	return projectProperties
 }
 
