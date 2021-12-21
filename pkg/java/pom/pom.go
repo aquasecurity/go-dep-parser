@@ -145,11 +145,49 @@ type pomDependencies struct {
 
 type pomDependency struct {
 	Text       string `xml:",chardata"`
-	GroupId    string `xml:"groupId"`
-	ArtifactId string `xml:"artifactId"`
+	GroupID    string `xml:"groupId"`
+	ArtifactID string `xml:"artifactId"`
 	Version    string `xml:"version"`
 	Scope      string `xml:"scope"`
 	Optional   bool   `xml:"optional"`
+}
+
+func (d pomDependency) Name() string {
+	return fmt.Sprintf("%s:%s", d.GroupID, d.ArtifactID)
+}
+
+// Resolve evaluates variables in the dependency and inherit some fields from dependencyManagement to the dependency.
+func (d pomDependency) Resolve(props map[string]string, depManagement map[string]pomDependency) pomDependency {
+	// Evaluate variables
+	dep := pomDependency{
+		Text:       d.Text,
+		GroupID:    evaluateVariable(d.GroupID, props),
+		ArtifactID: evaluateVariable(d.ArtifactID, props),
+		Version:    evaluateVariable(d.Version, props),
+		Scope:      evaluateVariable(d.Scope, props),
+		Optional:   d.Optional,
+	}
+
+	// Inherit version, scope and optional from dependencyManagement
+	if managed, ok := depManagement[d.Name()]; ok {
+		if dep.Version == "" {
+			dep.Version = evaluateVariable(managed.Version, props)
+		}
+		if dep.Scope == "" {
+			dep.Scope = evaluateVariable(managed.Scope, props)
+		}
+		// TODO: need to check the behavior
+		if !dep.Optional {
+			dep.Optional = managed.Optional
+		}
+	}
+	return dep
+}
+
+// ToArtifact converts dependency to artifact.
+// It should be called after calling Resolve() so that variables can be evaluated.
+func (d pomDependency) ToArtifact() artifact {
+	return newArtifact(d.GroupID, d.ArtifactID, d.Version, nil)
 }
 
 type properties map[string]string

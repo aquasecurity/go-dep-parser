@@ -211,7 +211,7 @@ type analysisResult struct {
 	filePath             string
 	artifact             artifact
 	dependencies         []artifact
-	dependencyManagement map[string]string
+	dependencyManagement map[string]pomDependency
 	properties           map[string]string
 	modules              []string
 }
@@ -238,7 +238,7 @@ func (p *parser) analyze(pom *pom) (analysisResult, error) {
 
 	// Extract and merge dependencies under "dependencyManagement"
 	depManagement := p.dependencyManagement(pom.content.DependencyManagement.Dependencies.Dependency, props)
-	depManagement = utils.MergeMaps(parent.dependencyManagement, depManagement)
+	depManagement = p.mergeDependencyManagement(parent.dependencyManagement, depManagement)
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
 	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement)
@@ -254,32 +254,34 @@ func (p *parser) analyze(pom *pom) (analysisResult, error) {
 	}, nil
 }
 
-func resolveDependency(dep pomDependency, props properties, depManagement map[string]string) artifact {
-	art := newArtifact(dep.GroupId, dep.ArtifactId, dep.Version, props)
-	if art.Version.String() == "" {
-		if ver, ok := depManagement[art.name()]; ok {
-			art.Version = newVersion(ver)
-		}
-	}
-	return art
-}
-
-func (p parser) dependencyManagement(deps []pomDependency, props properties) map[string]string {
-	depManagement := map[string]string{}
+func (p parser) dependencyManagement(deps []pomDependency, props properties) map[string]pomDependency {
+	depManagement := map[string]pomDependency{}
 	for _, d := range deps {
-		art := newArtifact(d.GroupId, d.ArtifactId, d.Version, props)
+		// Evaluate variables
+		d = d.Resolve(props, nil)
 
 		// https://howtodoinjava.com/maven/maven-dependency-scopes/#import
 		if d.Scope == "import" {
+			art := newArtifact(d.GroupID, d.ArtifactID, d.Version, props)
 			result, err := p.resolve(art)
 			if err == nil {
-				depManagement = utils.MergeMaps(depManagement, result.dependencyManagement)
+				depManagement = p.mergeDependencyManagement(depManagement, result.dependencyManagement)
 			}
 			continue
 		}
-		depManagement[art.name()] = art.Version.String()
+		depManagement[d.Name()] = d
 	}
 	return depManagement
+}
+
+func (p parser) mergeDependencyManagement(a, b map[string]pomDependency) map[string]pomDependency {
+	if a == nil {
+		return b
+	}
+	for key, value := range b {
+		a[key] = value
+	}
+	return a
 }
 
 func (p parser) parseParent(currentPath string, parent pomParent) (analysisResult, error) {
@@ -360,13 +362,16 @@ func (p parser) tryRelativePath(parentArtifact artifact, currentPath, relativePa
 	return pom, nil
 }
 
-func (p parser) parseDependencies(deps []pomDependency, props, depManagement map[string]string) []artifact {
+func (p parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement map[string]pomDependency) []artifact {
 	var dependencies []artifact
 	for _, d := range deps {
+		// Resolve dependencies
+		d = d.Resolve(props, depManagement)
+
 		if (d.Scope != "" && d.Scope != "compile") || d.Optional {
 			continue
 		}
-		dependencies = append(dependencies, resolveDependency(d, props, depManagement))
+		dependencies = append(dependencies, d.ToArtifact())
 	}
 	return dependencies
 }
