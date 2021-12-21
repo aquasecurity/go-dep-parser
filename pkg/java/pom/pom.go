@@ -6,6 +6,8 @@ import (
 	"io"
 	"reflect"
 	"strings"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
 
 type pom struct {
@@ -15,7 +17,7 @@ type pom struct {
 
 func (p *pom) merge(result analysisResult) {
 	// Merge properties
-	p.content.Properties = mergeMaps(result.properties, p.content.Properties)
+	p.content.Properties = utils.MergeMaps(result.properties, p.content.Properties)
 
 	art := p.artifact().inherit(result.artifact)
 
@@ -26,7 +28,7 @@ func (p *pom) merge(result analysisResult) {
 
 func (p pom) properties() properties {
 	props := p.content.Properties
-	return mergeMaps(props, p.projectProperties())
+	return utils.MergeMaps(props, p.projectProperties())
 }
 
 func (p pom) projectProperties() map[string]string {

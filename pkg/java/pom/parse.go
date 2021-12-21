@@ -16,20 +16,50 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
 
 const (
 	centralURL = "https://repo.maven.apache.org/maven2/"
 )
 
+type options struct {
+	offline     bool
+	remoteRepos []string
+}
+
+type option func(*options)
+
+func WithOffline(offline bool) option {
+	return func(opts *options) {
+		opts.offline = offline
+	}
+}
+
+func WithRemoteRepos(repos []string) option {
+	return func(opts *options) {
+		opts.remoteRepos = repos
+	}
+}
+
 type parser struct {
 	rootPath           string
 	cache              pomCache
 	localRepository    string
 	remoteRepositories []string
+	offline            bool
 }
 
-func newParser(filePath string) *parser {
+func NewParser(filePath string, opts ...option) *parser {
+	o := &options{
+		offline:     false,
+		remoteRepos: []string{centralURL},
+	}
+
+	for _, opt := range opts {
+		opt(o)
+	}
+
 	s := readSettings()
 	localRepository := s.LocalRepository
 	if localRepository == "" {
@@ -41,7 +71,8 @@ func newParser(filePath string) *parser {
 		rootPath:           filepath.Clean(filePath),
 		cache:              newPOMCache(),
 		localRepository:    localRepository,
-		remoteRepositories: []string{centralURL},
+		remoteRepositories: o.remoteRepos,
+		offline:            o.offline,
 	}
 }
 
@@ -119,8 +150,11 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, error) {
 		// Resolve transitive dependencies later
 		queue.enqueue(result.dependencies...)
 
-		// Override the version
-		uniqArtifacts[art.name()] = art.Version
+		// Offline mode may be missing some fields.
+		if !art.isEmpty() {
+			// Override the version
+			uniqArtifacts[art.name()] = art.Version
+		}
 	}
 
 	// Convert to []types.Library
@@ -188,7 +222,7 @@ func (p *parser) analyze(pom *pom) (analysisResult, error) {
 	}
 
 	// Update remoteRepositories
-	p.remoteRepositories = unique(append(p.remoteRepositories, pom.repositories()...))
+	p.remoteRepositories = utils.UniqueStrings(append(p.remoteRepositories, pom.repositories()...))
 
 	// Parent
 	parent, err := p.parseParent(pom.filePath, pom.content.Parent)
@@ -204,7 +238,7 @@ func (p *parser) analyze(pom *pom) (analysisResult, error) {
 
 	// Extract and merge dependencies under "dependencyManagement"
 	depManagement := p.dependencyManagement(pom.content.DependencyManagement.Dependencies.Dependency, props)
-	depManagement = mergeMaps(parent.dependencyManagement, depManagement)
+	depManagement = utils.MergeMaps(parent.dependencyManagement, depManagement)
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
 	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement)
@@ -239,7 +273,7 @@ func (p parser) dependencyManagement(deps []pomDependency, props properties) map
 		if d.Scope == "import" {
 			result, err := p.resolve(art)
 			if err == nil {
-				depManagement = mergeMaps(depManagement, result.dependencyManagement)
+				depManagement = utils.MergeMaps(depManagement, result.dependencyManagement)
 			}
 			continue
 		}
@@ -248,8 +282,7 @@ func (p parser) dependencyManagement(deps []pomDependency, props properties) map
 	return depManagement
 }
 
-func (p parser) parseParent(currentPath string, parent pomParent) (
-	analysisResult, error) {
+func (p parser) parseParent(currentPath string, parent pomParent) (analysisResult, error) {
 	// Pass nil properties so that variables in <parent> are not evaluated.
 	target := newArtifact(parent.GroupId, parent.ArtifactId, parent.Version, nil)
 	if target.isEmpty() {
@@ -406,6 +439,11 @@ func (p parser) loadPOMFromLocalRepository(paths []string) (*pom, error) {
 }
 
 func (p parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
+	// Do not try fetching pom.xml from remote repositories in offline mode
+	if p.offline {
+		return nil, nil
+	}
+
 	// try all remoteRepositories
 	for _, repo := range p.remoteRepositories {
 		repoURL, err := url.Parse(repo)

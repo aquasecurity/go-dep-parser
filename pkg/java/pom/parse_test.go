@@ -1,26 +1,26 @@
-package pom
+package pom_test
 
 import (
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/aquasecurity/go-dep-parser/pkg/java/pom"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-func TestParse(t *testing.T) {
+func TestPom_Parse(t *testing.T) {
 	tests := []struct {
 		name      string
 		inputFile string
 		local     bool
+		offline   bool
 		want      []types.Library
 		wantErr   string
 	}{
@@ -51,6 +51,18 @@ func TestParse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "offline mode",
+			inputFile: filepath.Join("testdata", "offline", "pom.xml"),
+			local:     false,
+			offline:   true,
+			want: []types.Library{
+				{
+					Name:    "org.example:example-offline",
+					Version: "2.3.4",
 				},
 			},
 		},
@@ -256,30 +268,15 @@ func TestParse(t *testing.T) {
 			var remoteRepos []string
 			if tt.local {
 				// for local repository
-				os.Setenv("MAVEN_HOME", "testdata")
-				defer os.Unsetenv("MAVEN_HOME")
+				t.Setenv("MAVEN_HOME", "testdata")
 			} else {
 				// for remote repository
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					paths := strings.Split(r.URL.Path, "/")
-					filePath := filepath.Join(paths...)
-					filePath = filepath.Join("testdata", "repository", filePath)
-
-					f, err = os.Open(filePath)
-					if err != nil {
-						http.NotFound(w, r)
-						return
-					}
-					defer f.Close()
-
-					_, err = io.Copy(w, f)
-					require.NoError(t, err)
-				}))
+				h := http.FileServer(http.Dir(filepath.Join("testdata", "repository")))
+				ts := httptest.NewServer(h)
 				remoteRepos = []string{ts.URL}
 			}
 
-			p := newParser(tt.inputFile)
-			p.remoteRepositories = remoteRepos
+			p := pom.NewParser(tt.inputFile, pom.WithRemoteRepos(remoteRepos), pom.WithOffline(tt.offline))
 
 			got, err := p.Parse(f)
 			if tt.wantErr != "" {
@@ -287,7 +284,7 @@ func TestParse(t *testing.T) {
 				assert.Contains(t, err.Error(), tt.wantErr)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			sort.Slice(got, func(i, j int) bool {
 				return got[i].Name < got[j].Name
