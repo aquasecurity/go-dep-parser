@@ -195,6 +195,25 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
+			name:      "exclusions",
+			inputFile: filepath.Join("testdata", "exclusions", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:exclusions",
+					Version: "3.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
+				{
+					Name:    "org.example:example-nested",
+					Version: "3.3.3",
+				},
+			},
+		},
+		{
 			name:      "multi module",
 			inputFile: filepath.Join("testdata", "multi-module", "pom.xml"),
 			local:     true,

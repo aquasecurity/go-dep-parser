@@ -89,7 +89,7 @@ func (p *parser) Parse(r io.Reader) ([]types.Library, error) {
 	}
 
 	// Analyze root POM
-	result, err := p.analyze(root)
+	result, err := p.analyze(root, nil)
 	if err != nil {
 		return nil, xerrors.Errorf("analyze error (%s): %w", p.rootPath, err)
 	}
@@ -127,7 +127,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, error) {
 		}
 
 		// For soft requirements, skip dependency resolution that has already been resolved.
-		if v, ok := uniqArtifacts[art.name()]; ok {
+		if v, ok := uniqArtifacts[art.Name()]; ok {
 			if !v.shouldOverride(art.Version) {
 				continue
 			}
@@ -152,9 +152,9 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, error) {
 		queue.enqueue(result.dependencies...)
 
 		// Offline mode may be missing some fields.
-		if !art.isEmpty() {
+		if !art.IsEmpty() {
 			// Override the version
-			uniqArtifacts[art.name()] = art.Version
+			uniqArtifacts[art.Name()] = art.Version
 		}
 	}
 
@@ -176,7 +176,7 @@ func (p *parser) parseModule(currentPath, relativePath string) (artifact, error)
 		return artifact{}, xerrors.Errorf("unable to open the relative path: %w", err)
 	}
 
-	result, err := p.analyze(module)
+	result, err := p.analyze(module, nil)
 	if err != nil {
 		return artifact{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -199,7 +199,7 @@ func (p *parser) resolve(art artifact) (analysisResult, error) {
 	if err != nil {
 		log.Logger.Debug(err)
 	}
-	result, err := p.analyze(pomContent)
+	result, err := p.analyze(pomContent, art.Exclusions)
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -217,7 +217,7 @@ type analysisResult struct {
 	modules              []string
 }
 
-func (p *parser) analyze(pom *pom) (analysisResult, error) {
+func (p *parser) analyze(pom *pom, exclusions map[string]struct{}) (analysisResult, error) {
 	if pom == nil || pom.content == nil {
 		return analysisResult{}, nil
 	}
@@ -231,8 +231,8 @@ func (p *parser) analyze(pom *pom) (analysisResult, error) {
 		return analysisResult{}, xerrors.Errorf("parent error: %w", err)
 	}
 
-	// Merge parent
-	pom.merge(parent)
+	// Inherit values/properties from parent
+	pom.inherit(parent)
 
 	// Generate properties
 	props := pom.properties()
@@ -242,8 +242,8 @@ func (p *parser) analyze(pom *pom) (analysisResult, error) {
 	depManagement = p.mergeDependencyManagement(parent.dependencyManagement, depManagement)
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
-	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement)
-	deps = append(deps, parent.dependencies...)
+	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, exclusions)
+	deps = p.mergeDependencies(parent.dependencies, deps, exclusions)
 
 	return analysisResult{
 		filePath:             pom.filePath,
@@ -285,10 +285,49 @@ func (p parser) mergeDependencyManagement(a, b map[string]pomDependency) map[str
 	return a
 }
 
+func (p parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement map[string]pomDependency,
+	exclusions map[string]struct{}) []artifact {
+	var dependencies []artifact
+	for _, d := range deps {
+		// Resolve dependencies
+		d = d.Resolve(props, depManagement)
+
+		if (d.Scope != "" && d.Scope != "compile") || d.Optional {
+			continue
+		}
+		dependencies = append(dependencies, d.ToArtifact(exclusions))
+	}
+	return dependencies
+}
+
+func (p parser) mergeDependencies(parent, child []artifact, exclusions map[string]struct{}) []artifact {
+	unique := map[string]artifact{}
+	for _, d := range child {
+		if _, ok := exclusions[d.Name()]; ok {
+			continue
+		}
+		unique[d.Name()] = d
+	}
+	for _, d := range parent {
+		if _, ok := exclusions[d.Name()]; ok {
+			continue
+		}
+		if _, ok := unique[d.Name()]; !ok {
+			unique[d.Name()] = d
+		}
+	}
+
+	var deps []artifact
+	for _, d := range unique {
+		deps = append(deps, d)
+	}
+	return deps
+}
+
 func (p parser) parseParent(currentPath string, parent pomParent) (analysisResult, error) {
 	// Pass nil properties so that variables in <parent> are not evaluated.
 	target := newArtifact(parent.GroupId, parent.ArtifactId, parent.Version, nil)
-	if target.isEmpty() {
+	if target.IsEmpty() {
 		return analysisResult{}, nil
 	}
 
@@ -302,7 +341,7 @@ func (p parser) parseParent(currentPath string, parent pomParent) (analysisResul
 		log.Logger.Debugf("parent POM not found: %s", err)
 	}
 
-	result, err := p.analyze(parentPOM)
+	result, err := p.analyze(parentPOM, nil)
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -351,30 +390,16 @@ func (p parser) tryRelativePath(parentArtifact artifact, currentPath, relativePa
 		return nil, err
 	}
 
-	result, err := p.analyze(pom)
+	result, err := p.analyze(pom, nil)
 	if err != nil {
 		return nil, xerrors.Errorf("analyze error: %w", err)
 	}
 
-	if !parentArtifact.equal(result.artifact) {
+	if !parentArtifact.Equal(result.artifact) {
 		return nil, xerrors.New("'parent.relativePath' points at wrong local POM")
 	}
 
 	return pom, nil
-}
-
-func (p parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement map[string]pomDependency) []artifact {
-	var dependencies []artifact
-	for _, d := range deps {
-		// Resolve dependencies
-		d = d.Resolve(props, depManagement)
-
-		if (d.Scope != "" && d.Scope != "compile") || d.Optional {
-			continue
-		}
-		dependencies = append(dependencies, d.ToArtifact())
-	}
-	return dependencies
 }
 
 func (p parser) openRelativePom(currentPath, relativePath string) (*pom, error) {

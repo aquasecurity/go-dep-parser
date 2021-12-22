@@ -16,6 +16,7 @@ type artifact struct {
 	ArtifactID string
 	Version    version
 	Module     bool
+	Exclusions map[string]struct{}
 }
 
 func newArtifact(groupID, artifactID, version string, props map[string]string) artifact {
@@ -26,15 +27,15 @@ func newArtifact(groupID, artifactID, version string, props map[string]string) a
 	}
 }
 
-func (a artifact) isEmpty() bool {
+func (a artifact) IsEmpty() bool {
 	return a.GroupID == "" || a.ArtifactID == "" || a.Version.String() == ""
 }
 
-func (a artifact) equal(o artifact) bool {
+func (a artifact) Equal(o artifact) bool {
 	return a.GroupID == o.GroupID || a.ArtifactID == o.ArtifactID || a.Version.String() == o.Version.String()
 }
 
-func (a artifact) inherit(parent artifact) artifact {
+func (a artifact) Inherit(parent artifact) artifact {
 	// inherited from a parent
 	if a.GroupID == "" {
 		a.GroupID = parent.GroupID
@@ -46,12 +47,12 @@ func (a artifact) inherit(parent artifact) artifact {
 	return a
 }
 
-func (a artifact) name() string {
+func (a artifact) Name() string {
 	return fmt.Sprintf("%s:%s", a.GroupID, a.ArtifactID)
 }
 
 func (a artifact) String() string {
-	return fmt.Sprintf("%s:%s", a.name(), a.Version)
+	return fmt.Sprintf("%s:%s", a.Name(), a.Version)
 }
 
 type version struct {

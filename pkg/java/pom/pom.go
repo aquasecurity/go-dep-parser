@@ -15,11 +15,11 @@ type pom struct {
 	content  *pomXML
 }
 
-func (p *pom) merge(result analysisResult) {
+func (p *pom) inherit(result analysisResult) {
 	// Merge properties
 	p.content.Properties = utils.MergeMaps(result.properties, p.content.Properties)
 
-	art := p.artifact().inherit(result.artifact)
+	art := p.artifact().Inherit(result.artifact)
 
 	p.content.GroupId = art.GroupID
 	p.content.ArtifactId = art.ArtifactID
@@ -150,6 +150,16 @@ type pomDependency struct {
 	Version    string `xml:"version"`
 	Scope      string `xml:"scope"`
 	Optional   bool   `xml:"optional"`
+	Exclusions []struct {
+		Text      string       `xml:",chardata"`
+		Exclusion pomExclusion `xml:"exclusion"`
+	} `xml:"exclusions"`
+}
+
+// ref. https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html
+type pomExclusion struct {
+	GroupID    string `xml:"groupId"`
+	ArtifactID string `xml:"artifactId"`
 }
 
 func (d pomDependency) Name() string {
@@ -166,6 +176,7 @@ func (d pomDependency) Resolve(props map[string]string, depManagement map[string
 		Version:    evaluateVariable(d.Version, props),
 		Scope:      evaluateVariable(d.Scope, props),
 		Optional:   d.Optional,
+		Exclusions: d.Exclusions,
 	}
 
 	// Inherit version, scope and optional from dependencyManagement
@@ -180,14 +191,28 @@ func (d pomDependency) Resolve(props map[string]string, depManagement map[string
 		if !dep.Optional {
 			dep.Optional = managed.Optional
 		}
+		if len(dep.Exclusions) == 0 {
+			dep.Exclusions = managed.Exclusions
+		}
 	}
 	return dep
 }
 
 // ToArtifact converts dependency to artifact.
 // It should be called after calling Resolve() so that variables can be evaluated.
-func (d pomDependency) ToArtifact() artifact {
-	return newArtifact(d.GroupID, d.ArtifactID, d.Version, nil)
+func (d pomDependency) ToArtifact(exclusions map[string]struct{}) artifact {
+	if exclusions == nil {
+		exclusions = map[string]struct{}{}
+	}
+	for _, e := range d.Exclusions {
+		exclusions[fmt.Sprintf("%s:%s", e.Exclusion.GroupID, e.Exclusion.ArtifactID)] = struct{}{}
+	}
+	return artifact{
+		GroupID:    d.GroupID,
+		ArtifactID: d.ArtifactID,
+		Version:    newVersion(d.Version),
+		Exclusions: exclusions,
+	}
 }
 
 type properties map[string]string
