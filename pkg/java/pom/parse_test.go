@@ -244,13 +244,31 @@ func TestPom_Parse(t *testing.T) {
 			name:      "parent not found",
 			inputFile: filepath.Join("testdata", "not-found-parent", "pom.xml"),
 			local:     true,
-			wantErr:   "com.example:parent:1.0.0 was not found in local/remote repositories",
+			want: []types.Library{
+				{
+					Name:    "com.example:no-parent",
+					Version: "1.0-SNAPSHOT",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
 		},
 		{
 			name:      "dependency not found",
 			inputFile: filepath.Join("testdata", "not-found-dependency", "pom.xml"),
 			local:     true,
-			wantErr:   "org.example:example-not-found:999 was not found in local/remote repositories",
+			want: []types.Library{
+				{
+					Name:    "com.example:not-found-dependency",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-not-found",
+					Version: "999",
+				},
+			},
 		},
 		{
 			name:      "module not found",

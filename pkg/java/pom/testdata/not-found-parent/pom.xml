@@ -2,9 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sad</artifactId>
+    <groupId>com.example</groupId>
+    <artifactId>no-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
-    <name>sad</name>
+    <name>no-parent</name>
     <description>Parent not found</description>
 
     <parent>
@@ -25,7 +27,7 @@
         <dependency>
             <groupId>org.example</groupId>
             <artifactId>example-api</artifactId>
-            <version>${api.version}</version>
+            <version>1.7.30</version>
         </dependency>
     </dependencies>
 </project>

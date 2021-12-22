@@ -15,6 +15,7 @@ import (
 	"golang.org/x/net/html/charset"
 	"golang.org/x/xerrors"
 
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
@@ -196,7 +197,7 @@ func (p *parser) resolve(art artifact) (analysisResult, error) {
 
 	pomContent, err := p.tryRepository(art.GroupID, art.ArtifactID, art.Version.String())
 	if err != nil {
-		return analysisResult{}, xerrors.Errorf("%s not found: %w", art, err)
+		log.Logger.Debug(err)
 	}
 	result, err := p.analyze(pomContent)
 	if err != nil {
@@ -298,7 +299,7 @@ func (p parser) parseParent(currentPath string, parent pomParent) (analysisResul
 
 	parentPOM, err := p.retrieveParent(currentPath, parent.RelativePath, target)
 	if err != nil {
-		return analysisResult{}, xerrors.Errorf("parent POM not found: %w", err)
+		log.Logger.Debugf("parent POM not found: %s", err)
 	}
 
 	result, err := p.analyze(parentPOM)
@@ -446,7 +447,8 @@ func (p parser) loadPOMFromLocalRepository(paths []string) (*pom, error) {
 func (p parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
 	// Do not try fetching pom.xml from remote repositories in offline mode
 	if p.offline {
-		return nil, nil
+		log.Logger.Debug("Fetching the remote pom.xml is skipped")
+		return nil, xerrors.New("offline mode")
 	}
 
 	// try all remoteRepositories
