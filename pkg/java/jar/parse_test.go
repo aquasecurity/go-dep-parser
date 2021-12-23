@@ -171,11 +171,8 @@ func TestParse(t *testing.T) {
 			stat, err := f.Stat()
 			require.NoError(t, err)
 
-			options := []jar.Option{jar.WithURL(ts.URL), jar.WithFilePath(v.file), jar.WithHTTPClient(ts.Client())}
-			if v.offline {
-				options = append(options, jar.WithOffline())
-			}
-			got, err := jar.Parse(f, stat.Size(), options...)
+			got, err := jar.Parse(f, stat.Size(), jar.WithURL(ts.URL), jar.WithFilePath(v.file),
+				jar.WithHTTPClient(ts.Client()), jar.WithOffline(v.offline))
 			require.NoError(t, err)
 
 			sort.Slice(got, func(i, j int) bool {

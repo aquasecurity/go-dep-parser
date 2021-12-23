@@ -65,9 +65,9 @@ func WithHTTPClient(client *http.Client) Option {
 	}
 }
 
-func WithOffline() Option {
+func WithOffline(offline bool) Option {
 	return func(c *conf) {
-		c.offline = true
+		c.offline = offline
 	}
 
 }
