@@ -143,11 +143,12 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 
 	manifestProps := m.properties()
 	if c.offline {
-		// In the offline mode, we will not check if the artifact information is correct.
-		if manifestProps.valid() {
-			libs = append(libs, manifestProps.library())
+		// In offline mode, we will not check if the artifact information is correct.
+		if !manifestProps.valid() {
+			log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
+			return libs, nil
 		}
-		return libs, nil
+		return append(libs, manifestProps.library()), nil
 	}
 
 	if manifestProps.valid() {
