@@ -16,10 +16,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
+	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
@@ -63,7 +64,7 @@ func WithHTTPClient(client *http.Client) Option {
 	}
 }
 
-func Parse(f *os.File, opts ...Option) ([]types.Library, error) {
+func Parse(r dio.ReadSeekerAt, size int64, opts ...Option) ([]types.Library, error) {
 	// for HTTP retry
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = logger{}
@@ -80,27 +81,13 @@ func Parse(f *os.File, opts ...Option) ([]types.Library, error) {
 		opt(&c)
 	}
 
-	return parseArtifact(c, c.rootFilePath, f)
+	return parseArtifact(c, c.rootFilePath, r, size)
 }
 
-func newZipReader(f *os.File) (*zip.Reader, error) {
-	stat, err := f.Stat()
-	if err != nil {
-		return nil, xerrors.Errorf("file stat error: %w", err)
-	}
-
-	zr, err := zip.NewReader(f, stat.Size())
-	if err != nil {
-		return nil, xerrors.Errorf("zip error: %w", err)
-	}
-
-	return zr, nil
-}
-
-func parseArtifact(c conf, fileName string, f *os.File) ([]types.Library, error) {
+func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]types.Library, error) {
 	log.Logger.Debugw("Parsing Java artifacts...", zap.String("file", fileName))
 
-	zr, err := newZipReader(f)
+	zr, err := zip.NewReader(r, size)
 	if err != nil {
 		return nil, xerrors.Errorf("zip error: %w", err)
 	}
@@ -157,7 +144,7 @@ func parseArtifact(c conf, fileName string, f *os.File) ([]types.Library, error)
 	}
 
 	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
-	p, err := searchBySHA1(c, f)
+	p, err := searchBySHA1(c, r)
 	if err == nil {
 		return append(libs, p.library()), nil
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
@@ -206,7 +193,7 @@ func parseInnerJar(c conf, zf *zip.File) ([]types.Library, error) {
 	}
 
 	// Parse jar/war/ear recursively
-	innerLibs, err := parseArtifact(c, zf.Name, f)
+	innerLibs, err := parseArtifact(c, zf.Name, f, int64(zf.UncompressedSize64))
 	if err != nil {
 		return nil, xerrors.Errorf("failed to parse %s: %w", zf.Name, err)
 	}
@@ -449,13 +436,13 @@ func exists(c conf, p properties) (bool, error) {
 	return res.Response.NumFound > 0, nil
 }
 
-func searchBySHA1(c conf, f *os.File) (properties, error) {
-	if _, err := f.Seek(0, io.SeekStart); err != nil {
+func searchBySHA1(c conf, r io.ReadSeeker) (properties, error) {
+	if _, err := r.Seek(0, io.SeekStart); err != nil {
 		return properties{}, xerrors.Errorf("file seek error: %w", err)
 	}
 
 	h := sha1.New()
-	if _, err := io.Copy(h, f); err != nil {
+	if _, err := io.Copy(h, r); err != nil {
 		return properties{}, xerrors.Errorf("unable to calculate SHA-1: %w", err)
 	}
 	digest := hex.EncodeToString(h.Sum(nil))
