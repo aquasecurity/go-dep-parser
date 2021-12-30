@@ -116,7 +116,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 			if err != nil {
 				return nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
-			libs = append(libs, props.library())
+			libs = append(libs, props.library(fileName))
 
 			// Check if the pom.properties is for the original JAR/WAR/EAR
 			if fileProps.artifactID == props.artifactID && fileProps.version == props.version {
@@ -148,7 +148,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 			log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
 			return libs, nil
 		}
-		return append(libs, manifestProps.library()), nil
+		return append(libs, manifestProps.library(fileName)), nil
 	}
 
 	if manifestProps.valid() {
@@ -156,14 +156,14 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 		// We have to make sure that the artifact exists actually.
 		if ok, _ := exists(c, manifestProps); ok {
 			// If groupId and artifactId are valid, they will be returned.
-			return append(libs, manifestProps.library()), nil
+			return append(libs, manifestProps.library(fileName)), nil
 		}
 	}
 
 	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
 	p, err := searchBySHA1(c, r)
 	if err == nil {
-		return append(libs, p.library()), nil
+		return append(libs, p.library(fileName)), nil
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
 		return nil, xerrors.Errorf("failed to search by SHA1: %w", err)
 	}
@@ -181,7 +181,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 	if err == nil {
 		log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
 			zap.String("artifact", fileProps.String()))
-		libs = append(libs, fileProps.library())
+		libs = append(libs, fileProps.library(fileName))
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
 		return nil, xerrors.Errorf("failed to search by artifact id: %w", err)
 	}
@@ -271,7 +271,8 @@ func parsePomProperties(f *zip.File) (properties, error) {
 	return p, nil
 }
 
-func (p properties) library() types.Library {
+func (p properties) library(source string) types.Library {
+	log.Logger.Debugw("library...", zap.String("groupID", p.groupID), zap.String("artifactID", p.artifactID), zap.String("version", p.version), zap.String("containedIn", source))
 	return types.Library{
 		Name:    fmt.Sprintf("%s:%s", p.groupID, p.artifactID),
 		Version: p.version,
