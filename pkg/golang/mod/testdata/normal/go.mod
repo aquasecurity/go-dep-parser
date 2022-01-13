@@ -156,7 +156,3 @@ require (
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-exclude (
-	sigs.k8s.io/yaml v1.3.0
-)
