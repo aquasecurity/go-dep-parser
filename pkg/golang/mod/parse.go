@@ -1,10 +1,11 @@
 package mod
 
 import (
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"io"
 
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/mod/modfile"
+	"golang.org/x/xerrors"
 )
 
 // Parse parses a go.mod file
@@ -14,7 +15,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 
 	goModData, err := io.ReadAll(r)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("file read error: %w", err)
 	}
 
 	modFileParsed, err := modfile.Parse("go.mod", goModData, nil)
