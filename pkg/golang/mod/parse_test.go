@@ -2,8 +2,8 @@ package mod
 
 import (
 	"os"
-	"path"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,25 +18,37 @@ func TestParse(t *testing.T) {
 		want []types.Library
 	}{
 		{
-			file: "testdata/gomod_normal.sum",
+			file: "testdata/normal/go.mod",
 			want: GoModNormal,
 		},
 		{
-			file: "testdata/gomod_emptyline.sum",
-			want: GoModEmptyLine,
+			file: "testdata/replaced/go.mod",
+			want: GoModReplaced,
 		},
 		{
-			file: "testdata/gomod_many.sum",
-			want: GoModMany,
+			file: "testdata/replaced-with-version/go.mod",
+			want: GoModReplacedWithVersion,
 		},
 		{
-			file: "testdata/gomod_trivy.sum",
-			want: GoModTrivy,
+			file: "testdata/replaced-with-version-mismatch/go.mod",
+			want: GoModReplacedWithVersionMismatch,
+		},
+		{
+			file: "testdata/replaced-with-local-path/go.mod",
+			want: GoModReplacedWithLocalPath,
+		},
+		{
+			file: "testdata/replaced-with-local-path-and-version/go.mod",
+			want: GoModReplacedWithLocalPathAndVersion,
+		},
+		{
+			file: "testdata/replaced-with-local-path-and-version-mismatch/go.mod",
+			want: GoModReplacedWithLocalPathAndVersionMismatch,
 		},
 	}
 
 	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
+		t.Run(strings.TrimPrefix(strings.TrimSuffix(v.file, "/go.mod"), "testdata/"), func(t *testing.T) {
 			f, err := os.Open(v.file)
 			require.NoError(t, err)
 

@@ -1,33 +1,55 @@
 package mod
 
 import (
-	"bufio"
-	"io"
-	"strings"
-
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
-	"golang.org/x/xerrors"
+	"io"
+
+	"golang.org/x/mod/modfile"
 )
 
-// Parse parses a go.sum file
+// Parse parses a go.mod file
 func Parse(r io.Reader) ([]types.Library, error) {
 	var libs []types.Library
 	uniqueLibs := make(map[string]string)
 
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		s := strings.Fields(line)
-		if len(s) < 2 {
+	goModData, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	modFileParsed, err := modfile.Parse("go.mod", goModData, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range modFileParsed.Require {
+		uniqueLibs[modFileParsed.Require[i].Mod.Path] = modFileParsed.Require[i].Mod.Version[1:]
+	}
+
+	for i := range modFileParsed.Replace {
+		// Check if replaced path is actually in our libs.
+		if _, ok := uniqueLibs[modFileParsed.Replace[i].Old.Path]; !ok {
 			continue
 		}
 
-		// go.sum records and sorts all non-major versions
-		// with the latest version as last entry
-		uniqueLibs[s[0]] = strings.TrimSuffix(strings.TrimPrefix(s[1], "v"), "/go.mod")
-	}
-	if err := scanner.Err(); err != nil {
-		return nil, xerrors.Errorf("scan error: %w", err)
+		// If the replace directive has a version on the left side, make sure it matches the version that was imported.
+		if modFileParsed.Replace[i].Old.Version != "" && uniqueLibs[modFileParsed.Replace[i].Old.Path] != modFileParsed.Replace[i].Old.Version[1:] {
+			continue
+		}
+
+		// Only support replace directive with version on the right side.
+		// Directive without version is a local path.
+		if modFileParsed.Replace[i].New.Version == "" {
+			// Delete old lib, since it's a local path now.
+			delete(uniqueLibs, modFileParsed.Replace[i].Old.Path)
+			continue
+		}
+
+		// Delete old lib, in case the path has changed.
+		delete(uniqueLibs, modFileParsed.Replace[i].Old.Path)
+
+		// Add replaced library to libary register.
+		uniqueLibs[modFileParsed.Replace[i].New.Path] = modFileParsed.Replace[i].New.Version[1:]
 	}
 
 	for k, v := range uniqueLibs {
