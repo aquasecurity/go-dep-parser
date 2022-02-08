@@ -44,6 +44,7 @@ func WithRemoteRepos(repos []string) option {
 }
 
 type parser struct {
+	originalDir        string
 	rootPath           string
 	cache              pomCache
 	localRepository    string
@@ -51,7 +52,7 @@ type parser struct {
 	offline            bool
 }
 
-func NewParser(filePath string, opts ...option) *parser {
+func NewParser(originalDir string, filePath string, opts ...option) *parser {
 	o := &options{
 		offline:     false,
 		remoteRepos: []string{centralURL},
@@ -69,6 +70,7 @@ func NewParser(filePath string, opts ...option) *parser {
 	}
 
 	return &parser{
+		originalDir:        filepath.Clean(originalDir),
 		rootPath:           filepath.Clean(filePath),
 		cache:              newPOMCache(),
 		localRepository:    localRepository,
@@ -404,6 +406,7 @@ func (p parser) tryRelativePath(parentArtifact artifact, currentPath, relativePa
 }
 
 func (p parser) openRelativePom(currentPath, relativePath string) (*pom, error) {
+	currentPath = filepath.Join(p.originalDir, currentPath)
 	// e.g. child/pom.xml => child/
 	dir := filepath.Dir(currentPath)
 
