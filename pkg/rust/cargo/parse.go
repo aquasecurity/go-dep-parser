@@ -18,10 +18,10 @@ type Lockfile struct {
 	Metadata interface{}
 }
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockfile Lockfile
 	if _, err := toml.DecodeReader(r, &lockfile); err != nil {
-		return nil, xerrors.Errorf("decode error: %w", err)
+		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
 	var libs []types.Library
@@ -31,5 +31,5 @@ func Parse(r io.Reader) ([]types.Library, error) {
 			Version: pkg.Version,
 		})
 	}
-	return libs, nil
+	return libs, nil, nil //TODO add actual dependencies
 }
