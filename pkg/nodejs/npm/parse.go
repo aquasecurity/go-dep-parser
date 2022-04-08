@@ -17,16 +17,16 @@ type Dependency struct {
 	Dependencies map[string]Dependency
 }
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)
 	if err != nil {
-		return nil, xerrors.Errorf("decode error: %w", err)
+		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
 	libs := parse(lockFile.Dependencies)
-	return unique(libs), nil
+	return unique(libs), nil, nil
 }
 
 func parse(dependencies map[string]Dependency) []types.Library {
@@ -36,10 +36,7 @@ func parse(dependencies map[string]Dependency) []types.Library {
 			continue
 		}
 
-		libs = append(libs, types.Library{
-			Name:    pkgName,
-			Version: dependency.Version,
-		})
+		libs = append(libs, types.NewLibrary(pkgName, dependency.Version, ""))
 
 		if dependency.Dependencies != nil {
 			// Recursion

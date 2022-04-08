@@ -21,37 +21,22 @@ func TestParse(t *testing.T) {
 		{
 			name:      "happy",
 			inputFile: "testdata/normal00.gemspec",
-			want: types.Library{
-				Name:    "rake",
-				Version: "13.0.3",
-				License: "MIT",
-			},
+			want:      types.NewLibrary("rake", "13.0.3", "MIT"),
 		},
 		{
 			name:      "another variable name",
 			inputFile: "testdata/normal01.gemspec",
-			want: types.Library{
-				Name:    "async",
-				Version: "1.25.0",
-			},
+			want:      types.NewLibrary("async", "1.25.0", ""),
 		},
 		{
 			name:      "license",
 			inputFile: "testdata/license.gemspec",
-			want: types.Library{
-				Name:    "async",
-				Version: "1.25.0",
-				License: "MIT",
-			},
+			want:      types.NewLibrary("async", "1.25.0", "MIT"),
 		},
 		{
 			name:      "multiple licenses",
 			inputFile: "testdata/multiple_licenses.gemspec",
-			want: types.Library{
-				Name:    "test-unit",
-				Version: "3.3.7",
-				License: "Ruby, BSDL, PSFL",
-			},
+			want:      types.NewLibrary("test-unit", "3.3.7", "Ruby, BSDL, PSFL"),
 		},
 		{
 			name:      "malformed variable name",

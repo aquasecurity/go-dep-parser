@@ -19,9 +19,5 @@ func Parse(r io.Reader) (types.Library, error) {
 		return types.Library{}, xerrors.Errorf("read MIME error: %w", err)
 	}
 
-	return types.Library{
-		Name:    h.Get("Name"),
-		Version: h.Get("Version"),
-		License: h.Get("License"),
-	}, nil
+	return types.NewLibrary(h.Get("Name"), h.Get("Version"), h.Get("License")), nil
 }

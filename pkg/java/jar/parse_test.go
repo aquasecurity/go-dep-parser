@@ -171,7 +171,7 @@ func TestParse(t *testing.T) {
 			stat, err := f.Stat()
 			require.NoError(t, err)
 
-			got, err := jar.Parse(f, stat.Size(), jar.WithURL(ts.URL), jar.WithFilePath(v.file),
+			got, _, err := jar.Parse(f, stat.Size(), jar.WithURL(ts.URL), jar.WithFilePath(v.file),
 				jar.WithHTTPClient(ts.Client()), jar.WithOffline(v.offline))
 			require.NoError(t, err)
 

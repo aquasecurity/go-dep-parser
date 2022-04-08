@@ -22,18 +22,15 @@ type Lockfile struct {
 	} `toml:"package"`
 }
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockfile Lockfile
 	if _, err := toml.DecodeReader(r, &lockfile); err != nil {
-		return nil, xerrors.Errorf("decode error: %w", err)
+		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
 	var libs []types.Library
 	for _, pkg := range lockfile.Packages {
-		libs = append(libs, types.Library{
-			Name:    pkg.Name,
-			Version: pkg.Version,
-		})
+		libs = append(libs, types.NewLibrary(pkg.Name, pkg.Version, ""))
 	}
-	return libs, nil
+	return libs, nil, nil
 }

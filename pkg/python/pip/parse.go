@@ -16,7 +16,7 @@ const (
 	hashMarker    string = "--"
 )
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	scanner := bufio.NewScanner(r)
 	var libs []types.Library
 	for scanner.Scan() {
@@ -30,15 +30,12 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		if len(s) != 2 {
 			continue
 		}
-		libs = append(libs, types.Library{
-			Name:    s[0],
-			Version: s[1],
-		})
+		libs = append(libs, types.NewLibrary(s[0], s[1], ""))
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, xerrors.Errorf("scan error: %w", err)
+		return nil, nil, xerrors.Errorf("scan error: %w", err)
 	}
-	return libs, nil
+	return libs, nil, nil
 }
 
 func rStripByKey(line string, key string) string {

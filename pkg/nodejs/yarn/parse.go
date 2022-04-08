@@ -60,7 +60,7 @@ func validProtocol(protocol string) (valid bool) {
 	return false
 }
 
-func Parse(r io.Reader) (libs []types.Library, err error) {
+func Parse(r io.Reader) (libs []types.Library, deps []types.Dependency, err error) {
 	scanner := bufio.NewScanner(r)
 	unique := map[string]struct{}{}
 	var lib types.Library
@@ -78,7 +78,7 @@ func Parse(r io.Reader) (libs []types.Library, err error) {
 				continue
 			}
 			if lib.Name == "" {
-				return nil, xerrors.New("Invalid yarn.lock format")
+				return nil, nil, xerrors.New("Invalid yarn.lock format")
 			}
 			// fetch between version prefix and last double-quote
 			symbol := fmt.Sprintf("%s@%s", lib.Name, version)
@@ -88,7 +88,7 @@ func Parse(r io.Reader) (libs []types.Library, err error) {
 			}
 
 			lib.Version = version
-			libs = append(libs, lib)
+			libs = append(libs, types.NewLibrary(lib.Name, lib.Version, ""))
 			lib = types.Library{}
 			unique[symbol] = struct{}{}
 			continue
@@ -110,5 +110,5 @@ func Parse(r io.Reader) (libs []types.Library, err error) {
 			lib.Name = name
 		}
 	}
-	return libs, nil
+	return libs, nil, nil
 }

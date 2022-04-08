@@ -17,20 +17,17 @@ type dependency struct {
 	Version string
 }
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockFile lockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)
 	if err != nil {
-		return nil, xerrors.Errorf("decode error: %w", err)
+		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
 	var libs []types.Library
 	for pkgName, dependency := range lockFile.Default {
-		libs = append(libs, types.Library{
-			Name:    pkgName,
-			Version: strings.TrimLeft(dependency.Version, "=="),
-		})
+		libs = append(libs, types.NewLibrary(pkgName, strings.TrimLeft(dependency.Version, "="), ""))
 	}
-	return libs, nil
+	return libs, nil, nil
 }

@@ -72,7 +72,7 @@ func WithOffline(offline bool) Option {
 
 }
 
-func Parse(r dio.ReadSeekerAt, size int64, opts ...Option) ([]types.Library, error) {
+func Parse(r dio.ReadSeekerAt, size int64, opts ...Option) ([]types.Library, []types.Dependency, error) {
 	// for HTTP retry
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = logger{}
@@ -99,12 +99,12 @@ func Parse(r dio.ReadSeekerAt, size int64, opts ...Option) ([]types.Library, err
 	return parseArtifact(c, c.rootFilePath, r, size)
 }
 
-func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]types.Library, error) {
+func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]types.Library, []types.Dependency, error) {
 	log.Logger.Debugw("Parsing Java artifacts...", zap.String("file", fileName))
 
 	zr, err := zip.NewReader(r, size)
 	if err != nil {
-		return nil, xerrors.Errorf("zip error: %w", err)
+		return nil, nil, xerrors.Errorf("zip error: %w", err)
 	}
 
 	// Try to extract artifactId and version from the file name
@@ -121,7 +121,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 		case filepath.Base(fileInJar.Name) == "pom.properties":
 			props, err := parsePomProperties(fileInJar)
 			if err != nil {
-				return nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
+				return nil, nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
 			libs = append(libs, props.library())
 
@@ -132,12 +132,12 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 		case filepath.Base(fileInJar.Name) == "MANIFEST.MF":
 			m, err = parseManifest(fileInJar)
 			if err != nil {
-				return nil, xerrors.Errorf("failed to parse MANIFEST.MF: %w", err)
+				return nil, nil, xerrors.Errorf("failed to parse MANIFEST.MF: %w", err)
 			}
 		case isArtifact(fileInJar.Name):
-			innerLibs, err := parseInnerJar(c, fileInJar)
+			innerLibs, _, err := parseInnerJar(c, fileInJar) //TODO process inner deps
 			if err != nil {
-				return nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
+				return nil, nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
 			libs = append(libs, innerLibs...)
 		}
@@ -145,7 +145,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 
 	// If pom.properties is found, it should be preferred than MANIFEST.MF.
 	if foundPomProps {
-		return libs, nil
+		return libs, nil, nil
 	}
 
 	manifestProps := m.properties()
@@ -153,9 +153,9 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 		// In offline mode, we will not check if the artifact information is correct.
 		if !manifestProps.valid() {
 			log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
-			return libs, nil
+			return libs, nil, nil
 		}
-		return append(libs, manifestProps.library()), nil
+		return append(libs, manifestProps.library()), nil, nil
 	}
 
 	if manifestProps.valid() {
@@ -163,23 +163,23 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 		// We have to make sure that the artifact exists actually.
 		if ok, _ := exists(c, manifestProps); ok {
 			// If groupId and artifactId are valid, they will be returned.
-			return append(libs, manifestProps.library()), nil
+			return append(libs, manifestProps.library()), nil, nil
 		}
 	}
 
 	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
 	p, err := searchBySHA1(c, r)
 	if err == nil {
-		return append(libs, p.library()), nil
+		return append(libs, p.library()), nil, nil
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
-		return nil, xerrors.Errorf("failed to search by SHA1: %w", err)
+		return nil, nil, xerrors.Errorf("failed to search by SHA1: %w", err)
 	}
 
 	log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
 
 	// Return when artifactId or version from the file name are empty
 	if fileProps.artifactID == "" || fileProps.version == "" {
-		return libs, nil
+		return libs, nil, nil
 	}
 
 	// Try to search groupId by artifactId via sonatype API
@@ -190,21 +190,21 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 			zap.String("artifact", fileProps.String()))
 		libs = append(libs, fileProps.library())
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
-		return nil, xerrors.Errorf("failed to search by artifact id: %w", err)
+		return nil, nil, xerrors.Errorf("failed to search by artifact id: %w", err)
 	}
 
-	return libs, nil
+	return libs, nil, nil
 }
 
-func parseInnerJar(c conf, zf *zip.File) ([]types.Library, error) {
+func parseInnerJar(c conf, zf *zip.File) ([]types.Library, []types.Dependency, error) {
 	fr, err := zf.Open()
 	if err != nil {
-		return nil, xerrors.Errorf("unable to open %s: %w", zf.Name, err)
+		return nil, nil, xerrors.Errorf("unable to open %s: %w", zf.Name, err)
 	}
 
 	f, err := os.CreateTemp("", "inner")
 	if err != nil {
-		return nil, xerrors.Errorf("unable to create a temp file: %w", err)
+		return nil, nil, xerrors.Errorf("unable to create a temp file: %w", err)
 	}
 	defer func() {
 		f.Close()
@@ -213,16 +213,16 @@ func parseInnerJar(c conf, zf *zip.File) ([]types.Library, error) {
 
 	// Copy the file content to the temp file
 	if _, err = io.Copy(f, fr); err != nil {
-		return nil, xerrors.Errorf("file copy error: %w", err)
+		return nil, nil, xerrors.Errorf("file copy error: %w", err)
 	}
 
 	// Parse jar/war/ear recursively
-	innerLibs, err := parseArtifact(c, zf.Name, f, int64(zf.UncompressedSize64))
+	innerLibs, innerDeps, err := parseArtifact(c, zf.Name, f, int64(zf.UncompressedSize64))
 	if err != nil {
-		return nil, xerrors.Errorf("failed to parse %s: %w", zf.Name, err)
+		return nil, nil, xerrors.Errorf("failed to parse %s: %w", zf.Name, err)
 	}
 
-	return innerLibs, nil
+	return innerLibs, innerDeps, nil
 }
 
 func isArtifact(name string) bool {
@@ -279,10 +279,7 @@ func parsePomProperties(f *zip.File) (properties, error) {
 }
 
 func (p properties) library() types.Library {
-	return types.Library{
-		Name:    fmt.Sprintf("%s:%s", p.groupID, p.artifactID),
-		Version: p.version,
-	}
+	return types.NewLibrary(fmt.Sprintf("%s:%s", p.groupID, p.artifactID), p.version, "")
 }
 
 func (p properties) valid() bool {

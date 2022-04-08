@@ -16,20 +16,17 @@ type packageInfo struct {
 	Version string
 }
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockFile lockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)
 	if err != nil {
-		return nil, xerrors.Errorf("decode error: %w", err)
+		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
 	var libs []types.Library
 	for _, pkg := range lockFile.Packages {
-		libs = append(libs, types.Library{
-			Name:    pkg.Name,
-			Version: pkg.Version,
-		})
+		libs = append(libs, types.NewLibrary(pkg.Name, pkg.Version, ""))
 	}
-	return libs, nil
+	return libs, nil, nil
 }

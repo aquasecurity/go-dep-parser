@@ -9,7 +9,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
@@ -20,16 +20,13 @@ func Parse(r io.Reader) ([]types.Library, error) {
 			if len(s) != 2 {
 				continue
 			}
-			libs = append(libs, types.Library{
-				Name:    s[0],
-				Version: strings.Trim(s[1], "()"),
-			})
+			libs = append(libs, types.NewLibrary(s[0], strings.Trim(s[1], "()"), ""))
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, xerrors.Errorf("scan error: %w", err)
+		return nil, nil, xerrors.Errorf("scan error: %w", err)
 	}
-	return libs, nil
+	return libs, nil, nil
 }
 
 func countLeadingSpace(line string) int {

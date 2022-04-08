@@ -30,10 +30,10 @@ func convertError(err error) error {
 }
 
 // Parse scans file to try to report the Go and module versions.
-func Parse(r dio.ReadSeekerAt) ([]types.Library, error) {
+func Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	info, err := buildinfo.Read(r)
 	if err != nil {
-		return nil, convertError(err)
+		return nil, nil, convertError(err)
 	}
 
 	libs := make([]types.Library, 0, len(info.Deps))
@@ -44,11 +44,8 @@ func Parse(r dio.ReadSeekerAt) ([]types.Library, error) {
 			mod = dep.Replace
 		}
 
-		libs = append(libs, types.Library{
-			Name:    mod.Path,
-			Version: mod.Version,
-		})
+		libs = append(libs, types.NewLibrary(mod.Path, mod.Version, ""))
 	}
 
-	return libs, nil
+	return libs, nil, nil
 }

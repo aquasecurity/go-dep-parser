@@ -21,12 +21,12 @@ type Dependency struct {
 	Resolved string
 }
 
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
 
 	if err := decoder.Decode(&lockFile); err != nil {
-		return nil, xerrors.Errorf("failed to decode packages.lock.json: %w", err)
+		return nil, nil, xerrors.Errorf("failed to decode packages.lock.json: %w", err)
 	}
 
 	uniqueLibs := map[types.Library]struct{}{}
@@ -37,10 +37,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 				continue
 			}
 
-			lib := types.Library{
-				Name:    packageName,
-				Version: packageContent.Resolved,
-			}
+			lib := types.NewLibrary(packageName, packageContent.Resolved, "")
 			uniqueLibs[lib] = struct{}{}
 		}
 	}
@@ -50,5 +47,5 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		libraries = append(libraries, lib)
 	}
 
-	return libraries, nil
+	return libraries, nil, nil
 }
