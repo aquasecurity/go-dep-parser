@@ -3,7 +3,7 @@ package types
 import "fmt"
 
 type Library struct {
-	Id      string
+	ID      string
 	Name    string
 	Version string
 	License string `json:",omitempty"`
@@ -17,7 +17,7 @@ type Dependency struct {
 func NewLibrary(name, version, license string) Library {
 	// TODO replace naive implementation
 	return Library{
-		Id:      fmt.Sprintf("%s@%s", name, version),
+		ID:      fmt.Sprintf("%s@%s", name, version),
 		Name:    name,
 		Version: version,
 		License: license,
