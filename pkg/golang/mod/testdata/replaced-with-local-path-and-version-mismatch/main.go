@@ -1,21 +1,13 @@
 package main
 
 import (
-	"os"
+	"log"
 
-	"github.com/aquasecurity/trivy/pkg/commands"
-	"github.com/aquasecurity/trivy/pkg/log"
-)
-
-var (
-	version = "dev"
+	"github.com/aquasecurity/go-dep-parser/pkg/golang/mod"
 )
 
 func main() {
-	// Load Trivy CLI to force imports.
-	app := commands.NewApp("")
-	err := app.Run(os.Args)
-	if err != nil {
+	if _, err := mod.Parse(nil); err != nil {
 		log.Fatal(err)
 	}
 }
