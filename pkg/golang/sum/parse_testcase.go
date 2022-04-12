@@ -1,4 +1,4 @@
-package mod
+package sum
 
 import "github.com/aquasecurity/go-dep-parser/pkg/types"
 
