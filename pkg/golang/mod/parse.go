@@ -2,6 +2,8 @@ package mod
 
 import (
 	"io"
+	"strconv"
+	"strings"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/mod/modfile"
@@ -20,37 +22,43 @@ func Parse(r io.Reader) ([]types.Library, error) {
 
 	modFileParsed, err := modfile.Parse("go.mod", goModData, nil)
 	if err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("go.mod parse error: %w", err)
 	}
 
-	for i := range modFileParsed.Require {
-		uniqueLibs[modFileParsed.Require[i].Mod.Path] = modFileParsed.Require[i].Mod.Version[1:]
+	skipIndirect := lessThan117(modFileParsed.Go.Version)
+
+	for _, require := range modFileParsed.Require {
+		// Skip indirect dependencies less than Go 1.17
+		if skipIndirect && require.Indirect {
+			continue
+		}
+		uniqueLibs[require.Mod.Path] = require.Mod.Version[1:]
 	}
 
-	for i := range modFileParsed.Replace {
+	for _, replace := range modFileParsed.Replace {
 		// Check if replaced path is actually in our libs.
-		if _, ok := uniqueLibs[modFileParsed.Replace[i].Old.Path]; !ok {
+		if _, ok := uniqueLibs[replace.Old.Path]; !ok {
 			continue
 		}
 
 		// If the replace directive has a version on the left side, make sure it matches the version that was imported.
-		if modFileParsed.Replace[i].Old.Version != "" && uniqueLibs[modFileParsed.Replace[i].Old.Path] != modFileParsed.Replace[i].Old.Version[1:] {
+		if replace.Old.Version != "" && uniqueLibs[replace.Old.Path] != replace.Old.Version[1:] {
 			continue
 		}
 
 		// Only support replace directive with version on the right side.
 		// Directive without version is a local path.
-		if modFileParsed.Replace[i].New.Version == "" {
+		if replace.New.Version == "" {
 			// Delete old lib, since it's a local path now.
-			delete(uniqueLibs, modFileParsed.Replace[i].Old.Path)
+			delete(uniqueLibs, replace.Old.Path)
 			continue
 		}
 
 		// Delete old lib, in case the path has changed.
-		delete(uniqueLibs, modFileParsed.Replace[i].Old.Path)
+		delete(uniqueLibs, replace.Old.Path)
 
-		// Add replaced library to libary register.
-		uniqueLibs[modFileParsed.Replace[i].New.Path] = modFileParsed.Replace[i].New.Version[1:]
+		// Add replaced library to library register.
+		uniqueLibs[replace.New.Path] = replace.New.Version[1:]
 	}
 
 	for k, v := range uniqueLibs {
@@ -61,4 +69,22 @@ func Parse(r io.Reader) ([]types.Library, error) {
 	}
 
 	return libs, nil
+}
+
+// Check if the Go version is less than 1.17
+func lessThan117(ver string) bool {
+	ss := strings.Split(ver, ".")
+	if len(ss) != 2 {
+		return false
+	}
+	major, err := strconv.Atoi(ss[0])
+	if err != nil {
+		return false
+	}
+	minor, err := strconv.Atoi(ss[1])
+	if err != nil {
+		return false
+	}
+
+	return major <= 1 && minor < 17
 }

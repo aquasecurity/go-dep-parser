@@ -47,4 +47,9 @@ var (
 		{"golang.org/x/xerrors", "0.0.0-20200804184101-5ec99f83aff1", ""},
 		{"gopkg.in/yaml.v3", "3.0.0-20210107192922-496545a6307b", ""},
 	}
+
+	// execute go mod tidy in go116 folder
+	GoMod116 = []types.Library{
+		{"github.com/aquasecurity/go-dep-parser", "0.0.0-20211224170007-df43bca6b6ff", ""},
+	}
 )

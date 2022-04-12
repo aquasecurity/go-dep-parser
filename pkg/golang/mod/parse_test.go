@@ -52,6 +52,11 @@ func TestParse(t *testing.T) {
 			file: "testdata/replaced-with-local-path-and-version-mismatch/go.mod",
 			want: GoModReplacedWithLocalPathAndVersionMismatch,
 		},
+		{
+			name: "go 1.16",
+			file: "testdata/go116/go.mod",
+			want: GoMod116,
+		},
 	}
 
 	for _, tt := range tests {
