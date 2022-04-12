@@ -5,15 +5,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"golang.org/x/exp/maps"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/xerrors"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 // Parse parses a go.mod file
 func Parse(r io.Reader) ([]types.Library, error) {
-	var libs []types.Library
-	uniqueLibs := make(map[string]string)
+	libs := map[string]types.Library{}
 
 	goModData, err := io.ReadAll(r)
 	if err != nil {
@@ -32,17 +33,22 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		if skipIndirect && require.Indirect {
 			continue
 		}
-		uniqueLibs[require.Mod.Path] = require.Mod.Version[1:]
+		libs[require.Mod.Path] = types.Library{
+			Name:     require.Mod.Path,
+			Version:  require.Mod.Version[1:],
+			Indirect: require.Indirect,
+		}
 	}
 
 	for _, replace := range modFileParsed.Replace {
 		// Check if replaced path is actually in our libs.
-		if _, ok := uniqueLibs[replace.Old.Path]; !ok {
+		old, ok := libs[replace.Old.Path]
+		if !ok {
 			continue
 		}
 
 		// If the replace directive has a version on the left side, make sure it matches the version that was imported.
-		if replace.Old.Version != "" && uniqueLibs[replace.Old.Path] != replace.Old.Version[1:] {
+		if replace.Old.Version != "" && old.Version != replace.Old.Version[1:] {
 			continue
 		}
 
@@ -50,25 +56,22 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		// Directive without version is a local path.
 		if replace.New.Version == "" {
 			// Delete old lib, since it's a local path now.
-			delete(uniqueLibs, replace.Old.Path)
+			delete(libs, replace.Old.Path)
 			continue
 		}
 
 		// Delete old lib, in case the path has changed.
-		delete(uniqueLibs, replace.Old.Path)
+		delete(libs, replace.Old.Path)
 
 		// Add replaced library to library register.
-		uniqueLibs[replace.New.Path] = replace.New.Version[1:]
+		libs[replace.New.Path] = types.Library{
+			Name:     replace.New.Path,
+			Version:  replace.New.Version[1:],
+			Indirect: old.Indirect,
+		}
 	}
 
-	for k, v := range uniqueLibs {
-		libs = append(libs, types.Library{
-			Name:    k,
-			Version: v,
-		})
-	}
-
-	return libs, nil
+	return maps.Values(libs), nil
 }
 
 // Check if the Go version is less than 1.17
