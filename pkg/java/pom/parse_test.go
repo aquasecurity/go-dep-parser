@@ -29,8 +29,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "happy", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:happy", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:happy",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -38,8 +44,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "happy", "pom.xml"),
 			local:     false,
 			want: []types.Library{
-				types.NewLibrary("com.example:happy", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:happy",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -48,7 +60,10 @@ func TestPom_Parse(t *testing.T) {
 			local:     false,
 			offline:   true,
 			want: []types.Library{
-				types.NewLibrary("org.example:example-offline", "2.3.4", ""),
+				{
+					Name:    "org.example:example-offline",
+					Version: "2.3.4",
+				},
 			},
 		},
 		{
@@ -56,8 +71,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "parent-properties", "child", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:child", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -65,8 +86,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "parent-dependencies", "child", "pom.xml"),
 			local:     false,
 			want: []types.Library{
-				types.NewLibrary("com.example:child", "1.0.0-SNAPSHOT", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0-SNAPSHOT",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -74,8 +101,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "parent-dependency-management", "child", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:child", "3.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:child",
+					Version: "3.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -83,8 +116,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "parent-relative-path", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:child", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -92,8 +131,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "parent-remote-repository", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("org.example:child", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "org.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -101,9 +146,18 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "soft-requirement", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:soft", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
-				types.NewLibrary("org.example:example-dependency", "1.2.3", ""),
+				{
+					Name:    "com.example:soft",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
 			},
 		},
 		{
@@ -111,10 +165,22 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "soft-requirement-with-transitive-dependencies", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:soft-transitive", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "2.0.0", ""),
-				types.NewLibrary("org.example:example-dependency", "1.2.3", ""),
-				types.NewLibrary("org.example:example-dependency2", "2.3.4", ""),
+				{
+					Name:    "com.example:soft-transitive",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
+				{
+					Name:    "org.example:example-dependency2",
+					Version: "2.3.4",
+				},
 			},
 		},
 		{
@@ -122,9 +188,18 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "hard-requirement", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:hard", "1.0.0", ""),
-				types.NewLibrary("org.example:example-api", "2.0.0", ""),
-				types.NewLibrary("org.example:example-dependency", "1.2.4", ""),
+				{
+					Name:    "com.example:hard",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.4",
+				},
 			},
 		},
 		{
@@ -132,7 +207,10 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "version-requirement", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:hard", "1.0.0", ""),
+				{
+					Name:    "com.example:hard",
+					Version: "1.0.0",
+				},
 			},
 		},
 		{
@@ -140,8 +218,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "import-dependency-management", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:import", "2.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:import",
+					Version: "2.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -149,8 +233,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "import-dependency-management-multiple", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:import", "2.0.0", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:import",
+					Version: "2.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -158,9 +248,18 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "exclusions", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:exclusions", "3.0.0", ""),
-				types.NewLibrary("org.example:example-dependency", "1.2.3", ""),
-				types.NewLibrary("org.example:example-nested", "3.3.3", ""),
+				{
+					Name:    "com.example:exclusions",
+					Version: "3.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
+				{
+					Name:    "org.example:example-nested",
+					Version: "3.3.3",
+				},
 			},
 		},
 		{
@@ -168,9 +267,18 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "multi-module", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:aggregation", "1.0.0", ""),
-				types.NewLibrary("com.example:module", "1.1.1", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:aggregation",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "com.example:module",
+					Version: "1.1.1",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -178,11 +286,26 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "multi-module-soft-requirement", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:aggregation", "1.0.0", ""),
-				types.NewLibrary("com.example:module1", "1.1.1", ""),
-				types.NewLibrary("com.example:module2", "1.1.1", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
-				types.NewLibrary("org.example:example-api", "2.0.0", ""),
+				{
+					Name:    "com.example:aggregation",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "com.example:module1",
+					Version: "1.1.1",
+				},
+				{
+					Name:    "com.example:module2",
+					Version: "1.1.1",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+				},
 			},
 		},
 		{
@@ -190,8 +313,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "not-found-parent", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:no-parent", "1.0-SNAPSHOT", ""),
-				types.NewLibrary("org.example:example-api", "1.7.30", ""),
+				{
+					Name:    "com.example:no-parent",
+					Version: "1.0-SNAPSHOT",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
 			},
 		},
 		{
@@ -199,8 +328,14 @@ func TestPom_Parse(t *testing.T) {
 			inputFile: filepath.Join("testdata", "not-found-dependency", "pom.xml"),
 			local:     true,
 			want: []types.Library{
-				types.NewLibrary("com.example:not-found-dependency", "1.0.0", ""),
-				types.NewLibrary("org.example:example-not-found", "999", ""),
+				{
+					Name:    "com.example:not-found-dependency",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-not-found",
+					Version: "999",
+				},
 			},
 		},
 		{

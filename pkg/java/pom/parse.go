@@ -164,7 +164,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 
 	// Convert to []types.Library
 	for name, ver := range uniqArtifacts {
-		libs = append(libs, types.NewLibrary(name, ver.String(), ""))
+		libs = append(libs, types.Library{Name: name, Version: ver.String()})
 	}
 
 	return libs, deps, nil

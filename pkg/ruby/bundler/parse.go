@@ -20,7 +20,7 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 			if len(s) != 2 {
 				continue
 			}
-			libs = append(libs, types.NewLibrary(s[0], strings.Trim(s[1], "()"), ""))
+			libs = append(libs, types.Library{Name: s[0], Version: strings.Trim(s[1], "()")})
 		}
 	}
 	if err := scanner.Err(); err != nil {

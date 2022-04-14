@@ -15,6 +15,7 @@ type Dependency struct {
 	Version      string
 	Dev          bool
 	Dependencies map[string]Dependency
+	Requires     map[string]string
 }
 
 func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
@@ -25,25 +26,54 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
-	libs := parse(lockFile.Dependencies)
-	return unique(libs), nil, nil
+	libs, deps := parse(lockFile.Dependencies)
+
+	return unique(libs), deps, nil
 }
 
-func parse(dependencies map[string]Dependency) []types.Library {
+func parse(dependencies map[string]Dependency) ([]types.Library, []types.Dependency) {
 	var libs []types.Library
+	var deps []types.Dependency
 	for pkgName, dependency := range dependencies {
 		if dependency.Dev {
 			continue
 		}
 
-		libs = append(libs, types.NewLibrary(pkgName, dependency.Version, ""))
+		lib := types.Library{Name: pkgName, Version: dependency.Version}
+		libs = append(libs, lib)
+		dependsOn := make([]string, 0, len(dependency.Requires))
+		for k := range dependency.Requires {
+			dependsOn = append(dependsOn, k)
+		}
+		deps = append(deps, types.Dependency{ID: types.ID(lib), DependsOn: dependsOn})
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			libs = append(libs, parse(dependency.Dependencies)...)
+			childLibs, childDeps := parse(dependency.Dependencies)
+			libs = append(libs, childLibs...)
+			resolve(childLibs, childDeps)
+			deps = append(deps, childDeps...)
 		}
 	}
-	return libs
+
+	resolve(libs, deps)
+
+	return libs, deps
+}
+func resolve(libs []types.Library, deps []types.Dependency) {
+	resolved := make(map[string]types.Library)
+	for _, lib := range libs {
+		resolved[lib.Name] = lib
+	}
+	for _, dep := range deps {
+		for i := range dep.DependsOn {
+			pkg := dep.DependsOn[i]
+			resolvedLib, ok := resolved[pkg]
+			if ok {
+				dep.DependsOn[i] = types.ID(resolvedLib)
+			}
+		}
+	}
 }
 
 func unique(libs []types.Library) []types.Library {

@@ -30,7 +30,7 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 
 	var libs []types.Library
 	for _, pkg := range lockfile.Packages {
-		libs = append(libs, types.NewLibrary(pkg.Name, pkg.Version, ""))
+		libs = append(libs, types.Library{Name: pkg.Name, Version: pkg.Version})
 	}
 	return libs, nil, nil
 }

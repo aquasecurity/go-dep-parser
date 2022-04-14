@@ -88,7 +88,7 @@ func Parse(r io.Reader) (libs []types.Library, deps []types.Dependency, err erro
 			}
 
 			lib.Version = version
-			libs = append(libs, types.NewLibrary(lib.Name, lib.Version, ""))
+			libs = append(libs, types.Library{Name: lib.Name, Version: lib.Version})
 			lib = types.Library{}
 			unique[symbol] = struct{}{}
 			continue

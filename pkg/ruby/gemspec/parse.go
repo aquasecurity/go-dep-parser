@@ -89,7 +89,7 @@ func Parse(r io.Reader) (types.Library, error) {
 		return types.Library{}, xerrors.New("failed to parse gemspec")
 	}
 
-	return types.NewLibrary(name, version, license), nil
+	return types.Library{Name: name, Version: version, License: license}, nil
 }
 
 func findSubString(re *regexp.Regexp, line, name string) string {

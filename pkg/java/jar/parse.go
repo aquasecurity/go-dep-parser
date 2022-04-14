@@ -279,7 +279,7 @@ func parsePomProperties(f *zip.File) (properties, error) {
 }
 
 func (p properties) library() types.Library {
-	return types.NewLibrary(fmt.Sprintf("%s:%s", p.groupID, p.artifactID), p.version, "")
+	return types.Library{Name: fmt.Sprintf("%s:%s", p.groupID, p.artifactID), Version: p.version}
 }
 
 func (p properties) valid() bool {

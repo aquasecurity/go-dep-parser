@@ -22,15 +22,15 @@ func TestParse(t *testing.T) {
 			name:      "Config",
 			inputFile: "testdata/packages.config",
 			want: []types.Library{
-				types.NewLibrary("Newtonsoft.Json", "6.0.4", ""),
-				types.NewLibrary("Microsoft.AspNet.WebApi", "5.2.2", ""),
+				{Name: "Newtonsoft.Json", Version: "6.0.4"},
+				{Name: "Microsoft.AspNet.WebApi", Version: "5.2.2"},
 			},
 		},
 		{
 			name:      "with development dependency",
 			inputFile: "testdata/dev_dependency.config",
 			want: []types.Library{
-				types.NewLibrary("Newtonsoft.Json", "8.0.3", ""),
+				{Name: "Newtonsoft.Json", Version: "8.0.3"},
 			},
 		},
 		{

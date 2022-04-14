@@ -31,7 +31,7 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	}
 
 	for k, v := range uniqueLibs {
-		libs = append(libs, types.NewLibrary(k, v, ""))
+		libs = append(libs, types.Library{Name: k, Version: v})
 	}
 
 	return libs, nil, nil
