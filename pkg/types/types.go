@@ -3,9 +3,10 @@ package types
 import "fmt"
 
 type Library struct {
-	Name    string
-	Version string
-	License string `json:",omitempty"`
+	Name     string
+	Version  string
+	Indirect bool   `json:",omitempty"`
+	License  string `json:",omitempty"`
 }
 
 type Dependency struct {
