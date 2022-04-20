@@ -43,34 +43,36 @@ func parse(dependencies map[string]Dependency) ([]types.Library, []types.Depende
 		libs = append(libs, lib)
 		dependsOn := make([]string, 0, len(dependency.Requires))
 		for k := range dependency.Requires {
-			dependsOn = append(dependsOn, k)
+			resolvedLib, ok := dependency.Dependencies[k] //try to resolve with nested dependencies first
+
+			if ok {
+				k = types.ID(types.Library{Name: k, Version: resolvedLib.Version})
+			}
+
+			dependsOn = append(dependsOn, k) //add library name only
 		}
-		deps = append(deps, types.Dependency{ID: types.ID(lib), DependsOn: dependsOn})
+		if len(dependsOn) > 0 {
+			deps = append(deps, types.Dependency{ID: types.ID(lib), DependsOn: dependsOn})
+		}
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			childLibs, childDeps := parse(dependency.Dependencies)
+			childLibs, _ := parse(dependency.Dependencies)
 			libs = append(libs, childLibs...)
-			resolve(childLibs, childDeps)
-			deps = append(deps, childDeps...)
 		}
 	}
 
-	resolve(libs, deps)
+	resolveDefaultDependencies(dependencies, deps)
 
 	return libs, deps
 }
-func resolve(libs []types.Library, deps []types.Dependency) {
-	resolved := make(map[string]types.Library)
-	for _, lib := range libs {
-		resolved[lib.Name] = lib
-	}
+func resolveDefaultDependencies(dependencies map[string]Dependency, deps []types.Dependency) {
 	for _, dep := range deps {
 		for i := range dep.DependsOn {
 			pkg := dep.DependsOn[i]
-			resolvedLib, ok := resolved[pkg]
+			resolvedLib, ok := dependencies[pkg]
 			if ok {
-				dep.DependsOn[i] = types.ID(resolvedLib)
+				dep.DependsOn[i] = types.ID(types.Library{Name: pkg, Version: resolvedLib.Version})
 			}
 		}
 	}
