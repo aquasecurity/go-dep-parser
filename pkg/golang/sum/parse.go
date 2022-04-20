@@ -10,7 +10,7 @@ import (
 )
 
 // Parse parses a go.sum file
-func Parse(r io.Reader) ([]types.Library, error) {
+func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
 	uniqueLibs := make(map[string]string)
 
@@ -27,7 +27,7 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		uniqueLibs[s[0]] = strings.TrimSuffix(strings.TrimPrefix(s[1], "v"), "/go.mod")
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, xerrors.Errorf("scan error: %w", err)
+		return nil, nil, xerrors.Errorf("scan error: %w", err)
 	}
 
 	for k, v := range uniqueLibs {
@@ -37,5 +37,5 @@ func Parse(r io.Reader) ([]types.Library, error) {
 		})
 	}
 
-	return libs, nil
+	return libs, nil, nil
 }
