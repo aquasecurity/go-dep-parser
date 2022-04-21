@@ -2,6 +2,7 @@ package npm
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
@@ -16,6 +17,11 @@ type Dependency struct {
 	Dev          bool
 	Dependencies map[string]Dependency
 	Requires     map[string]string
+}
+
+func ID(name, version string) string {
+	// TODO replace naive implementation
+	return fmt.Sprintf("%s@%s", name, version)
 }
 
 func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
@@ -46,13 +52,13 @@ func parse(dependencies map[string]Dependency) ([]types.Library, []types.Depende
 			resolvedLib, ok := dependency.Dependencies[k] //try to resolve with nested dependencies first
 
 			if ok {
-				k = types.ID(types.Library{Name: k, Version: resolvedLib.Version})
+				k = ID(k, resolvedLib.Version)
 			}
 
 			dependsOn = append(dependsOn, k) //add library name only
 		}
 		if len(dependsOn) > 0 {
-			deps = append(deps, types.Dependency{ID: types.ID(lib), DependsOn: dependsOn})
+			deps = append(deps, types.Dependency{ID: ID(lib.Name, lib.Version), DependsOn: dependsOn})
 		}
 
 		if dependency.Dependencies != nil {
@@ -72,7 +78,7 @@ func resolveDefaultDependencies(dependencies map[string]Dependency, deps []types
 			pkg := dep.DependsOn[i]
 			resolvedLib, ok := dependencies[pkg]
 			if ok {
-				dep.DependsOn[i] = types.ID(types.Library{Name: pkg, Version: resolvedLib.Version})
+				dep.DependsOn[i] = ID(pkg, resolvedLib.Version)
 			}
 		}
 	}
