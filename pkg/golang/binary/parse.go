@@ -44,7 +44,10 @@ func Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 			mod = dep.Replace
 		}
 
-		libs = append(libs, types.Library{Name: mod.Path, Version: mod.Version})
+		libs = append(libs, types.Library{
+			Name:    mod.Path,
+			Version: mod.Version,
+		})
 	}
 
 	return libs, nil, nil

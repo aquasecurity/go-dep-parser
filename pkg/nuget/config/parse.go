@@ -34,7 +34,10 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 			continue
 		}
 
-		lib := types.Library{Name: pkg.ID, Version: pkg.Version}
+		lib := types.Library{
+			Name:    pkg.ID,
+			Version: pkg.Version,
+		}
 		uniqueLibs[lib] = struct{}{}
 	}
 
