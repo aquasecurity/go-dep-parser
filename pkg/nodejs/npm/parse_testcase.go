@@ -411,6 +411,14 @@ var (
 			ID:        "verror@1.10.0",
 			DependsOn: []string{"assert-plus@1.0.0", "core-util-is@1.0.2", "extsprintf@1.3.0"},
 		},
+		{
+			ID:        "debug@2.6.9",
+			DependsOn: []string{"ms@2.0.0"},
+		},
+		{
+			ID:        "supports-color@5.5.0",
+			DependsOn: []string{"has-flag@3.0.0"},
+		},
 	}
 
 	// manually created
@@ -448,5 +456,252 @@ var (
 		ID: "on-finished@2.3.0", DependsOn: []string{"ee-first@1.1.1"},
 	}, {
 		ID: "debug@2.0.0", DependsOn: []string{"ms@0.6.2"},
+	}, {
+		ID:        "debug@2.6.9",
+		DependsOn: []string{"ms@2.0.0"},
 	}}
+
+	npmDeepNested = []types.Library{
+		{Name: "ansi-regex", Version: "0.2.1"},
+		{Name: "ansi-regex", Version: "2.1.1"},
+		{Name: "ansi-regex", Version: "6.0.1"},
+		{Name: "camelcase", Version: "3.0.0"},
+		{Name: "cliui", Version: "3.2.0"},
+		{Name: "code-point-at", Version: "1.1.0"},
+		{Name: "decamelize", Version: "1.2.0"},
+		{Name: "eastasianwidth", Version: "0.2.0"},
+		{Name: "emoji-regex", Version: "9.2.2"},
+		{Name: "error-ex", Version: "1.3.2"},
+		{Name: "find-up", Version: "1.1.2"},
+		{Name: "function-bind", Version: "1.1.1"},
+		{Name: "get-caller-file", Version: "1.0.3"},
+		{Name: "graceful-fs", Version: "4.2.10"},
+		{Name: "has", Version: "1.0.3"},
+		{Name: "hosted-git-info", Version: "2.8.9"},
+		{Name: "invert-kv", Version: "1.0.0"},
+		{Name: "is-arrayish", Version: "0.2.1"},
+		{Name: "is-core-module", Version: "2.9.0"},
+		{Name: "is-fullwidth-code-point", Version: "1.0.0"},
+		{Name: "is-utf8", Version: "0.2.1"},
+		{Name: "lcid", Version: "1.0.0"},
+		{Name: "load-json-file", Version: "1.1.0"},
+		{Name: "normalize-package-data", Version: "2.5.0"},
+		{Name: "number-is-nan", Version: "1.0.1"},
+		{Name: "os-locale", Version: "1.4.0"},
+		{Name: "parse-json", Version: "2.2.0"},
+		{Name: "path-exists", Version: "2.1.0"},
+		{Name: "path-parse", Version: "1.0.7"},
+		{Name: "path-type", Version: "1.1.0"},
+		{Name: "pify", Version: "2.3.0"},
+		{Name: "pinkie", Version: "2.0.4"},
+		{Name: "pinkie-promise", Version: "2.0.1"},
+		{Name: "read-pkg", Version: "1.1.0"},
+		{Name: "read-pkg-up", Version: "1.0.1"},
+		{Name: "require-directory", Version: "2.1.1"},
+		{Name: "require-main-filename", Version: "1.0.1"},
+		{Name: "resolve", Version: "1.22.0"},
+		{Name: "semver", Version: "5.7.1"},
+		{Name: "set-blocking", Version: "2.0.0"},
+		{Name: "spdx-correct", Version: "3.1.1"},
+		{Name: "spdx-exceptions", Version: "2.3.0"},
+		{Name: "spdx-expression-parse", Version: "3.0.1"},
+		{Name: "spdx-license-ids", Version: "3.0.11"},
+		{Name: "string-width", Version: "1.0.2"},
+		{Name: "string-width", Version: "5.1.2"},
+		{Name: "strip-ansi", Version: "1.0.0"},
+		{Name: "strip-ansi", Version: "3.0.1"},
+		{Name: "strip-ansi", Version: "7.0.1"},
+		{Name: "strip-bom", Version: "2.0.0"},
+		{Name: "supports-preserve-symlinks-flag", Version: "1.0.0"},
+		{Name: "validate-npm-package-license", Version: "3.0.4"},
+		{Name: "which-module", Version: "1.0.0"},
+		{Name: "wrap-ansi", Version: "2.1.0"},
+		{Name: "y18n", Version: "3.2.2"},
+		{Name: "yargs", Version: "6.6.0"},
+		{Name: "yargs-parser", Version: "4.2.1"},
+	}
+	npmDeepNestedDeps = []types.Dependency{
+		{
+			ID: "cliui@3.2.0",
+			DependsOn: []string{
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+				"wrap-ansi@2.1.0",
+			},
+		},
+		{
+			ID:        "error-ex@1.3.2",
+			DependsOn: []string{"is-arrayish@0.2.1"},
+		},
+		{
+			ID: "find-up@1.1.2",
+			DependsOn: []string{"path-exists@2.1.0",
+				"pinkie-promise@2.0.1",
+			},
+		},
+		{
+			ID:        "has@1.0.3",
+			DependsOn: []string{"function-bind@1.1.1"},
+		},
+		{
+			ID:        "is-core-module@2.9.0",
+			DependsOn: []string{"has@1.0.3"},
+		},
+		{
+			ID:        "is-fullwidth-code-point@1.0.0",
+			DependsOn: []string{"number-is-nan@1.0.1"},
+		},
+		{
+			ID:        "lcid@1.0.0",
+			DependsOn: []string{"invert-kv@1.0.0"},
+		},
+		{
+			ID: "load-json-file@1.1.0",
+			DependsOn: []string{
+				"graceful-fs@4.2.10",
+				"parse-json@2.2.0",
+				"pify@2.3.0",
+				"pinkie-promise@2.0.1",
+				"strip-bom@2.0.0",
+			},
+		},
+		{
+			ID: "normalize-package-data@2.5.0",
+			DependsOn: []string{
+				"hosted-git-info@2.8.9",
+				"resolve@1.22.0",
+				"semver@5.7.1",
+				"validate-npm-package-license@3.0.4",
+			},
+		},
+		{
+			ID:        "os-locale@1.4.0",
+			DependsOn: []string{"lcid@1.0.0"},
+		},
+		{
+			ID:        "parse-json@2.2.0",
+			DependsOn: []string{"error-ex@1.3.2"},
+		},
+		{
+			ID:        "path-exists@2.1.0",
+			DependsOn: []string{"pinkie-promise@2.0.1"},
+		},
+		{
+			ID: "path-type@1.1.0",
+			DependsOn: []string{
+				"graceful-fs@4.2.10",
+				"pify@2.3.0",
+				"pinkie-promise@2.0.1",
+			},
+		},
+		{
+			ID:        "pinkie-promise@2.0.1",
+			DependsOn: []string{"pinkie@2.0.4"},
+		},
+		{
+			ID: "read-pkg-up@1.0.1",
+			DependsOn: []string{
+				"find-up@1.1.2",
+				"read-pkg@1.1.0",
+			},
+		},
+		{
+			ID: "read-pkg@1.1.0",
+			DependsOn: []string{
+				"load-json-file@1.1.0",
+				"normalize-package-data@2.5.0",
+				"path-type@1.1.0",
+			},
+		},
+		{
+			ID: "resolve@1.22.0",
+			DependsOn: []string{
+				"is-core-module@2.9.0",
+				"path-parse@1.0.7",
+				"supports-preserve-symlinks-flag@1.0.0",
+			},
+		},
+		{
+			ID: "spdx-correct@3.1.1",
+			DependsOn: []string{
+				"spdx-expression-parse@3.0.1",
+				"spdx-license-ids@3.0.11",
+			},
+		},
+		{
+			ID: "spdx-expression-parse@3.0.1",
+			DependsOn: []string{
+				"spdx-exceptions@2.3.0",
+				"spdx-license-ids@3.0.11",
+			},
+		},
+		{
+			ID: "string-width@1.0.2",
+			DependsOn: []string{
+				"code-point-at@1.1.0",
+				"is-fullwidth-code-point@1.0.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "string-width@5.1.2",
+			DependsOn: []string{
+				"eastasianwidth@0.2.0",
+				"emoji-regex@9.2.2",
+				"strip-ansi@7.0.1",
+			},
+		},
+		{
+			ID:        "strip-ansi@1.0.0",
+			DependsOn: []string{"ansi-regex@0.2.1"},
+		},
+		{
+			ID:        "strip-ansi@3.0.1",
+			DependsOn: []string{"ansi-regex@2.1.1"},
+		},
+		{
+			ID:        "strip-ansi@7.0.1",
+			DependsOn: []string{"ansi-regex@6.0.1"},
+		},
+		{
+			ID:        "strip-bom@2.0.0",
+			DependsOn: []string{"is-utf8@0.2.1"},
+		},
+		{
+			ID: "validate-npm-package-license@3.0.4",
+			DependsOn: []string{
+				"spdx-correct@3.1.1",
+				"spdx-expression-parse@3.0.1",
+			},
+		},
+		{
+			ID: "wrap-ansi@2.1.0",
+			DependsOn: []string{
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID:        "yargs-parser@4.2.1",
+			DependsOn: []string{"camelcase@3.0.0"},
+		},
+		{
+			ID: "yargs@6.6.0",
+			DependsOn: []string{
+				"camelcase@3.0.0",
+				"cliui@3.2.0",
+				"decamelize@1.2.0",
+				"get-caller-file@1.0.3",
+				"os-locale@1.4.0",
+				"read-pkg-up@1.0.1",
+				"require-directory@2.1.1",
+				"require-main-filename@1.0.1",
+				"set-blocking@2.0.0",
+				"string-width@1.0.2",
+				"which-module@1.0.0",
+				"y18n@3.2.2",
+				"yargs-parser@4.2.1",
+			},
+		},
+	}
 )

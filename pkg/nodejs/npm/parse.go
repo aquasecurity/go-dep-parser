@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
+	"strings"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
@@ -34,7 +36,7 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 
 	libs, deps := parse(lockFile.Dependencies)
 
-	return unique(libs), deps, nil
+	return unique(libs), uniqueDeps(deps), nil
 }
 
 func parse(dependencies map[string]Dependency) ([]types.Library, []types.Dependency) {
@@ -63,8 +65,9 @@ func parse(dependencies map[string]Dependency) ([]types.Library, []types.Depende
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			childLibs, _ := parse(dependency.Dependencies)
+			childLibs, childDeps := parse(dependency.Dependencies)
 			libs = append(libs, childLibs...)
+			deps = append(deps, childDeps...)
 		}
 	}
 
@@ -94,4 +97,18 @@ func unique(libs []types.Library) []types.Library {
 		}
 	}
 	return uniqLibs
+}
+func uniqueDeps(deps []types.Dependency) []types.Dependency {
+	var uniqDeps []types.Dependency
+	unique := make(map[string]struct{})
+
+	for _, dep := range deps {
+		sort.Strings(dep.DependsOn)
+		depKey := fmt.Sprintf("%s:%s", dep.ID, strings.Join(dep.DependsOn, ","))
+		if _, ok := unique[depKey]; !ok {
+			unique[depKey] = struct{}{}
+			uniqDeps = append(uniqDeps, dep)
+		}
+	}
+	return uniqDeps
 }

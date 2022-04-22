@@ -43,6 +43,11 @@ func TestParse(t *testing.T) {
 			want:     npmNested,
 			wantDeps: npmNestedDeps,
 		},
+		{
+			file:     "testdata/package-lock_deep-nested.json",
+			want:     npmDeepNested,
+			wantDeps: npmDeepNestedDeps,
+		},
 	}
 
 	for _, v := range vectors {
