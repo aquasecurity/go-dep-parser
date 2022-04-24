@@ -2,7 +2,6 @@ package npm
 
 import (
 	"os"
-	"path"
 	"sort"
 	"strings"
 	"testing"
@@ -14,58 +13,66 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	vectors := []struct {
+	tests := []struct {
+		name     string
 		file     string // Test input file
 		want     []types.Library
 		wantDeps []types.Dependency
 	}{
 		{
+			name:     "normal",
 			file:     "testdata/package-lock_normal.json",
 			want:     npmNormal,
 			wantDeps: npmNormalDeps,
 		},
 		{
+			name:     "react",
 			file:     "testdata/package-lock_react.json",
 			want:     npmReact,
 			wantDeps: npmReactDeps,
 		},
 		{
+			name:     "with devDependencies",
 			file:     "testdata/package-lock_with_dev.json",
 			want:     npmWithDev,
 			wantDeps: npmWithDevDeps,
-		}, {
+		},
+		{
+			name:     "many packages",
 			file:     "testdata/package-lock_many.json",
 			want:     npmMany,
 			wantDeps: npmManyDeps,
 		},
 		{
+			name:     "nested packages",
 			file:     "testdata/package-lock_nested.json",
 			want:     npmNested,
 			wantDeps: npmNestedDeps,
 		},
 		{
+			name:     "deep nested packages",
 			file:     "testdata/package-lock_deep-nested.json",
 			want:     npmDeepNested,
 			wantDeps: npmDeepNestedDeps,
 		},
 	}
 
-	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
-			f, err := os.Open(v.file)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f, err := os.Open(tt.file)
 			require.NoError(t, err)
 
 			got, deps, err := Parse(f)
 			require.NoError(t, err)
 
 			sortLibs(got)
-			sortLibs(v.want)
+			sortLibs(tt.want)
 
-			assert.Equal(t, v.want, got)
-			if v.wantDeps != nil {
+			assert.Equal(t, tt.want, got)
+			if tt.wantDeps != nil {
 				sortDeps(deps)
-				sortDeps(v.wantDeps)
-				assert.Equal(t, v.wantDeps, deps)
+				sortDeps(tt.wantDeps)
+				assert.Equal(t, tt.wantDeps, deps)
 			}
 		})
 	}
