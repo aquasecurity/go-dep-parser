@@ -7,8 +7,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 type LockFile struct {
@@ -34,12 +37,18 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
-	libs, deps := parse(lockFile.Dependencies)
+	libs, deps := parse(lockFile.Dependencies, map[string]string{})
 
 	return unique(libs), uniqueDeps(deps), nil
 }
 
-func parse(dependencies map[string]Dependency) ([]types.Library, []types.Dependency) {
+func parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
+	// Update package name and version mapping.
+	for pkgName, dep := range dependencies {
+		// Overwrite the existing package version so that the nested version can take precedence.
+		versions[pkgName] = dep.Version
+	}
+
 	var libs []types.Library
 	var deps []types.Dependency
 	for pkgName, dependency := range dependencies {
@@ -47,44 +56,44 @@ func parse(dependencies map[string]Dependency) ([]types.Library, []types.Depende
 			continue
 		}
 
-		lib := types.Library{Name: pkgName, Version: dependency.Version}
+		lib := types.Library{
+			Name:    pkgName,
+			Version: dependency.Version,
+		}
 		libs = append(libs, lib)
-		dependsOn := make([]string, 0, len(dependency.Requires))
-		for k := range dependency.Requires {
-			resolvedLib, ok := dependency.Dependencies[k] //try to resolve with nested dependencies first
 
-			if ok {
-				k = ID(k, resolvedLib.Version)
+		dependsOn := make([]string, 0, len(dependency.Requires))
+		for libName, requiredVer := range dependency.Requires {
+			// Try to resolve the version with nested dependencies first
+			if resolvedDep, ok := dependency.Dependencies[libName]; ok {
+				libID := ID(libName, resolvedDep.Version)
+				dependsOn = append(dependsOn, libID)
+				continue
 			}
 
-			dependsOn = append(dependsOn, k) //add library name only
+			// Try to resolve the version with the higher level dependencies
+			if ver, ok := versions[libName]; ok {
+				dependsOn = append(dependsOn, ID(libName, ver))
+				continue
+			}
+
+			// It should not reach here.
+			log.Logger.Warnf("Cannot resolve the version: %s@%s", libName, requiredVer)
 		}
+
 		if len(dependsOn) > 0 {
 			deps = append(deps, types.Dependency{ID: ID(lib.Name, lib.Version), DependsOn: dependsOn})
 		}
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			childLibs, childDeps := parse(dependency.Dependencies)
+			childLibs, childDeps := parse(dependency.Dependencies, maps.Clone(versions))
 			libs = append(libs, childLibs...)
 			deps = append(deps, childDeps...)
 		}
 	}
 
-	resolveDefaultDependencies(dependencies, deps)
-
 	return libs, deps
-}
-func resolveDefaultDependencies(dependencies map[string]Dependency, deps []types.Dependency) {
-	for _, dep := range deps {
-		for i := range dep.DependsOn {
-			pkg := dep.DependsOn[i]
-			resolvedLib, ok := dependencies[pkg]
-			if ok {
-				dep.DependsOn[i] = ID(pkg, resolvedLib.Version)
-			}
-		}
-	}
 }
 
 func unique(libs []types.Library) []types.Library {
