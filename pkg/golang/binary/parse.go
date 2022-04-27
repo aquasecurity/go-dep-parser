@@ -2,6 +2,7 @@ package binary
 
 import (
 	"debug/buildinfo"
+	"io"
 	"strings"
 
 	"golang.org/x/xerrors"
@@ -29,9 +30,17 @@ func convertError(err error) error {
 	return err
 }
 
+type golangParser struct {
+	types.DefaultParser
+}
+
+func NewParser() *golangParser {
+	return &golangParser{}
+}
+
 // Parse scans file to try to report the Go and module versions.
-func Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
-	info, err := buildinfo.Read(r)
+func (p *golangParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+	info, err := buildinfo.Read(r.(dio.ReadSeekerAt))
 	if err != nil {
 		return nil, nil, convertError(err)
 	}

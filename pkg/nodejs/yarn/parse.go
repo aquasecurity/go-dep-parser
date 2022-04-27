@@ -60,7 +60,15 @@ func validProtocol(protocol string) (valid bool) {
 	return false
 }
 
-func Parse(r io.Reader) (libs []types.Library, deps []types.Dependency, err error) {
+type npmParser struct {
+	types.DefaultParser
+}
+
+func NewParser() *npmParser {
+	return &npmParser{}
+}
+
+func (p *npmParser) Parse(r io.Reader) (libs []types.Library, deps []types.Dependency, err error) {
 	scanner := bufio.NewScanner(r)
 	unique := map[string]struct{}{}
 	var lib types.Library

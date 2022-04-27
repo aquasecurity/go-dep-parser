@@ -21,8 +21,15 @@ type config struct {
 	XMLName  xml.Name              `xml:"packages"`
 	Packages []cfgPackageReference `xml:"package"`
 }
+type nugetParser struct {
+	types.DefaultParser
+}
 
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func NewParser() *nugetParser {
+	return &nugetParser{}
+}
+
+func (p *nugetParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var cfgData config
 	if err := xml.NewDecoder(r).Decode(&cfgData); err != nil {
 		return nil, nil, xerrors.Errorf("failed to decode .config file: %w", err)

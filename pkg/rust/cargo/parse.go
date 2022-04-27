@@ -17,8 +17,15 @@ type Lockfile struct {
 	} `toml:"package"`
 	Metadata interface{}
 }
+type cargoParser struct {
+	types.DefaultParser
+}
 
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func NewParser() *cargoParser {
+	return &cargoParser{}
+}
+
+func (p *cargoParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockfile Lockfile
 	if _, err := toml.DecodeReader(r, &lockfile); err != nil {
 		return nil, nil, xerrors.Errorf("decode error: %w", err)

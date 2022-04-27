@@ -44,6 +44,7 @@ func WithRemoteRepos(repos []string) option {
 }
 
 type parser struct {
+	types.DefaultParser
 	rootPath           string
 	cache              pomCache
 	localRepository    string

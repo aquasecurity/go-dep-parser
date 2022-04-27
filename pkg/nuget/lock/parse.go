@@ -20,8 +20,15 @@ type Dependency struct {
 	Type     string
 	Resolved string
 }
+type nugetParser struct {
+	types.DefaultParser
+}
 
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func NewParser() *nugetParser {
+	return &nugetParser{}
+}
+
+func (p *nugetParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
 

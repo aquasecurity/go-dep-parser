@@ -38,41 +38,49 @@ var (
 	ArtifactNotFoundErr = xerrors.New("no artifact found")
 )
 
-type conf struct {
+type javaParser struct {
+	types.DefaultParser
+
 	baseURL      string
 	rootFilePath string
 	httpClient   *http.Client
 	offline      bool
+	size         int64
 }
 
-type Option func(*conf)
+type Option func(*javaParser)
 
 func WithURL(url string) Option {
-	return func(c *conf) {
-		c.baseURL = url
+	return func(p *javaParser) {
+		p.baseURL = url
 	}
 }
 
 func WithFilePath(filePath string) Option {
-	return func(c *conf) {
-		c.rootFilePath = filePath
+	return func(p *javaParser) {
+		p.rootFilePath = filePath
 	}
 }
 
 func WithHTTPClient(client *http.Client) Option {
-	return func(c *conf) {
-		c.httpClient = client
+	return func(p *javaParser) {
+		p.httpClient = client
 	}
 }
 
 func WithOffline(offline bool) Option {
-	return func(c *conf) {
-		c.offline = offline
+	return func(p *javaParser) {
+		p.offline = offline
 	}
-
 }
 
-func Parse(r dio.ReadSeekerAt, size int64, opts ...Option) ([]types.Library, []types.Dependency, error) {
+func WithSize(size int64) Option {
+	return func(p *javaParser) {
+		p.size = size
+	}
+}
+
+func NewParser(opts ...Option) *javaParser {
 	// for HTTP retry
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = logger{}
@@ -88,18 +96,29 @@ func Parse(r dio.ReadSeekerAt, size int64, opts ...Option) ([]types.Library, []t
 		mavenURL = baseURL
 	}
 
-	c := conf{
+	p := &javaParser{
 		baseURL:    mavenURL,
 		httpClient: client,
 	}
+
 	for _, opt := range opts {
-		opt(&c)
+		opt(p)
 	}
 
-	return parseArtifact(c, c.rootFilePath, r, size)
+	return p
 }
 
-func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]types.Library, []types.Dependency, error) {
+func (p *javaParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+	dioReader, ok := r.(dio.ReadSeekerAt)
+
+	if !ok {
+		return nil, nil, xerrors.Errorf("unable to convert reader")
+	}
+
+	return p.parseArtifact(p.rootFilePath, p.size, dioReader)
+}
+
+func (p *javaParser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	log.Logger.Debugw("Parsing Java artifacts...", zap.String("file", fileName))
 
 	zr, err := zip.NewReader(r, size)
@@ -135,7 +154,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 				return nil, nil, xerrors.Errorf("failed to parse MANIFEST.MF: %w", err)
 			}
 		case isArtifact(fileInJar.Name):
-			innerLibs, _, err := parseInnerJar(c, fileInJar) //TODO process inner deps
+			innerLibs, _, err := p.parseInnerJar(fileInJar) //TODO process inner deps
 			if err != nil {
 				return nil, nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
@@ -149,7 +168,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 	}
 
 	manifestProps := m.properties()
-	if c.offline {
+	if p.offline {
 		// In offline mode, we will not check if the artifact information is correct.
 		if !manifestProps.valid() {
 			log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
@@ -161,16 +180,16 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 	if manifestProps.valid() {
 		// Even if MANIFEST.MF is found, the groupId and artifactId might not be valid.
 		// We have to make sure that the artifact exists actually.
-		if ok, _ := exists(c, manifestProps); ok {
+		if ok, _ := p.exists(manifestProps); ok {
 			// If groupId and artifactId are valid, they will be returned.
 			return append(libs, manifestProps.library()), nil, nil
 		}
 	}
 
 	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
-	p, err := searchBySHA1(c, r)
+	props, err := p.searchBySHA1(r)
 	if err == nil {
-		return append(libs, p.library()), nil, nil
+		return append(libs, props.library()), nil, nil
 	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
 		return nil, nil, xerrors.Errorf("failed to search by SHA1: %w", err)
 	}
@@ -184,7 +203,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 
 	// Try to search groupId by artifactId via sonatype API
 	// When some artifacts have the same groupIds, it might result in false detection.
-	fileProps.groupID, err = searchByArtifactID(c, fileProps.artifactID)
+	fileProps.groupID, err = p.searchByArtifactID(fileProps.artifactID)
 	if err == nil {
 		log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
 			zap.String("artifact", fileProps.String()))
@@ -196,7 +215,7 @@ func parseArtifact(c conf, fileName string, r dio.ReadSeekerAt, size int64) ([]t
 	return libs, nil, nil
 }
 
-func parseInnerJar(c conf, zf *zip.File) ([]types.Library, []types.Dependency, error) {
+func (p *javaParser) parseInnerJar(zf *zip.File) ([]types.Library, []types.Dependency, error) {
 	fr, err := zf.Open()
 	if err != nil {
 		return nil, nil, xerrors.Errorf("unable to open %s: %w", zf.Name, err)
@@ -217,7 +236,7 @@ func parseInnerJar(c conf, zf *zip.File) ([]types.Library, []types.Dependency, e
 	}
 
 	// Parse jar/war/ear recursively
-	innerLibs, innerDeps, err := parseArtifact(c, zf.Name, f, int64(zf.UncompressedSize64))
+	innerLibs, innerDeps, err := p.parseArtifact(zf.Name, int64(zf.UncompressedSize64), f)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("failed to parse %s: %w", zf.Name, err)
 	}
@@ -433,18 +452,18 @@ func (m manifest) determineVersion() (string, error) {
 	return strings.TrimSpace(version), nil
 }
 
-func exists(c conf, p properties) (bool, error) {
-	req, err := http.NewRequest(http.MethodGet, c.baseURL, nil)
+func (p *javaParser) exists(props properties) (bool, error) {
+	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
 	if err != nil {
 		return false, xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
 
 	q := req.URL.Query()
-	q.Set("q", fmt.Sprintf(idQuery, p.groupID, p.artifactID))
+	q.Set("q", fmt.Sprintf(idQuery, props.groupID, props.artifactID))
 	q.Set("rows", "1")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := p.httpClient.Do(req)
 	if err != nil {
 		return false, xerrors.Errorf("http error: %w", err)
 	}
@@ -457,7 +476,7 @@ func exists(c conf, p properties) (bool, error) {
 	return res.Response.NumFound > 0, nil
 }
 
-func searchBySHA1(c conf, r io.ReadSeeker) (properties, error) {
+func (p *javaParser) searchBySHA1(r io.ReadSeeker) (properties, error) {
 	if _, err := r.Seek(0, io.SeekStart); err != nil {
 		return properties{}, xerrors.Errorf("file seek error: %w", err)
 	}
@@ -468,7 +487,7 @@ func searchBySHA1(c conf, r io.ReadSeeker) (properties, error) {
 	}
 	digest := hex.EncodeToString(h.Sum(nil))
 
-	req, err := http.NewRequest(http.MethodGet, c.baseURL, nil)
+	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
 	if err != nil {
 		return properties{}, xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
@@ -479,7 +498,7 @@ func searchBySHA1(c conf, r io.ReadSeeker) (properties, error) {
 	q.Set("wt", "json")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := p.httpClient.Do(req)
 	if err != nil {
 		return properties{}, xerrors.Errorf("sha1 search error: %w", err)
 	}
@@ -513,8 +532,8 @@ func searchBySHA1(c conf, r io.ReadSeeker) (properties, error) {
 	}, nil
 }
 
-func searchByArtifactID(c conf, artifactID string) (string, error) {
-	req, err := http.NewRequest(http.MethodGet, c.baseURL, nil)
+func (p *javaParser) searchByArtifactID(artifactID string) (string, error) {
+	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
 	if err != nil {
 		return "", xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
@@ -525,7 +544,7 @@ func searchByArtifactID(c conf, artifactID string) (string, error) {
 	q.Set("wt", "json")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := c.httpClient.Do(req)
+	resp, err := p.httpClient.Do(req)
 	if err != nil {
 		return "", xerrors.Errorf("artifactID search error: %w", err)
 	}

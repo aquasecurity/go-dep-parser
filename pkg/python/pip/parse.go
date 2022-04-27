@@ -16,7 +16,16 @@ const (
 	hashMarker    string = "--"
 )
 
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+type pythonParser struct {
+	types.DefaultParser
+}
+
+func NewParser() *pythonParser {
+	return &pythonParser{}
+}
+
+func (p *pythonParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+
 	scanner := bufio.NewScanner(r)
 	var libs []types.Library
 	for scanner.Scan() {

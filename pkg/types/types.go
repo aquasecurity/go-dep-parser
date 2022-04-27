@@ -11,3 +11,9 @@ type Dependency struct {
 	ID        string
 	DependsOn []string
 }
+
+type DefaultParser struct{}
+
+func (p *DefaultParser) ID(pkgName, version string) string {
+	return ""
+}

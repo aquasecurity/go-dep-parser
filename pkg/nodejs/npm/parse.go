@@ -23,13 +23,17 @@ type Dependency struct {
 	Dependencies map[string]Dependency
 	Requires     map[string]string
 }
+type npmParser struct{}
 
-func ID(name, version string) string {
-	// TODO replace naive implementation
+func NewParser() *npmParser {
+	return &npmParser{}
+}
+
+func (p *npmParser) ID(name, version string) string {
 	return fmt.Sprintf("%s@%s", name, version)
 }
 
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *npmParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)
@@ -37,12 +41,12 @@ func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
-	libs, deps := parse(lockFile.Dependencies, map[string]string{})
+	libs, deps := p.parse(lockFile.Dependencies, map[string]string{})
 
 	return unique(libs), uniqueDeps(deps), nil
 }
 
-func parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
+func (p *npmParser) parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
 	// Update package name and version mapping.
 	for pkgName, dep := range dependencies {
 		// Overwrite the existing package version so that the nested version can take precedence.
@@ -66,14 +70,14 @@ func parse(dependencies map[string]Dependency, versions map[string]string) ([]ty
 		for libName, requiredVer := range dependency.Requires {
 			// Try to resolve the version with nested dependencies first
 			if resolvedDep, ok := dependency.Dependencies[libName]; ok {
-				libID := ID(libName, resolvedDep.Version)
+				libID := p.ID(libName, resolvedDep.Version)
 				dependsOn = append(dependsOn, libID)
 				continue
 			}
 
 			// Try to resolve the version with the higher level dependencies
 			if ver, ok := versions[libName]; ok {
-				dependsOn = append(dependsOn, ID(libName, ver))
+				dependsOn = append(dependsOn, p.ID(libName, ver))
 				continue
 			}
 
@@ -82,12 +86,12 @@ func parse(dependencies map[string]Dependency, versions map[string]string) ([]ty
 		}
 
 		if len(dependsOn) > 0 {
-			deps = append(deps, types.Dependency{ID: ID(lib.Name, lib.Version), DependsOn: dependsOn})
+			deps = append(deps, types.Dependency{ID: p.ID(lib.Name, lib.Version), DependsOn: dependsOn})
 		}
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			childLibs, childDeps := parse(dependency.Dependencies, maps.Clone(versions))
+			childLibs, childDeps := p.parse(dependency.Dependencies, maps.Clone(versions))
 			libs = append(libs, childLibs...)
 			deps = append(deps, childDeps...)
 		}

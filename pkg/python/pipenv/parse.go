@@ -16,8 +16,15 @@ type lockFile struct {
 type dependency struct {
 	Version string
 }
+type pythonParser struct {
+	types.DefaultParser
+}
 
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func NewParser() *pythonParser {
+	return &pythonParser{}
+}
+
+func (p *pythonParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var lockFile lockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)

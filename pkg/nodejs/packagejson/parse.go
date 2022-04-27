@@ -13,23 +13,30 @@ type packageJSON struct {
 	Version string      `json:"version"`
 	License interface{} `json:"license"`
 }
+type npmParser struct {
+	types.DefaultParser
+}
 
-func Parse(r io.Reader) (types.Library, error) {
+func NewParser() *npmParser {
+	return &npmParser{}
+}
+
+func (p *npmParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var data packageJSON
 	err := json.NewDecoder(r).Decode(&data)
 	if err != nil {
-		return types.Library{}, xerrors.Errorf("JSON decode error: %w", err)
+		return nil, nil, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
 	if data.Name == "" || data.Version == "" {
-		return types.Library{}, xerrors.Errorf("unable to parse package.json")
+		return nil, nil, xerrors.Errorf("unable to parse package.json")
 	}
 
-	return types.Library{
+	return []types.Library{{
 		Name:    data.Name,
 		Version: data.Version,
 		License: parseLicense(data.License),
-	}, nil
+	}}, nil, nil
 }
 
 func parseLicense(val interface{}) string {

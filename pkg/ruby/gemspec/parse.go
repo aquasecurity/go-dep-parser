@@ -42,7 +42,15 @@ var (
 	licensesRegexp = regexp.MustCompile(`\.licenses\s*=\s*\[(?P<licenses>.+)\]`)
 )
 
-func Parse(r io.Reader) (types.Library, error) {
+type rubyParser struct {
+	types.DefaultParser
+}
+
+func NewParser() *rubyParser {
+	return &rubyParser{}
+}
+
+func (p *rubyParser) Parse(r io.Reader) (libs []types.Library, deps []types.Dependency, err error) {
 	var newVar, name, version, license string
 
 	scanner := bufio.NewScanner(r)
@@ -82,18 +90,19 @@ func Parse(r io.Reader) (types.Library, error) {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return types.Library{}, xerrors.Errorf("failed to parse gemspec: %w", err)
+		return nil, nil, xerrors.Errorf("failed to parse gemspec: %w", err)
 	}
 
 	if name == "" || version == "" {
-		return types.Library{}, xerrors.New("failed to parse gemspec")
+		return nil, nil, xerrors.New("failed to parse gemspec")
 	}
 
-	return types.Library{
-		Name:    name,
-		Version: version,
-		License: license,
-	}, nil
+	return []types.Library{
+		{
+			Name:    name,
+			Version: version,
+			License: license,
+		}}, nil, nil
 }
 
 func findSubString(re *regexp.Regexp, line, name string) string {

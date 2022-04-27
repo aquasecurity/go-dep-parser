@@ -9,8 +9,16 @@ import (
 	"golang.org/x/xerrors"
 )
 
+type golangParser struct {
+	types.DefaultParser
+}
+
+func NewParser() *golangParser {
+	return &golangParser{}
+}
+
 // Parse parses a go.sum file
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *golangParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
 	uniqueLibs := make(map[string]string)
 

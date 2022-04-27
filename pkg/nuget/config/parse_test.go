@@ -44,7 +44,7 @@ func TestParse(t *testing.T) {
 			f, err := os.Open(tt.inputFile)
 			require.NoError(t, err)
 
-			got, _, err := config.Parse(f)
+			got, _, err := config.NewParser().Parse(f)
 			if tt.wantErr != "" {
 				require.NotNil(t, err)
 				assert.Contains(t, err.Error(), tt.wantErr)

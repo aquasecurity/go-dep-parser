@@ -12,8 +12,16 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
+type golangParser struct {
+	types.DefaultParser
+}
+
+func NewParser() *golangParser {
+	return &golangParser{}
+}
+
 // Parse parses a go.mod file
-func Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *golangParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
 	libs := map[string]types.Library{}
 
 	goModData, err := io.ReadAll(r)
