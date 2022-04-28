@@ -9,6 +9,7 @@ import (
 	"golang.org/x/mod/modfile"
 	"golang.org/x/xerrors"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -21,7 +22,7 @@ func NewParser() *golangParser {
 }
 
 // Parse parses a go.mod file
-func (p *golangParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *golangParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	libs := map[string]types.Library{}
 
 	goModData, err := io.ReadAll(r)

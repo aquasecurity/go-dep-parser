@@ -2,10 +2,11 @@ package bundler
 
 import (
 	"bufio"
-	"io"
 	"strings"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+
 	"golang.org/x/xerrors"
 )
 
@@ -17,7 +18,7 @@ func NewParser() *rubyParser {
 	return &rubyParser{}
 }
 
-func (p *rubyParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *rubyParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {

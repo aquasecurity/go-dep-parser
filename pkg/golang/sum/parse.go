@@ -2,9 +2,9 @@ package sum
 
 import (
 	"bufio"
-	"io"
 	"strings"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
 )
@@ -18,7 +18,7 @@ func NewParser() *golangParser {
 }
 
 // Parse parses a go.sum file
-func (p *golangParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *golangParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
 	uniqueLibs := make(map[string]string)
 

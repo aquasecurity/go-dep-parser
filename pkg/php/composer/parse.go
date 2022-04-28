@@ -2,8 +2,8 @@ package composer
 
 import (
 	"encoding/json"
-	"io"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
 )
@@ -23,7 +23,7 @@ func NewParser() *phpParser {
 	return &phpParser{}
 }
 
-func (p *phpParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *phpParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockFile lockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)

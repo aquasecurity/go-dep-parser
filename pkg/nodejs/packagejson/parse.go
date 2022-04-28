@@ -2,8 +2,8 @@ package packagejson
 
 import (
 	"encoding/json"
-	"io"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
 )
@@ -21,7 +21,7 @@ func NewParser() *npmParser {
 	return &npmParser{}
 }
 
-func (p *npmParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *npmParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var data packageJSON
 	err := json.NewDecoder(r).Decode(&data)
 	if err != nil {

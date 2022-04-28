@@ -10,6 +10,7 @@ import (
 
 	"golang.org/x/xerrors"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -30,7 +31,8 @@ func NewParser(filePath string, size int64, isRequired func(filePath string, _ o
 
 // Parse parses egg and wheel metadata.
 // e.g. .egg-info/PKG-INFO and dist-info/METADATA
-func (p *pythonParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *pythonParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+	var zr io.ReadCloser = r.(io.ReadCloser)
 
 	// .egg file is zip format and PKG-INFO needs to be extracted from the zip file.
 	if strings.HasSuffix(p.filePath, ".egg") {
@@ -44,10 +46,10 @@ func (p *pythonParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, 
 
 		defer pkginfoInZip.Close()
 
-		r = pkginfoInZip
+		zr = pkginfoInZip
 	}
 
-	rd := textproto.NewReader(bufio.NewReader(r))
+	rd := textproto.NewReader(bufio.NewReader(zr))
 	h, err := rd.ReadMIMEHeader()
 	if err != nil && err != io.EOF {
 		return nil, nil, xerrors.Errorf("read MIME error: %w", err)

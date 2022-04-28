@@ -2,10 +2,10 @@ package lock
 
 import (
 	"encoding/json"
-	"io"
 
 	"golang.org/x/xerrors"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -28,7 +28,7 @@ func NewParser() *nugetParser {
 	return &nugetParser{}
 }
 
-func (p *nugetParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *nugetParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
 

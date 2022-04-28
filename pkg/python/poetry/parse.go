@@ -1,9 +1,8 @@
 package poetry
 
 import (
-	"io"
-
 	"github.com/BurntSushi/toml"
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
 )
@@ -29,7 +28,7 @@ func NewParser() *pythonParser {
 	return &pythonParser{}
 }
 
-func (p *pythonParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *pythonParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockfile Lockfile
 	if _, err := toml.DecodeReader(r, &lockfile); err != nil {
 		return nil, nil, xerrors.Errorf("decode error: %w", err)

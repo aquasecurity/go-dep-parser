@@ -2,10 +2,10 @@ package pip
 
 import (
 	"bufio"
-	"io"
 	"strings"
 	"unicode"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
 )
@@ -24,7 +24,7 @@ func NewParser() *pythonParser {
 	return &pythonParser{}
 }
 
-func (p *pythonParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *pythonParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 
 	scanner := bufio.NewScanner(r)
 	var libs []types.Library

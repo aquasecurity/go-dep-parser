@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	multierror "github.com/hashicorp/go-multierror"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/xerrors"
@@ -78,7 +79,7 @@ func NewParser(filePath string, opts ...option) *parser {
 	}
 }
 
-func (p *parser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	content, err := parsePom(r)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("failed to parse POM: %w", err)

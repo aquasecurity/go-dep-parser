@@ -3,14 +3,15 @@ package npm
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"sort"
 	"strings"
 
 	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
+
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -33,7 +34,7 @@ func (p *npmParser) ID(name, version string) string {
 	return fmt.Sprintf("%s@%s", name, version)
 }
 
-func (p *npmParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
+func (p *npmParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)

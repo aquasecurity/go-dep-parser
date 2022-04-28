@@ -3,13 +3,13 @@ package gemspec
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"regexp"
 	"strings"
 	"unicode"
 
 	"golang.org/x/xerrors"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -50,7 +50,7 @@ func NewParser() *rubyParser {
 	return &rubyParser{}
 }
 
-func (p *rubyParser) Parse(r io.Reader) (libs []types.Library, deps []types.Dependency, err error) {
+func (p *rubyParser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
 	var newVar, name, version, license string
 
 	scanner := bufio.NewScanner(r)

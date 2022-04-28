@@ -3,10 +3,10 @@ package yarn
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"regexp"
 	"strings"
 
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
 )
@@ -68,7 +68,7 @@ func NewParser() *npmParser {
 	return &npmParser{}
 }
 
-func (p *npmParser) Parse(r io.Reader) (libs []types.Library, deps []types.Dependency, err error) {
+func (p *npmParser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
 	scanner := bufio.NewScanner(r)
 	unique := map[string]struct{}{}
 	var lib types.Library

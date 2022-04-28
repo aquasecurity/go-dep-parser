@@ -108,14 +108,8 @@ func NewParser(opts ...Option) *javaParser {
 	return p
 }
 
-func (p *javaParser) Parse(r io.Reader) ([]types.Library, []types.Dependency, error) {
-	dioReader, ok := r.(dio.ReadSeekerAt)
-
-	if !ok {
-		return nil, nil, xerrors.Errorf("unable to convert reader")
-	}
-
-	return p.parseArtifact(p.rootFilePath, p.size, dioReader)
+func (p *javaParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+	return p.parseArtifact(p.rootFilePath, p.size, r)
 }
 
 func (p *javaParser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
