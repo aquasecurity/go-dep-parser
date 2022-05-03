@@ -13,15 +13,15 @@ type packageJSON struct {
 	Version string      `json:"version"`
 	License interface{} `json:"license"`
 }
-type npmParser struct {
+type Parser struct {
 	types.DefaultParser
 }
 
-func NewParser() *npmParser {
-	return &npmParser{}
+func NewParser() types.Parser {
+	return &Parser{}
 }
 
-func (p *npmParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var data packageJSON
 	err := json.NewDecoder(r).Decode(&data)
 	if err != nil {

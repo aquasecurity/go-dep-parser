@@ -24,17 +24,18 @@ type Dependency struct {
 	Dependencies map[string]Dependency
 	Requires     map[string]string
 }
-type npmParser struct{}
 
-func NewParser() *npmParser {
-	return &npmParser{}
+type Parser struct{}
+
+func NewParser() types.Parser {
+	return &Parser{}
 }
 
-func (p *npmParser) ID(name, version string) string {
+func (p *Parser) ID(name, version string) string {
 	return fmt.Sprintf("%s@%s", name, version)
 }
 
-func (p *npmParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)
@@ -47,7 +48,7 @@ func (p *npmParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependen
 	return unique(libs), uniqueDeps(deps), nil
 }
 
-func (p *npmParser) parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
+func (p *Parser) parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
 	// Update package name and version mapping.
 	for pkgName, dep := range dependencies {
 		// Overwrite the existing package version so that the nested version can take precedence.
