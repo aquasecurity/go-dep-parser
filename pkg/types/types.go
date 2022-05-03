@@ -1,5 +1,7 @@
 package types
 
+import dio "github.com/aquasecurity/go-dep-parser/pkg/io"
+
 type Library struct {
 	Name     string
 	Version  string
@@ -10,6 +12,11 @@ type Library struct {
 type Dependency struct {
 	ID        string
 	DependsOn []string
+}
+
+type Parser interface {
+	ID(pkgName, version string) string
+	Parse(r dio.ReadSeekerAt) ([]Library, []Dependency, error)
 }
 
 type DefaultParser struct{}
