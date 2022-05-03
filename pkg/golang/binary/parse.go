@@ -29,16 +29,16 @@ func convertError(err error) error {
 	return err
 }
 
-type golangParser struct {
+type Parser struct {
 	types.DefaultParser
 }
 
-func NewParser() *golangParser {
-	return &golangParser{}
+func NewParser() types.Parser {
+	return &Parser{}
 }
 
 // Parse scans file to try to report the Go and module versions.
-func (p *golangParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	info, err := buildinfo.Read(r)
 	if err != nil {
 		return nil, nil, convertError(err)
