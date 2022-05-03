@@ -10,15 +10,15 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type rubyParser struct {
+type Parser struct {
 	types.DefaultParser
 }
 
-func NewParser() *rubyParser {
-	return &rubyParser{}
+func NewParser() types.Parser {
+	return &Parser{}
 }
 
-func (p *rubyParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {

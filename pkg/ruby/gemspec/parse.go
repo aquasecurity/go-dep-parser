@@ -42,15 +42,15 @@ var (
 	licensesRegexp = regexp.MustCompile(`\.licenses\s*=\s*\[(?P<licenses>.+)\]`)
 )
 
-type rubyParser struct {
+type Parser struct {
 	types.DefaultParser
 }
 
-func NewParser() *rubyParser {
-	return &rubyParser{}
+func NewParser() types.Parser {
+	return &Parser{}
 }
 
-func (p *rubyParser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
 	var newVar, name, version, license string
 
 	scanner := bufio.NewScanner(r)
