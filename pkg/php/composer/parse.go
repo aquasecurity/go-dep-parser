@@ -15,15 +15,15 @@ type packageInfo struct {
 	Name    string
 	Version string
 }
-type phpParser struct {
+type Parser struct {
 	types.DefaultParser
 }
 
-func NewParser() *phpParser {
-	return &phpParser{}
+func NewParser() types.Parser {
+	return &Parser{}
 }
 
-func (p *phpParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockFile lockFile
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(&lockFile)
