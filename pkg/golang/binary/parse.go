@@ -29,9 +29,7 @@ func convertError(err error) error {
 	return err
 }
 
-type Parser struct {
-	types.DefaultParser
-}
+type Parser struct{}
 
 func NewParser() types.Parser {
 	return &Parser{}

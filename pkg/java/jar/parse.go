@@ -39,8 +39,6 @@ var (
 )
 
 type Parser struct {
-	types.DefaultParser
-
 	baseURL      string
 	rootFilePath string
 	httpClient   *http.Client

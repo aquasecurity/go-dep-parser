@@ -15,7 +15,6 @@ import (
 )
 
 type Parser struct {
-	types.DefaultParser
 	size       int64
 	filePath   string
 	isRequired func(filePath string, _ os.FileInfo) bool

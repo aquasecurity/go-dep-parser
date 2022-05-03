@@ -13,9 +13,7 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-type Parser struct {
-	types.DefaultParser
-}
+type Parser struct{}
 
 func NewParser() types.Parser {
 	return &Parser{}

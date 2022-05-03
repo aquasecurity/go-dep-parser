@@ -3,6 +3,7 @@ package types
 import dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 
 type Library struct {
+	ID       string `json:",omitempty"`
 	Name     string
 	Version  string
 	Indirect bool   `json:",omitempty"`
@@ -15,12 +16,6 @@ type Dependency struct {
 }
 
 type Parser interface {
-	ID(pkgName, version string) string
+	// Parse parses the dependency file
 	Parse(r dio.ReadSeekerAt) ([]Library, []Dependency, error)
-}
-
-type DefaultParser struct{}
-
-func (p *DefaultParser) ID(pkgName, version string) string {
-	return ""
 }

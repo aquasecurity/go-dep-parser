@@ -16,9 +16,8 @@ type lockFile struct {
 type dependency struct {
 	Version string
 }
-type Parser struct {
-	types.DefaultParser
-}
+
+type Parser struct{}
 
 func NewParser() types.Parser {
 	return &Parser{}

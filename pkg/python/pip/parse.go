@@ -16,9 +16,7 @@ const (
 	hashMarker    string = "--"
 )
 
-type Parser struct {
-	types.DefaultParser
-}
+type Parser struct{}
 
 func NewParser() types.Parser {
 	return &Parser{}

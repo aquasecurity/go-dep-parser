@@ -63,6 +63,7 @@ func (p *Parser) parse(dependencies map[string]Dependency, versions map[string]s
 		}
 
 		lib := types.Library{
+			ID:      p.ID(pkgName, dependency.Version),
 			Name:    pkgName,
 			Version: dependency.Version,
 		}

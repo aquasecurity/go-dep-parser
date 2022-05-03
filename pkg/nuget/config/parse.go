@@ -22,9 +22,7 @@ type config struct {
 	Packages []cfgPackageReference `xml:"package"`
 }
 
-type Parser struct {
-	types.DefaultParser
-}
+type Parser struct{}
 
 func NewParser() types.Parser {
 	return &Parser{}

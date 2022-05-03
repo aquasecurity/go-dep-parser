@@ -42,9 +42,7 @@ var (
 	licensesRegexp = regexp.MustCompile(`\.licenses\s*=\s*\[(?P<licenses>.+)\]`)
 )
 
-type Parser struct {
-	types.DefaultParser
-}
+type Parser struct{}
 
 func NewParser() types.Parser {
 	return &Parser{}
