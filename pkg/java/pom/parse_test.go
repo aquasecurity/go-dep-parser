@@ -362,7 +362,71 @@ func TestPom_Parse(t *testing.T) {
 				remoteRepos = []string{ts.URL}
 			}
 
-			p := pom.NewParser(tt.inputFile, pom.WithRemoteRepos(remoteRepos), pom.WithOffline(tt.offline))
+			p := pom.NewParser(".", tt.inputFile, pom.WithRemoteRepos(remoteRepos), pom.WithOffline(tt.offline))
+
+			got, err := p.Parse(f)
+			if tt.wantErr != "" {
+				require.NotNil(t, err)
+				assert.Contains(t, err.Error(), tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+
+			sort.Slice(got, func(i, j int) bool {
+				return got[i].Name < got[j].Name
+			})
+
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+
+func TestPomDiffPath_Parse(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputFile string
+		local     bool
+		offline   bool
+		want      []types.Library
+		wantErr   string
+	}{
+		{
+			name:      "parent relativePath",
+			inputFile: filepath.Join("testdata", "parent-relative-path", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Chdir("..")
+			testPath := filepath.Join("pom", tt.inputFile)
+			f, err := os.Open(testPath)
+			require.NoError(t, err)
+			defer f.Close()
+
+			var remoteRepos []string
+			if tt.local {
+				// for local repository
+				t.Setenv("MAVEN_HOME", "testdata")
+			} else {
+				// for remote repository
+				h := http.FileServer(http.Dir(filepath.Join("testdata", "repository")))
+				ts := httptest.NewServer(h)
+				remoteRepos = []string{ts.URL}
+			}
+
+			p := pom.NewParser("pom", tt.inputFile, pom.WithRemoteRepos(remoteRepos), pom.WithOffline(tt.offline))
 
 			got, err := p.Parse(f)
 			if tt.wantErr != "" {
