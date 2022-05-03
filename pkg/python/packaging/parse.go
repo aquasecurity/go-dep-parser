@@ -14,15 +14,15 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-type pythonParser struct {
+type Parser struct {
 	types.DefaultParser
 	size       int64
 	filePath   string
 	isRequired func(filePath string, _ os.FileInfo) bool
 }
 
-func NewParser(filePath string, size int64, isRequired func(filePath string, _ os.FileInfo) bool) *pythonParser {
-	return &pythonParser{
+func NewParser(filePath string, size int64, isRequired func(filePath string, _ os.FileInfo) bool) types.Parser {
+	return &Parser{
 		size:       size,
 		filePath:   filePath,
 		isRequired: isRequired,
@@ -31,7 +31,7 @@ func NewParser(filePath string, size int64, isRequired func(filePath string, _ o
 
 // Parse parses egg and wheel metadata.
 // e.g. .egg-info/PKG-INFO and dist-info/METADATA
-func (p *pythonParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var zr io.ReadCloser = r.(io.ReadCloser)
 
 	// .egg file is zip format and PKG-INFO needs to be extracted from the zip file.
@@ -62,7 +62,7 @@ func (p *pythonParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Depen
 	}}, nil, nil
 }
 
-func (p *pythonParser) analyzeEggZip(r io.ReaderAt, size int64) (io.ReadCloser, error) {
+func (p *Parser) analyzeEggZip(r io.ReaderAt, size int64) (io.ReadCloser, error) {
 	zr, err := zip.NewReader(r, size)
 	if err != nil {
 		return nil, xerrors.Errorf("zip reader error: %w", err)
