@@ -77,9 +77,8 @@ func TestParse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, err := os.Open(tt.input)
 			require.NoError(t, err)
-			everythingIsRequired := func(filePath string, _ os.FileInfo) bool { return true }
 
-			got, _, err := packaging.NewParser("", 0, everythingIsRequired).Parse(f)
+			got, _, err := packaging.NewParser().Parse(f)
 			require.Equal(t, tt.wantErr, err != nil)
 
 			assert.Equal(t, tt.want, got)
