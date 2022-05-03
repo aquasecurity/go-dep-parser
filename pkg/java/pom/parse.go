@@ -149,7 +149,12 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, error) {
 		}
 
 		// Resolve transitive dependencies later
-		queue.enqueue(result.dependencies...)
+		for _, dep := range result.dependencies {
+			libs = append(libs, types.Library{
+				Name:    dep.ArtifactID,
+				Version: dep.Version.ver,
+			})
+		}
 
 		// Offline mode may be missing some fields.
 		if !art.IsEmpty() {
