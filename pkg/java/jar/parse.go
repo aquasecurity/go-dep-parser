@@ -38,7 +38,7 @@ var (
 	ArtifactNotFoundErr = xerrors.New("no artifact found")
 )
 
-type javaParser struct {
+type Parser struct {
 	types.DefaultParser
 
 	baseURL      string
@@ -48,39 +48,39 @@ type javaParser struct {
 	size         int64
 }
 
-type Option func(*javaParser)
+type Option func(*Parser)
 
 func WithURL(url string) Option {
-	return func(p *javaParser) {
+	return func(p *Parser) {
 		p.baseURL = url
 	}
 }
 
 func WithFilePath(filePath string) Option {
-	return func(p *javaParser) {
+	return func(p *Parser) {
 		p.rootFilePath = filePath
 	}
 }
 
 func WithHTTPClient(client *http.Client) Option {
-	return func(p *javaParser) {
+	return func(p *Parser) {
 		p.httpClient = client
 	}
 }
 
 func WithOffline(offline bool) Option {
-	return func(p *javaParser) {
+	return func(p *Parser) {
 		p.offline = offline
 	}
 }
 
 func WithSize(size int64) Option {
-	return func(p *javaParser) {
+	return func(p *Parser) {
 		p.size = size
 	}
 }
 
-func NewParser(opts ...Option) *javaParser {
+func NewParser(opts ...Option) types.Parser {
 	// for HTTP retry
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = logger{}
@@ -96,7 +96,7 @@ func NewParser(opts ...Option) *javaParser {
 		mavenURL = baseURL
 	}
 
-	p := &javaParser{
+	p := &Parser{
 		baseURL:    mavenURL,
 		httpClient: client,
 	}
@@ -108,11 +108,11 @@ func NewParser(opts ...Option) *javaParser {
 	return p
 }
 
-func (p *javaParser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	return p.parseArtifact(p.rootFilePath, p.size, r)
 }
 
-func (p *javaParser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	log.Logger.Debugw("Parsing Java artifacts...", zap.String("file", fileName))
 
 	zr, err := zip.NewReader(r, size)
@@ -209,7 +209,7 @@ func (p *javaParser) parseArtifact(fileName string, size int64, r dio.ReadSeeker
 	return libs, nil, nil
 }
 
-func (p *javaParser) parseInnerJar(zf *zip.File) ([]types.Library, []types.Dependency, error) {
+func (p *Parser) parseInnerJar(zf *zip.File) ([]types.Library, []types.Dependency, error) {
 	fr, err := zf.Open()
 	if err != nil {
 		return nil, nil, xerrors.Errorf("unable to open %s: %w", zf.Name, err)
@@ -446,7 +446,7 @@ func (m manifest) determineVersion() (string, error) {
 	return strings.TrimSpace(version), nil
 }
 
-func (p *javaParser) exists(props properties) (bool, error) {
+func (p *Parser) exists(props properties) (bool, error) {
 	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
 	if err != nil {
 		return false, xerrors.Errorf("unable to initialize HTTP client: %w", err)
@@ -470,7 +470,7 @@ func (p *javaParser) exists(props properties) (bool, error) {
 	return res.Response.NumFound > 0, nil
 }
 
-func (p *javaParser) searchBySHA1(r io.ReadSeeker) (properties, error) {
+func (p *Parser) searchBySHA1(r io.ReadSeeker) (properties, error) {
 	if _, err := r.Seek(0, io.SeekStart); err != nil {
 		return properties{}, xerrors.Errorf("file seek error: %w", err)
 	}
@@ -526,7 +526,7 @@ func (p *javaParser) searchBySHA1(r io.ReadSeeker) (properties, error) {
 	}, nil
 }
 
-func (p *javaParser) searchByArtifactID(artifactID string) (string, error) {
+func (p *Parser) searchByArtifactID(artifactID string) (string, error) {
 	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
 	if err != nil {
 		return "", xerrors.Errorf("unable to initialize HTTP client: %w", err)

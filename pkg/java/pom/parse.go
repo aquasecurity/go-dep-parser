@@ -53,7 +53,7 @@ type parser struct {
 	offline            bool
 }
 
-func NewParser(filePath string, opts ...option) *parser {
+func NewParser(filePath string, opts ...option) types.Parser {
 	o := &options{
 		offline:     false,
 		remoteRepos: []string{centralURL},
