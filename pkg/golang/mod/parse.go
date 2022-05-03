@@ -33,7 +33,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		return nil, nil, xerrors.Errorf("go.mod parse error: %w", err)
 	}
 
-	skipIndirect := lessThan117(modFileParsed.Go.Version)
+	skipIndirect := true
+	if modFileParsed.Go != nil { // Old go.mod file may not include the go version. Go version for these files  is less than 1.17
+		skipIndirect = lessThan117(modFileParsed.Go.Version)
+	}
 
 	for _, require := range modFileParsed.Require {
 		// Skip indirect dependencies less than Go 1.17
