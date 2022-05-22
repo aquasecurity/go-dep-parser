@@ -17,6 +17,7 @@ import (
 
 type LockFile struct {
 	Dependencies map[string]Dependency
+	Packages     map[string]Dependency
 }
 type Dependency struct {
 	Version      string
@@ -45,7 +46,17 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	libs, deps := p.parse(lockFile.Dependencies, map[string]string{})
 
+	appendDirectLibs(libs, lockFile.Packages[""].Dependencies)
+
 	return unique(libs), uniqueDeps(deps), nil
+}
+
+func appendDirectLibs(libs []types.Library, pkgs map[string]Dependency) {
+	for _, lib := range libs {
+		if _, ok := pkgs[lib.Name]; !ok {
+			lib.Indirect = true
+		}
+	}
 }
 
 func (p *Parser) parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
