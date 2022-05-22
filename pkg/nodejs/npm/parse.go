@@ -51,14 +51,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	return unique(libs), uniqueDeps(deps), nil
 }
 
-func appendDirectLibs(libs []types.Library, pkgs map[string]Dependency) {
-	for _, lib := range libs {
-		if _, ok := pkgs[lib.Name]; !ok {
-			lib.Indirect = true
-		}
-	}
-}
-
 func (p *Parser) parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
 	// Update package name and version mapping.
 	for pkgName, dep := range dependencies {
@@ -138,4 +130,12 @@ func uniqueDeps(deps []types.Dependency) []types.Dependency {
 		}
 	}
 	return uniqDeps
+}
+
+func appendDirectLibs(libs []types.Library, pkgs map[string]Dependency) {
+	for _, lib := range libs {
+		if _, ok := pkgs[lib.Name]; !ok {
+			lib.Indirect = true
+		}
+	}
 }
