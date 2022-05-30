@@ -17,13 +17,18 @@ import (
 
 type LockFile struct {
 	Dependencies map[string]Dependency
-	Packages     map[string]Dependency
+	Packages     map[string]Package
 }
 type Dependency struct {
 	Version      string
 	Dev          bool
 	Dependencies map[string]Dependency
 	Requires     map[string]string
+}
+
+type Package struct {
+	Version      string
+	Dependencies map[string]string
 }
 
 type Parser struct{}
@@ -132,10 +137,10 @@ func uniqueDeps(deps []types.Dependency) []types.Dependency {
 	return uniqDeps
 }
 
-func appendDirectLibs(libs []types.Library, pkgs map[string]Dependency) {
-	for _, lib := range libs {
+func appendDirectLibs(libs []types.Library, pkgs map[string]string) {
+	for i, lib := range libs {
 		if _, ok := pkgs[lib.Name]; !ok {
-			lib.Indirect = true
+			libs[i].Indirect = true
 		}
 	}
 }
