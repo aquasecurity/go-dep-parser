@@ -50,14 +50,12 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
-	libs, deps := p.parse(lockFile.Dependencies, map[string]string{})
-
-	appendDirectLibs(libs, lockFile.Packages[""].Dependencies)
+	libs, deps := p.parse(lockFile.Dependencies, lockFile.Packages[""].Dependencies, map[string]string{})
 
 	return unique(libs), uniqueDeps(deps), nil
 }
 
-func (p *Parser) parse(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
+func (p *Parser) parse(dependencies map[string]Dependency, packages map[string]string, versions map[string]string) ([]types.Library, []types.Dependency) {
 	// Update package name and version mapping.
 	for pkgName, dep := range dependencies {
 		// Overwrite the existing package version so that the nested version can take precedence.
@@ -72,9 +70,10 @@ func (p *Parser) parse(dependencies map[string]Dependency, versions map[string]s
 		}
 
 		lib := types.Library{
-			ID:      p.ID(pkgName, dependency.Version),
-			Name:    pkgName,
-			Version: dependency.Version,
+			ID:       p.ID(pkgName, dependency.Version),
+			Name:     pkgName,
+			Version:  dependency.Version,
+			Indirect: isIndirectLib(pkgName, packages),
 		}
 		libs = append(libs, lib)
 
@@ -103,7 +102,7 @@ func (p *Parser) parse(dependencies map[string]Dependency, versions map[string]s
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			childLibs, childDeps := p.parse(dependency.Dependencies, maps.Clone(versions))
+			childLibs, childDeps := p.parse(dependency.Dependencies, packages, maps.Clone(versions))
 			libs = append(libs, childLibs...)
 			deps = append(deps, childDeps...)
 		}
@@ -138,10 +137,10 @@ func uniqueDeps(deps []types.Dependency) []types.Dependency {
 	return uniqDeps
 }
 
-func appendDirectLibs(libs []types.Library, pkgs map[string]string) {
-	for i, lib := range libs {
-		if _, ok := pkgs[lib.Name]; !ok {
-			libs[i].Indirect = true
-		}
+func isIndirectLib(libName string, pkgs map[string]string) bool {
+	if _, ok := pkgs[libName]; !ok {
+		return true
 	}
+
+	return false
 }
