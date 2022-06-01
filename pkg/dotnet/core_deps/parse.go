@@ -36,15 +36,14 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		split := strings.Split(nameVer, "/")
 		if len(split) != 2 {
 			// Invalid name
-			log.Logger.Warnf("Cannot parse library version from: %s", nameVer)
+			log.Logger.Warnf("Cannot parse .NET library version from: %s", nameVer)
 			continue
 		}
 
-		lib := types.Library{
+		libraries = append(libraries, types.Library{
 			Name:    split[0],
 			Version: split[1],
-		}
-		libraries = append(libraries, lib)
+		})
 	}
 
 	return libraries, nil, nil
