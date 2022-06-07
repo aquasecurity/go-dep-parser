@@ -93,7 +93,7 @@ func (v1 version) String() string {
 	return v1.ver
 }
 
-func evaluateVariable(s string, props map[string]string, usedProps []string) string {
+func evaluateVariable(s string, props map[string]string, seenProps []string) string {
 	if props == nil {
 		props = map[string]string{}
 	}
@@ -111,13 +111,13 @@ func evaluateVariable(s string, props map[string]string, usedProps []string) str
 			ss, ok := props[m[1]]
 			if ok {
 				// search for looped properties
-				if slices.Contains(usedProps, ss) {
-					printLoopedPropertiesStack(m[0], usedProps)
+				if slices.Contains(seenProps, ss) {
+					printLoopedPropertiesStack(m[0], seenProps)
 					return ""
 				}
-				usedProps = append(usedProps, ss) // save received props to check if we get this prop again
-				newValue = evaluateVariable(ss, props, usedProps)
-				usedProps = []string{} // clear props if we returned from recursive. Required for correct work with 2 same props like ${foo}-${foo}
+				seenProps = append(seenProps, ss) // save evaluated props to check if we get this prop again
+				newValue = evaluateVariable(ss, props, seenProps)
+				seenProps = []string{} // clear props if we returned from recursive. Required for correct work with 2 same props like ${foo}-${foo}
 			}
 
 		}
