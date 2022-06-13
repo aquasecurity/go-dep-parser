@@ -65,7 +65,6 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 	var deps []types.Dependency
 
 	for pkg, info := range lockFile.Packages {
-
 		if info.IsDev {
 			continue
 		}
@@ -79,9 +78,10 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 		}
 
 		libs = append(libs, types.Library{
-			ID:      id,
-			Name:    name,
-			Version: version,
+			ID:       id,
+			Name:     name,
+			Version:  version,
+			Indirect: isIndirectLib(name, lockFile.Dependencies),
 		})
 
 		if len(dependencies) > 0 {
@@ -93,6 +93,11 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 	}
 
 	return libs, deps
+}
+
+func isIndirectLib(name string, directDeps map[string]string) bool {
+	_, ok := directDeps[name]
+	return !ok
 }
 
 func getPackageNameAndVersion(pkg string) (string, string) {
