@@ -2,6 +2,7 @@ package pnpm
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"golang.org/x/xerrors"
@@ -57,7 +58,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	libs, deps := p.parse(&lockFile)
 
-	return libs, deps, nil
+	return uniqueLibs(libs), uniqueDeps(deps), nil
 }
 
 func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency) {
@@ -106,4 +107,30 @@ func getPackageNameAndVersion(pkg string) (string, string) {
 	version := pkg[idx+1:]
 
 	return name, version
+}
+
+func uniqueLibs(libs []types.Library) []types.Library {
+	var uniqLibs []types.Library
+	unique := map[types.Library]struct{}{}
+	for _, lib := range libs {
+		if _, ok := unique[lib]; !ok {
+			unique[lib] = struct{}{}
+			uniqLibs = append(uniqLibs, lib)
+		}
+	}
+	return uniqLibs
+}
+func uniqueDeps(deps []types.Dependency) []types.Dependency {
+	var uniqDeps []types.Dependency
+	unique := make(map[string]struct{})
+
+	for _, dep := range deps {
+		sort.Strings(dep.DependsOn)
+		depKey := fmt.Sprintf("%s:%s", dep.ID, strings.Join(dep.DependsOn, ","))
+		if _, ok := unique[depKey]; !ok {
+			unique[depKey] = struct{}{}
+			uniqDeps = append(uniqDeps, dep)
+		}
+	}
+	return uniqDeps
 }
