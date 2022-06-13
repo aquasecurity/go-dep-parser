@@ -31,6 +31,12 @@ func TestParse(t *testing.T) {
 			want:     pnpmWithDev,
 			wantDeps: pnpmWithDevDeps,
 		},
+		{
+			name:     "many",
+			file:     "testdata/pnpm-lock_many.yaml",
+			want:     pnpmMany,
+			wantDeps: pnpmManyDeps,
+		},
 	}
 
 	for _, tt := range tests {
