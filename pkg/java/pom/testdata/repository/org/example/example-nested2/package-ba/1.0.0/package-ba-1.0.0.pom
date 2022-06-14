@@ -4,19 +4,19 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>example-api</artifactId>
-    <version>1.7.30</version>
+    <groupId>org.example.example-nested2</groupId>
+    <artifactId>package-ba</artifactId>
+    <version>1.0.0</version>
 
     <packaging>jar</packaging>
-    <name>Example API Module</name>
-    <description>The example API</description>
+    <name>Package BA</name>
+    <description>The BA Package</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>utils</artifactId>
-            <version>1.7.30</version>
+            <groupId>org.example.example-nested2</groupId>
+            <artifactId>package-baa</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 </project>

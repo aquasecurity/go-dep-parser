@@ -125,7 +125,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 				return nil, nil, err
 			}
 			libs = append(libs, moduleLibs...)
-			if deps != nil {
+			if moduleDeps != nil {
 				deps = append(deps, moduleDeps...)
 			}
 			continue
@@ -156,6 +156,12 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		// Resolve transitive dependencies later
 		queue.enqueue(result.dependencies...)
 
+		dependency := buildArtifactDependency(result)
+
+		if len(dependency.DependsOn) > 0 {
+			deps = append(deps, dependency)
+		}
+
 		// Offline mode may be missing some fields.
 		if !art.IsEmpty() {
 			// Override the version
@@ -172,6 +178,22 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 	}
 
 	return libs, deps, nil
+}
+
+func buildArtifactDependency(result analysisResult) types.Dependency {
+	dependency := types.Dependency{
+		ID: id(result.artifact),
+	}
+
+	for _, d := range result.dependencies {
+		dependency.DependsOn = append(dependency.DependsOn, id(d))
+	}
+
+	return dependency
+}
+
+func id(art artifact) string {
+	return fmt.Sprintf("%s.%s:%s", art.GroupID, art.ArtifactID, art.Version.String())
 }
 
 func (p *parser) parseModule(currentPath, relativePath string) (artifact, error) {

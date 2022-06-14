@@ -5,18 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>example-api</artifactId>
+    <artifactId>flow</artifactId>
     <version>1.7.30</version>
 
     <packaging>jar</packaging>
-    <name>Example API Module</name>
-    <description>The example API</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>utils</artifactId>
-            <version>1.7.30</version>
-        </dependency>
-    </dependencies>
+    <name>Example flow Module</name>
+    <description>The flow</description>
 </project>
