@@ -3,11 +3,17 @@ package types
 import dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 
 type Library struct {
-	ID       string `json:",omitempty"`
-	Name     string
-	Version  string
-	Indirect bool   `json:",omitempty"`
-	License  string `json:",omitempty"`
+	ID                 string `json:",omitempty"`
+	Name               string
+	Version            string
+	Indirect           bool          `json:",omitempty"`
+	License            string        `json:",omitempty"`
+	ExternalReferences []ExternalRef `json:",omitempty"`
+}
+
+type ExternalRef struct {
+	Type string
+	Url  string
 }
 
 type Dependency struct {

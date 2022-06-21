@@ -24,6 +24,7 @@ type Dependency struct {
 	// TODO : currently yarn can't recognize Dev flag.
 	// That need to parse package.json for Dev flag
 	Dev          bool
+	Resolved     string
 	Dependencies map[string]Dependency
 }
 
@@ -41,6 +42,11 @@ func parsePackageLocator(target string) (packagename, protocol string, err error
 		}
 	}
 	return
+}
+
+func (p *Parser) GetExternalRefs(dependency Dependency) []types.ExternalRef {
+	externalRefs := []types.ExternalRef{{Type: "other", Url: dependency.Resolved}}
+	return externalRefs
 }
 
 func getVersion(target string) (version string, err error) {

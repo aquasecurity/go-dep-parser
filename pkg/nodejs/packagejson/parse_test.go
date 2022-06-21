@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/thoas/go-funk"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/nodejs/packagejson"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
@@ -28,9 +29,10 @@ func TestParse(t *testing.T) {
 			// npm install --save promise jquery
 			// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\"},\n")}'
 			want: []types.Library{{
-				Name:    "bootstrap",
-				Version: "5.0.2",
-				License: "MIT",
+				Name:               "bootstrap",
+				Version:            "5.0.2",
+				License:            "MIT",
+				ExternalReferences: []types.ExternalRef{{Type: "website", Url: "https://getbootstrap.com/"}, {Type: "vcs", Url: "git+https://github.com/twbs/bootstrap.git"}, {Type: "issue-tracker", Url: "https://github.com/twbs/bootstrap/issues"}},
 			}},
 			wantErr: "",
 		},
@@ -38,9 +40,10 @@ func TestParse(t *testing.T) {
 			name:      "happy path - legacy license",
 			inputFile: "testdata/legacy_package.json",
 			want: []types.Library{{
-				Name:    "angular",
-				Version: "4.1.2",
-				License: "ISC",
+				Name:               "angular",
+				Version:            "4.1.2",
+				License:            "ISC",
+				ExternalReferences: []types.ExternalRef{{Type: "website", Url: "https://getbootstrap.com/"}, {Type: "vcs", Url: "git+https://github.com/twbs/bootstrap.git"}, {Type: "issue-tracker", Url: "https://github.com/twbs/bootstrap/issues"}, {Type: "license", Url: "https://opensource.org/licenses/ISC"}},
 			}},
 			wantErr: "",
 		},
@@ -70,7 +73,20 @@ func TestParse(t *testing.T) {
 			}
 
 			require.NoError(t, err)
-			assert.Equal(t, v.want, got)
+			comparableKeys := []string{"Name", "Version", "License"}
+			inComparableKeys := []string{"ExternalReferences"}
+			for _, key := range comparableKeys {
+				expected := funk.Get(v.want, key)
+				actual := funk.Get(got, key)
+				assert.Equal(t, expected, actual)
+			}
+
+			for _, key := range inComparableKeys {
+				expected := funk.Get(v.want, key)
+				actual := funk.Get(got, key)
+				assert.ElementsMatch(t, expected, actual)
+			}
+			// assert.Equal(t, v.want, got)
 		})
 	}
 }

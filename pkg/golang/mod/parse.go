@@ -2,6 +2,7 @@ package mod
 
 import (
 	"io"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -13,10 +14,44 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
+var (
+	// By convention, modules with a major version equal to or above v2
+	// have it as suffix in their module path.
+	vcsUrlMajorVersionSuffixRegex = regexp.MustCompile(`(/v[\d]+)$`)
+
+	// gopkg.in/user/pkg.v -> github.com/user/pkg
+	vcsUrlGoPkgInRegexWithUser = regexp.MustCompile(`^gopkg\.in/([^/]+)/([^.]+)\..*$`)
+
+	// gopkg.in without user segment
+	// Example: gopkg.in/pkg.v3 -> github.com/go-pkg/pkg
+	vcsUrlGoPkgInRegexWithoutUser = regexp.MustCompile(`^gopkg\.in/([^.]+)\..*$`)
+)
+
 type Parser struct{}
 
 func NewParser() types.Parser {
 	return &Parser{}
+}
+
+func (p *Parser) GetExternalRefs(path string) []types.ExternalRef {
+	if url := resolveVcsUrl(path); url != "" {
+		return []types.ExternalRef{{Type: "vcs", Url: url}}
+	}
+
+	return nil
+}
+
+func resolveVcsUrl(modulePath string) string {
+	switch {
+	case strings.HasPrefix(modulePath, "github.com/"):
+		return "https://" + vcsUrlMajorVersionSuffixRegex.ReplaceAllString(modulePath, "")
+	case vcsUrlGoPkgInRegexWithUser.MatchString(modulePath):
+		return "https://" + vcsUrlGoPkgInRegexWithUser.ReplaceAllString(modulePath, "github.com/$1/$2")
+	case vcsUrlGoPkgInRegexWithoutUser.MatchString(modulePath):
+		return "https://" + vcsUrlGoPkgInRegexWithoutUser.ReplaceAllString(modulePath, "github.com/go-$1/$1")
+	}
+
+	return ""
 }
 
 // Parse parses a go.mod file
@@ -44,9 +79,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			continue
 		}
 		libs[require.Mod.Path] = types.Library{
-			Name:     require.Mod.Path,
-			Version:  require.Mod.Version[1:],
-			Indirect: require.Indirect,
+			Name:               require.Mod.Path,
+			Version:            require.Mod.Version[1:],
+			Indirect:           require.Indirect,
+			ExternalReferences: p.GetExternalRefs(require.Mod.Path),
 		}
 	}
 
@@ -75,9 +111,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 		// Add replaced library to library register.
 		libs[replace.New.Path] = types.Library{
-			Name:     replace.New.Path,
-			Version:  replace.New.Version[1:],
-			Indirect: old.Indirect,
+			Name:               replace.New.Path,
+			Version:            replace.New.Version[1:],
+			Indirect:           old.Indirect,
+			ExternalReferences: p.GetExternalRefs(replace.New.Path),
 		}
 	}
 

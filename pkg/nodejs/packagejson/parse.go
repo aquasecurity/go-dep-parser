@@ -8,10 +8,18 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type packageJSON struct {
-	Name    string      `json:"name"`
-	Version string      `json:"version"`
-	License interface{} `json:"license"`
+type PackageRef struct {
+	Type string
+	Url  string
+}
+type PackageJSON struct {
+	Name       string      `json:"name"`
+	Version    string      `json:"version"`
+	License    interface{} `json:"license"`
+	Homepage   string      `json:"homepage,omitempty"`
+	Repository PackageRef  `json:"repository,omitempty"`
+	Bugs       PackageRef  `json:"bugs,omitempty"`
+	Funding    PackageRef  `json:"funding,omitempty"`
 }
 type Parser struct{}
 
@@ -19,8 +27,31 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
+func (p *Parser) GetExternalRefs(packageJson PackageJSON) []types.ExternalRef {
+	externalRefs := []types.ExternalRef{}
+	if packageJson.Homepage != "" {
+		externalRefs = append(externalRefs, types.ExternalRef{Type: "website", Url: packageJson.Homepage})
+	}
+	switch v := packageJson.License.(type) {
+	case map[string]interface{}:
+		if licenseUrl, ok := v["url"]; ok {
+			externalRefs = append(externalRefs, types.ExternalRef{Type: "license", Url: licenseUrl.(string)})
+		}
+	}
+
+	if (packageJson.Repository != PackageRef{}) {
+		externalRefs = append(externalRefs, types.ExternalRef{Type: "vcs", Url: packageJson.Repository.Url})
+	}
+
+	if (packageJson.Bugs != PackageRef{}) {
+		externalRefs = append(externalRefs, types.ExternalRef{Type: "issue-tracker", Url: packageJson.Bugs.Url})
+	}
+
+	return externalRefs
+}
+
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
-	var data packageJSON
+	var data PackageJSON
 	err := json.NewDecoder(r).Decode(&data)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("JSON decode error: %w", err)
@@ -31,9 +62,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	return []types.Library{{
-		Name:    data.Name,
-		Version: data.Version,
-		License: parseLicense(data.License),
+		Name:               data.Name,
+		Version:            data.Version,
+		License:            parseLicense(data.License),
+		ExternalReferences: p.GetExternalRefs(data),
 	}}, nil, nil
 }
 
