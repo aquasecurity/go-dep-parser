@@ -86,7 +86,6 @@ func TestParse(t *testing.T) {
 				actual := funk.Get(got, key)
 				assert.ElementsMatch(t, expected, actual)
 			}
-			// assert.Equal(t, v.want, got)
 		})
 	}
 }
