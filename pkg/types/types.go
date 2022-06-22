@@ -12,7 +12,7 @@ type Library struct {
 }
 
 type ExternalRef struct {
-	Type string
+	Type RefType
 	Url  string
 }
 
@@ -25,3 +25,13 @@ type Parser interface {
 	// Parse parses the dependency file
 	Parse(r dio.ReadSeekerAt) ([]Library, []Dependency, error)
 }
+
+type RefType string
+
+const (
+	Website      RefType = "website"
+	License      RefType = "license"
+	Vcs          RefType = "vcs"
+	IssueTracker RefType = "issue-tracker"
+	Other        RefType = "other"
+)

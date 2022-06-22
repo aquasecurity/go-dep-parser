@@ -45,7 +45,7 @@ func parsePackageLocator(target string) (packagename, protocol string, err error
 }
 
 func (p *Parser) GetExternalRefs(dependency Dependency) []types.ExternalRef {
-	externalRefs := []types.ExternalRef{{Type: "other", Url: dependency.Resolved}}
+	externalRefs := []types.ExternalRef{{Type: types.Other, Url: dependency.Resolved}}
 	return externalRefs
 }
 

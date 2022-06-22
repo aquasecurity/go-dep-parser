@@ -35,7 +35,7 @@ func NewParser() types.Parser {
 
 func (p *Parser) GetExternalRefs(path string) []types.ExternalRef {
 	if url := resolveVcsUrl(path); url != "" {
-		return []types.ExternalRef{{Type: "vcs", Url: url}}
+		return []types.ExternalRef{{Type: types.Vcs, Url: url}}
 	}
 
 	return nil

@@ -30,21 +30,21 @@ func NewParser() types.Parser {
 func (p *Parser) GetExternalRefs(packageJson PackageJSON) []types.ExternalRef {
 	externalRefs := []types.ExternalRef{}
 	if packageJson.Homepage != "" {
-		externalRefs = append(externalRefs, types.ExternalRef{Type: "website", Url: packageJson.Homepage})
+		externalRefs = append(externalRefs, types.ExternalRef{Type: types.Website, Url: packageJson.Homepage})
 	}
 	switch v := packageJson.License.(type) {
 	case map[string]interface{}:
 		if licenseUrl, ok := v["url"]; ok {
-			externalRefs = append(externalRefs, types.ExternalRef{Type: "license", Url: licenseUrl.(string)})
+			externalRefs = append(externalRefs, types.ExternalRef{Type: types.License, Url: licenseUrl.(string)})
 		}
 	}
 
 	if (packageJson.Repository != PackageRef{}) {
-		externalRefs = append(externalRefs, types.ExternalRef{Type: "vcs", Url: packageJson.Repository.Url})
+		externalRefs = append(externalRefs, types.ExternalRef{Type: types.Vcs, Url: packageJson.Repository.Url})
 	}
 
 	if (packageJson.Bugs != PackageRef{}) {
-		externalRefs = append(externalRefs, types.ExternalRef{Type: "issue-tracker", Url: packageJson.Bugs.Url})
+		externalRefs = append(externalRefs, types.ExternalRef{Type: types.IssueTracker, Url: packageJson.Bugs.Url})
 	}
 
 	return externalRefs
