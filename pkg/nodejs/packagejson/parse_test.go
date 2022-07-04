@@ -3,11 +3,11 @@ package packagejson_test
 import (
 	"os"
 	"path"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/thoas/go-funk"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/nodejs/packagejson"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
@@ -72,20 +72,22 @@ func TestParse(t *testing.T) {
 				return
 			}
 
-			require.NoError(t, err)
-			comparableKeys := []string{"Name", "Version", "License"}
-			inComparableKeys := []string{"ExternalReferences"}
-			for _, key := range comparableKeys {
-				expected := funk.Get(v.want, key)
-				actual := funk.Get(got, key)
-				assert.Equal(t, expected, actual)
+			for _, lib := range v.want {
+				sortExternalRefs(lib.ExternalReferences)
 			}
 
-			for _, key := range inComparableKeys {
-				expected := funk.Get(v.want, key)
-				actual := funk.Get(got, key)
-				assert.ElementsMatch(t, expected, actual)
+			for _, lib := range got {
+				sortExternalRefs(lib.ExternalReferences)
 			}
+
+			require.NoError(t, err)
+			assert.Equal(t, v.want, got)
 		})
 	}
+}
+
+func sortExternalRefs(refs []types.ExternalRef) {
+	sort.Slice(refs, func(i, j int) bool {
+		return refs[i].URL < refs[j].URL
+	})
 }

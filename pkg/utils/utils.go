@@ -1,8 +1,7 @@
 package utils
 
 import (
-	"bytes"
-	"encoding/gob"
+	"fmt"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
@@ -24,19 +23,13 @@ func UniqueLibraries(libs []types.Library) []types.Library {
 	var uniqLibs []types.Library
 	unique := map[string]struct{}{}
 	for _, lib := range libs {
-		h := hash(lib)
-		if _, ok := unique[h]; !ok {
-			unique[h] = struct{}{}
+		identifier := fmt.Sprintf("%s@%s", lib.Name, lib.Version)
+		if _, ok := unique[identifier]; !ok {
+			unique[identifier] = struct{}{}
 			uniqLibs = append(uniqLibs, lib)
 		}
 	}
 	return uniqLibs
-}
-
-func hash(lib types.Library) string {
-	var b bytes.Buffer
-	gob.NewEncoder(&b).Encode(lib)
-	return b.String()
 }
 
 func MergeMaps(parent, child map[string]string) map[string]string {
