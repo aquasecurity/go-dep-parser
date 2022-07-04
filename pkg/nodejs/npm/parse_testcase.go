@@ -6,7 +6,7 @@ var (
 	// docker run --name node --rm -it node:12-alpine sh
 	// npm init --force
 	// npm install --save promise jquery
-	// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
+	// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\", \"\"},\n")}'
 	npmNormal = []types.Library{
 		{ID: "asap@2.0.7", Name: "asap", Version: "2.0.7", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/asap/-/asap-2.0.7.tgz"}}},
 		{ID: "jquery@3.4.0", Name: "jquery", Version: "3.4.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/jquery/-/jquery-3.4.0.tgz"}}},
@@ -23,7 +23,7 @@ var (
 	// docker run --name node --rm -it node:12-alpine sh
 	// npm init --force
 	// npm install --save react redux
-	// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
+	// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\", \"\"},\n")}'
 	npmReact = []types.Library{
 		{ID: "asap@2.0.6", Name: "asap", Version: "2.0.6", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/asap/-/asap-2.0.6.tgz"}}},
 		{ID: "jquery@3.4.0", Name: "jquery", Version: "3.4.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/jquery/-/jquery-3.4.0.tgz"}}},
@@ -69,7 +69,7 @@ var (
 	// npm init --force
 	// npm install --save react redux
 	// npm install --save-dev mocha
-	// npm ls -prod | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
+	// npm ls -prod | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\", \"\"},\n")}'
 	npmWithDev = []types.Library{
 		{ID: "asap@2.0.6", Name: "asap", Version: "2.0.6", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/asap/-/asap-2.0.6.tgz"}}},
 		{ID: "jquery@3.4.0", Name: "jquery", Version: "3.4.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/jquery/-/jquery-3.4.0.tgz"}}},
@@ -117,7 +117,7 @@ var (
 	// npm install --save react redux
 	// npm install --save-dev mocha
 	// npm install --save lodash request chalk commander express async axios vue
-	// npm ls -prod | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
+	// npm ls -prod | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\", \"\"},\n")}'
 	npmMany = []types.Library{
 		{ID: "accepts@1.3.6", Name: "accepts", Version: "1.3.6", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/accepts/-/accepts-1.3.6.tgz"}}},
 		{ID: "ajv@6.10.0", Name: "ajv", Version: "6.10.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: "https://registry.npmjs.org/ajv/-/ajv-6.10.0.tgz"}}},
