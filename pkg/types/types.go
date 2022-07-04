@@ -13,7 +13,7 @@ type Library struct {
 
 type ExternalRef struct {
 	Type RefType
-	Url  string
+	URL  string
 }
 
 type Dependency struct {
@@ -31,7 +31,7 @@ type RefType string
 const (
 	Website      RefType = "website"
 	License      RefType = "license"
-	Vcs          RefType = "vcs"
+	VCS          RefType = "vcs"
 	IssueTracker RefType = "issue-tracker"
 	Other        RefType = "other"
 )

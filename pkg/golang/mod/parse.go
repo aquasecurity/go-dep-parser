@@ -17,14 +17,14 @@ import (
 var (
 	// By convention, modules with a major version equal to or above v2
 	// have it as suffix in their module path.
-	vcsUrlMajorVersionSuffixRegex = regexp.MustCompile(`(/v[\d]+)$`)
+	VCSUrlMajorVersionSuffixRegex = regexp.MustCompile(`(/v[\d]+)$`)
 
 	// gopkg.in/user/pkg.v -> github.com/user/pkg
-	vcsUrlGoPkgInRegexWithUser = regexp.MustCompile(`^gopkg\.in/([^/]+)/([^.]+)\..*$`)
+	VCSUrlGoPkgInRegexWithUser = regexp.MustCompile(`^gopkg\.in/([^/]+)/([^.]+)\..*$`)
 
 	// gopkg.in without user segment
 	// Example: gopkg.in/pkg.v3 -> github.com/go-pkg/pkg
-	vcsUrlGoPkgInRegexWithoutUser = regexp.MustCompile(`^gopkg\.in/([^.]+)\..*$`)
+	VCSUrlGoPkgInRegexWithoutUser = regexp.MustCompile(`^gopkg\.in/([^.]+)\..*$`)
 )
 
 type Parser struct{}
@@ -34,21 +34,21 @@ func NewParser() types.Parser {
 }
 
 func (p *Parser) GetExternalRefs(path string) []types.ExternalRef {
-	if url := resolveVcsUrl(path); url != "" {
-		return []types.ExternalRef{{Type: types.Vcs, Url: url}}
+	if url := resolveVCSUrl(path); url != "" {
+		return []types.ExternalRef{{Type: types.VCS, URL: url}}
 	}
 
 	return nil
 }
 
-func resolveVcsUrl(modulePath string) string {
+func resolveVCSUrl(modulePath string) string {
 	switch {
 	case strings.HasPrefix(modulePath, "github.com/"):
-		return "https://" + vcsUrlMajorVersionSuffixRegex.ReplaceAllString(modulePath, "")
-	case vcsUrlGoPkgInRegexWithUser.MatchString(modulePath):
-		return "https://" + vcsUrlGoPkgInRegexWithUser.ReplaceAllString(modulePath, "github.com/$1/$2")
-	case vcsUrlGoPkgInRegexWithoutUser.MatchString(modulePath):
-		return "https://" + vcsUrlGoPkgInRegexWithoutUser.ReplaceAllString(modulePath, "github.com/go-$1/$1")
+		return "https://" + VCSUrlMajorVersionSuffixRegex.ReplaceAllString(modulePath, "")
+	case VCSUrlGoPkgInRegexWithUser.MatchString(modulePath):
+		return "https://" + VCSUrlGoPkgInRegexWithUser.ReplaceAllString(modulePath, "github.com/$1/$2")
+	case VCSUrlGoPkgInRegexWithoutUser.MatchString(modulePath):
+		return "https://" + VCSUrlGoPkgInRegexWithoutUser.ReplaceAllString(modulePath, "github.com/go-$1/$1")
 	}
 
 	return ""

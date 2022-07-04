@@ -44,11 +44,6 @@ func (p *Parser) ID(name, version string) string {
 	return fmt.Sprintf("%s@%s", name, version)
 }
 
-func (p *Parser) GetExternalRefs(dependency Dependency) []types.ExternalRef {
-	externalRefs := []types.ExternalRef{{Type: types.Other, Url: dependency.Resolved}}
-	return externalRefs
-}
-
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
 	decoder := json.NewDecoder(r)
@@ -82,7 +77,7 @@ func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string
 			Name:               pkgName,
 			Version:            dependency.Version,
 			Indirect:           isIndirectLib(pkgName, dircetDeps),
-			ExternalReferences: p.GetExternalRefs(dependency),
+			ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: dependency.Resolved}},
 		}
 		libs = append(libs, lib)
 
