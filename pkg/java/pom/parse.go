@@ -90,7 +90,7 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	// Analyze root POM
-	result, err := p.analyze(root, nil)
+	result, err := p.analyze(root, nil, nil)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("analyze error (%s): %w", p.rootPath, err)
 	}
@@ -181,7 +181,7 @@ func (p *parser) parseModule(currentPath, relativePath string) (artifact, error)
 		return artifact{}, xerrors.Errorf("unable to open the relative path: %w", err)
 	}
 
-	result, err := p.analyze(module, nil)
+	result, err := p.analyze(module, nil, nil)
 	if err != nil {
 		return artifact{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -205,7 +205,7 @@ func (p *parser) resolve(art artifact) (analysisResult, error) {
 	if err != nil {
 		log.Logger.Debug(err)
 	}
-	result, err := p.analyze(pomContent, art.Exclusions)
+	result, err := p.analyze(pomContent, art.Exclusions, art.DependencyManagement)
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -223,7 +223,7 @@ type analysisResult struct {
 	modules              []string
 }
 
-func (p *parser) analyze(pom *pom, exclusions map[string]struct{}) (analysisResult, error) {
+func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, rootDependencyManagement map[string]pomDependency) (analysisResult, error) {
 	if pom == nil || pom.content == nil {
 		return analysisResult{}, nil
 	}
@@ -247,8 +247,13 @@ func (p *parser) analyze(pom *pom, exclusions map[string]struct{}) (analysisResu
 	depManagement := p.dependencyManagement(pom.content.DependencyManagement.Dependencies.Dependency, props)
 	depManagement = p.mergeDependencyManagement(parent.dependencyManagement, depManagement)
 
+	//
+	for k, v := range rootDependencyManagement {
+		depManagement[k] = v
+	}
+
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
-	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, exclusions)
+	deps := p.parseDependencies(pom, props, depManagement, exclusions)
 	deps = p.mergeDependencies(parent.dependencies, deps, exclusions)
 
 	return analysisResult{
@@ -291,17 +296,17 @@ func (p parser) mergeDependencyManagement(a, b map[string]pomDependency) map[str
 	return a
 }
 
-func (p parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement map[string]pomDependency,
+func (p parser) parseDependencies(deps *pom, props map[string]string, depManagement map[string]pomDependency,
 	exclusions map[string]struct{}) []artifact {
 	var dependencies []artifact
-	for _, d := range deps {
+	for _, d := range deps.content.Dependencies.Dependency {
 		// Resolve dependencies
 		d = d.Resolve(props, depManagement)
 
 		if (d.Scope != "" && d.Scope != "compile") || d.Optional {
 			continue
 		}
-		dependencies = append(dependencies, d.ToArtifact(exclusions))
+		dependencies = append(dependencies, d.ToArtifact(exclusions, depManagement))
 	}
 	return dependencies
 }
@@ -341,7 +346,7 @@ func (p parser) parseParent(currentPath string, parent pomParent) (analysisResul
 		log.Logger.Debugf("parent POM not found: %s", err)
 	}
 
-	result, err := p.analyze(parentPOM, nil)
+	result, err := p.analyze(parentPOM, nil, nil)
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -390,7 +395,7 @@ func (p parser) tryRelativePath(parentArtifact artifact, currentPath, relativePa
 		return nil, err
 	}
 
-	result, err := p.analyze(pom, nil)
+	result, err := p.analyze(pom, nil, nil)
 	if err != nil {
 		return nil, xerrors.Errorf("analyze error: %w", err)
 	}
