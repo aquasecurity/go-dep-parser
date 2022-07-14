@@ -113,6 +113,7 @@ func findSubString(re *regexp.Regexp, line, name string) string {
 // Trim single quotes, double quotes and ".freeze"
 // e.g. "async".freeze => async
 func trim(s string) string {
+	s = strings.TrimSpace(s)
 	s = strings.TrimSuffix(s, ".freeze")
 	return strings.Trim(s, `'"`)
 }
@@ -120,7 +121,7 @@ func trim(s string) string {
 func parseLicenses(s string) string {
 	// e.g. `"Ruby".freeze, "BSDL".freeze`
 	//      => {"\"Ruby\".freeze", "\"BSDL\".freeze"}
-	ss := strings.Split(s, ", ")
+	ss := strings.Split(s, ",")
 
 	// e.g. {"\"Ruby\".freeze", "\"BSDL\".freeze"}
 	//      => {"Ruby", "BSDL"}
