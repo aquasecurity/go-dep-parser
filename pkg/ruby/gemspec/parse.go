@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"unicode"
 
 	"golang.org/x/xerrors"
 
@@ -39,7 +38,7 @@ var (
 	// Capture the value of "licenses"
 	// e.g. s.license = ["MIT".freeze, "BSDL".freeze]
 	//      => "MIT".freeze, "BSDL".freeze
-	licensesRegexp = regexp.MustCompile(`\.licenses\s*=\s*\[(?P<licenses>.+)\]`)
+	licensesRegexp = regexp.MustCompile(`\.licenses\s*=\s*\[(?P<licenses>.+)]`)
 )
 
 type Parser struct{}
@@ -121,9 +120,7 @@ func trim(s string) string {
 func parseLicenses(s string) string {
 	// e.g. `"Ruby".freeze, "BSDL".freeze`
 	//      => {"\"Ruby\".freeze", "\"BSDL\".freeze"}
-	ss := strings.FieldsFunc(s, func(r rune) bool {
-		return unicode.IsSpace(r) || r == ','
-	})
+	ss := strings.Split(s, ", ")
 
 	// e.g. {"\"Ruby\".freeze", "\"BSDL\".freeze"}
 	//      => {"Ruby", "BSDL"}

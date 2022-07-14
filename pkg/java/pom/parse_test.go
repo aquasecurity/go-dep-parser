@@ -112,6 +112,21 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
+			name:      "transitive parents",
+			inputFile: filepath.Join("testdata", "transitive-parents", "base", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "3.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+				},
+			},
+		},
+		{
 			name:      "parent relativePath",
 			inputFile: filepath.Join("testdata", "parent-relative-path", "pom.xml"),
 			local:     true,
