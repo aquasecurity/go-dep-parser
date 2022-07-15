@@ -247,7 +247,7 @@ func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, rootDependenc
 	depManagement := p.dependencyManagement(pom.content.DependencyManagement.Dependencies.Dependency, props)
 	depManagement = p.mergeDependencyManagement(parent.dependencyManagement, depManagement)
 
-	//
+	// depManagement deps from root file have higher priority
 	for k, v := range rootDependencyManagement {
 		depManagement[k] = v
 	}
