@@ -24,7 +24,6 @@ type Dependency struct {
 	// TODO : currently yarn can't recognize Dev flag.
 	// That need to parse package.json for Dev flag
 	Dev          bool
-	Resolved     string
 	Dependencies map[string]Dependency
 }
 

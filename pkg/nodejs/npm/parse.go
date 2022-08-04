@@ -77,7 +77,7 @@ func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string
 			Name:               pkgName,
 			Version:            dependency.Version,
 			Indirect:           isIndirectLib(pkgName, dircetDeps),
-			ExternalReferences: []types.ExternalRef{{Type: types.Other, URL: dependency.Resolved}},
+			ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: dependency.Resolved}},
 		}
 		libs = append(libs, lib)
 

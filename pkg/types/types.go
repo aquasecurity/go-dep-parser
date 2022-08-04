@@ -29,9 +29,9 @@ type Parser interface {
 type RefType string
 
 const (
-	Website      RefType = "website"
-	License      RefType = "license"
-	VCS          RefType = "vcs"
-	IssueTracker RefType = "issue-tracker"
-	Other        RefType = "other"
+	RefWebsite      RefType = "website"
+	RefLicense      RefType = "license"
+	RefVCS          RefType = "vcs"
+	RefIssueTracker RefType = "issue-tracker"
+	RefOther        RefType = "other"
 )
