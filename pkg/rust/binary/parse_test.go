@@ -11,6 +11,9 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
+// Test binaries generated from cargo-auditable test fixture
+// https://github.com/rust-secure-code/cargo-auditable/tree/6b77151/cargo-auditable/tests/fixtures/workspace
+
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name      string

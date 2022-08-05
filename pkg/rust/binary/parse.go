@@ -2,8 +2,6 @@
 package binary
 
 import (
-	"fmt"
-
 	"golang.org/x/xerrors"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
@@ -40,13 +38,11 @@ func NewParser() types.Parser {
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	info, err := rustaudit.GetDependencyInfo(r)
 	if err != nil {
-		fmt.Printf("%v", err)
 		return nil, nil, convertError(err)
 	}
 
 	var libs []types.Library
 	for _, dep := range info.Packages {
-		fmt.Printf("%v", dep)
 		if dep.Kind == rustaudit.Runtime {
 			libs = append(libs, types.Library{
 				Name:    dep.Name,
