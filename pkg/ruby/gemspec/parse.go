@@ -38,7 +38,7 @@ var (
 	// Capture the value of "licenses"
 	// e.g. s.license = ["MIT".freeze, "BSDL".freeze]
 	//      => "MIT".freeze, "BSDL".freeze
-	licensesRegexp = regexp.MustCompile(`\.licenses\s*=\s*\[(?P<licenses>.+)]`)
+	licensesRegexp = regexp.MustCompile(`\.licenses\s*=\s*\[(?P<licenses>.+)\]`)
 )
 
 type Parser struct{}
