@@ -24,6 +24,7 @@ func TestParse(t *testing.T) {
 			want: []types.Library{
 				{Name: "Newtonsoft.Json", Version: "6.0.4"},
 				{Name: "Microsoft.AspNet.WebApi", Version: "5.2.2"},
+				{Name: "Floating.Version", Version: "1.2"},
 			},
 		},
 		{

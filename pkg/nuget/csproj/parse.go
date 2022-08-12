@@ -44,9 +44,11 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			continue
 		}
 
+		var versionNotFloating = strings.TrimRight(pkg.Version, ".*")
+
 		lib := types.Library{
 			Name:    pkg.Include,
-			Version: pkg.Version,
+			Version: versionNotFloating,
 		}
 
 		libs = append(libs, lib)
