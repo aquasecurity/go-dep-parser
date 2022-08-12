@@ -30,6 +30,11 @@ func TestParse(t *testing.T) {
 			name:      "with development dependency",
 			inputFile: "testdata/dev_dependency.csproj",
 			want: []types.Library{
+				{Name: "PrivateAssets.Tag.None", Version: "1.0.0"},
+				{Name: "PrivateAssets.Conflicting.Tag.Attribute", Version: "1.0.0"},
+				{Name: "ExcludeAssets.Tag.ContentFiles", Version: "1.0.0"},
+				{Name: "ExcludeAssets.Tag.None", Version: "1.0.0"},
+				{Name: "ExcludeAssets.Conflicting.Tag.Attribute", Version: "1.0.0"},
 				{Name: "Newtonsoft.Json", Version: "8.0.3"},
 			},
 		},

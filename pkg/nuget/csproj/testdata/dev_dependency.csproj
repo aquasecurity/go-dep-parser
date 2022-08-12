@@ -4,9 +4,40 @@
     <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers" Version="1.0.0">
+    <!-- PrivateAssets=all indicates a development dependency, and we exclude those -->
+    <PackageReference Include="PrivateAssets.Tag.All" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="PrivateAssets.Tag.None" Version="1.0.0">
+      <PrivateAssets>none</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PrivateAssets.Attribute.All" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="PrivateAssets.Conflicting.Tag.Attribute" Version="1.0.0" PrivateAssets="All">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+
+    <!-- ExcludeAssets=all / runtime indicates a compile-time dependency, and we exclude those -->
+    <PackageReference Include="ExcludeAssets.Tag.All" Version="1.0.0">
+      <ExcludeAssets>all</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ExcludeAssets.Tag.Runtime" Version="1.0.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ExcludeAssets.Tag.RuntimeAndMore" Version="1.0.0">
+      <ExcludeAssets>contentFiles;runtime;native</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ExcludeAssets.Tag.ContentFiles" Version="1.0.0">
+      <ExcludeAssets>contentFiles</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ExcludeAssets.Tag.None" Version="1.0.0">
+      <ExcludeAssets>none</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ExcludeAssets.Attribute.All" Version="1.0.0" ExcludeAssets="All" />
+    <PackageReference Include="ExcludeAssets.Conflicting.Tag.Attribute" Version="1.0.0" ExcludeAssets="All">
+      <ExcludeAssets>None</ExcludeAssets>
+    </PackageReference>
+
+    <!-- Normal dependency -->
     <PackageReference Include="Newtonsoft.Json" Version="8.0.3" />
   </ItemGroup>
 </Project>

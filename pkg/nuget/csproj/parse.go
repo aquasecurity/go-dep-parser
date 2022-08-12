@@ -2,6 +2,7 @@ package csproj
 
 import (
 	"encoding/xml"
+	"strings"
 
 	"golang.org/x/xerrors"
 
@@ -11,10 +12,13 @@ import (
 )
 
 type cfgPackageReference struct {
-	XMLName       xml.Name `xml:"PackageReference"`
-	Version       string   `xml:"Version,attr"`
-	Include       string   `xml:"Include,attr"`
-	PrivateAssets string   `xml:"PrivateAssets"`
+	XMLName           xml.Name `xml:"PackageReference"`
+	Version           string   `xml:"Version,attr"`
+	Include           string   `xml:"Include,attr"`
+	PrivateAssetsTag  string   `xml:"PrivateAssets"`
+	PrivateAssetsAttr string   `xml:"PrivateAssets,attr"`
+	ExcludeAssetsTag  string   `xml:"ExcludeAssets"`
+	ExcludeAssetsAttr string   `xml:"ExcludeAssets,attr"`
 }
 
 type config struct {
@@ -36,7 +40,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	libs := make([]types.Library, 0)
 	for _, pkg := range cfgData.Packages {
-		if pkg.Include == "" || pkg.PrivateAssets != "" {
+		if pkg.Include == "" || isDevDependency(pkg) {
 			continue
 		}
 
@@ -49,4 +53,29 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	return utils.UniqueLibraries(libs), nil, nil
+}
+
+func isDevDependency(pkg cfgPackageReference) bool {
+	var privateAssets = tagOrAttribute(pkg.PrivateAssetsTag, pkg.PrivateAssetsAttr)
+	var excludeAssets = tagOrAttribute(pkg.ExcludeAssetsTag, pkg.ExcludeAssetsAttr)
+	return assetListContains(privateAssets, "all") || assetListContains(excludeAssets, "all") || assetListContains(excludeAssets, "runtime")
+}
+
+func assetListContains(assets []string, needle string) bool {
+	for _, v := range assets {
+		if strings.EqualFold(v, needle) {
+			return true
+		}
+	}
+	return false
+}
+
+func tagOrAttribute(tag string, attr string) []string {
+	var strvalue = "";
+	if (tag != "") {
+		strvalue = tag
+	} else {
+		strvalue = attr
+	}
+	return strings.Split(strvalue, ";")
 }
