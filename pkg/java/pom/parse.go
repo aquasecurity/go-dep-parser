@@ -245,6 +245,10 @@ func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, rootDependenc
 
 	// Extract and merge dependencies under "dependencyManagement"
 	depManagement := p.dependencyManagement(pom.content.DependencyManagement.Dependencies.Dependency, props)
+	// dependencyManagements have next priority:
+	// 1. rootDependencyManagement - depManagements from pom.xml(and from its parents) which contains this pom in `dependencies` tag
+	// 2. depManagement - depManagements from this pom.xml
+	// 3. parent.dependencyManagement - depManagements from parent of this pom.xml
 	depManagement = p.mergeDependencyManagements(rootDependencyManagement, depManagement, parent.dependencyManagement)
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
