@@ -253,7 +253,7 @@ func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, rootDependenc
 	}
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
-	deps := p.parseDependencies(pom, props, depManagement, exclusions)
+	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, exclusions)
 	deps = p.mergeDependencies(parent.dependencies, deps, exclusions)
 
 	return analysisResult{
@@ -296,10 +296,10 @@ func (p parser) mergeDependencyManagement(a, b map[string]pomDependency) map[str
 	return a
 }
 
-func (p parser) parseDependencies(deps *pom, props map[string]string, depManagement map[string]pomDependency,
+func (p parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement map[string]pomDependency,
 	exclusions map[string]struct{}) []artifact {
 	var dependencies []artifact
-	for _, d := range deps.content.Dependencies.Dependency {
+	for _, d := range deps {
 		// Resolve dependencies
 		d = d.Resolve(props, depManagement)
 
