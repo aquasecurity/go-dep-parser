@@ -245,12 +245,7 @@ func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, rootDependenc
 
 	// Extract and merge dependencies under "dependencyManagement"
 	depManagement := p.dependencyManagement(pom.content.DependencyManagement.Dependencies.Dependency, props)
-	depManagement = p.mergeDependencyManagement(parent.dependencyManagement, depManagement)
-
-	// depManagement deps from root file have higher priority
-	for k, v := range rootDependencyManagement {
-		depManagement[k] = v
-	}
+	depManagement = p.mergeDependencyManagements(rootDependencyManagement, depManagement, parent.dependencyManagement)
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
 	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, exclusions)
@@ -277,7 +272,7 @@ func (p parser) dependencyManagement(deps []pomDependency, props properties) map
 			art := newArtifact(d.GroupID, d.ArtifactID, d.Version, props)
 			result, err := p.resolve(art)
 			if err == nil {
-				depManagement = p.mergeDependencyManagement(result.dependencyManagement, depManagement)
+				depManagement = p.mergeDependencyManagements(depManagement, result.dependencyManagement)
 			}
 			continue
 		}
@@ -286,14 +281,15 @@ func (p parser) dependencyManagement(deps []pomDependency, props properties) map
 	return depManagement
 }
 
-func (p parser) mergeDependencyManagement(a, b map[string]pomDependency) map[string]pomDependency {
-	if a == nil {
-		return b
+func (p parser) mergeDependencyManagements(depManagements ...map[string]pomDependency) map[string]pomDependency {
+	mergedDepManagements := map[string]pomDependency{}
+	// The preceding argument takes precedence.
+	for i := len(depManagements) - 1; i >= 0; i-- {
+		for key, value := range depManagements[i] {
+			mergedDepManagements[key] = value
+		}
 	}
-	for key, value := range b {
-		a[key] = value
-	}
-	return a
+	return mergedDepManagements
 }
 
 func (p parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement map[string]pomDependency,
