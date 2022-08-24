@@ -46,7 +46,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	var deps []types.Dependency
 	for _, pkg := range info.Packages {
 		if pkg.Kind == rustaudit.Runtime {
+			pkgID := utils.PackageID(pkg.Name, pkg.Version)
 			libs = append(libs, types.Library{
+				ID:       pkgID,
 				Name:     pkg.Name,
 				Version:  pkg.Version,
 				Indirect: !pkg.Root,
@@ -56,11 +58,11 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			for _, dep_idx := range pkg.Dependencies {
 				dep := info.Packages[dep_idx]
 				if dep.Kind == rustaudit.Runtime {
-					childDeps = append(childDeps, utils.PackageID(dep.Name, dep.Version))
+					childDeps = append(childDeps, pkgID)
 				}
 			}
 			if len(childDeps) > 0 {
-				deps = append(deps, types.Dependency{ID: utils.PackageID(pkg.Name, pkg.Version), DependsOn: childDeps})
+				deps = append(deps, types.Dependency{ID: pkgID, DependsOn: childDeps})
 			}
 		}
 	}
