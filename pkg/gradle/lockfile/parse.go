@@ -19,7 +19,7 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	var libs []types.Library
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := strings.TrimSpace(scanner.Text())
 		if strings.HasPrefix(line, "#") { // skip comments
 			continue
 		}

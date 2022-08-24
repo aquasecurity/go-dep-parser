@@ -26,6 +26,10 @@ func TestParser_Parse(t *testing.T) {
 					Name:    "org.springframework:spring-asm",
 					Version: "3.1.3.RELEASE",
 				},
+				{
+					Name:    "org.springframework:spring-beans",
+					Version: "5.0.5.RELEASE",
+				},
 			},
 		},
 		{
