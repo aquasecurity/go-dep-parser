@@ -33,7 +33,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	decoder := json.NewDecoder(r)
 	if err := decoder.Decode(&lock); err != nil {
-		return nil, nil, xerrors.Errorf("failed to decode canon.lock file: %s", err.Error())
+		return nil, nil, xerrors.Errorf("failed to decode conan.lock file: %s", err.Error())
 	}
 
 	for _, nod := range lock.GraphLock.Nodes {
