@@ -48,7 +48,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			ref := strings.Split(strings.Split(nod.Ref, "@")[0], "/")
 			if len(ref) != 2 {
 				once.Do(func() {
-					log.Logger.Debugw("Unable to detect conan dependency: %s", ref)
+					log.Logger.Debugf("Unable to detect conan dependency: %q", nod.Ref)
 				})
 				continue
 			}
