@@ -3,9 +3,12 @@ package lock
 import (
 	"encoding/json"
 	"strings"
+	"sync"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+
 	"golang.org/x/xerrors"
 )
 
@@ -28,6 +31,7 @@ func NewParser() types.Parser {
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
+	var once sync.Once
 	var lock LockFile
 	var libs []types.Library
 
@@ -43,11 +47,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			// 'pkgc/system'
 			ref := strings.Split(strings.Split(nod.Ref, "@")[0], "/")
 			if len(ref) != 2 {
-				return nil, nil, xerrors.Errorf("unable to parse ref: %s", nod.Ref)
-			}
-
-			// skip system dependencies
-			if ref[1] == "system" {
+				once.Do(func() {
+					log.Logger.Debugw("Unable to detect conan dependency: %s", ref)
+				})
 				continue
 			}
 

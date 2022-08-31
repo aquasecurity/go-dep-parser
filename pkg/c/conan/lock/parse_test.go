@@ -16,7 +16,6 @@ func TestParse(t *testing.T) {
 		name      string
 		inputFile string // Test input file
 		want      []types.Library
-		wantErr   string
 	}{
 		{
 			name:      "happy path",
@@ -25,6 +24,10 @@ func TestParse(t *testing.T) {
 				{
 					Name:    "pkga",
 					Version: "0.0.1",
+				},
+				{
+					Name:    "pkgb",
+					Version: "system",
 				},
 				{
 					Name:    "pkgc",
@@ -39,7 +42,6 @@ func TestParse(t *testing.T) {
 		{
 			name:      "sad path. wrong ref format",
 			inputFile: "testdata/sad.lock",
-			wantErr:   "unable to parse ref",
 		},
 	}
 
@@ -49,12 +51,6 @@ func TestParse(t *testing.T) {
 			require.NoError(t, err)
 
 			got, _, err := NewParser().Parse(f)
-
-			if tt.wantErr != "" {
-				require.NotNil(t, err)
-				assert.Contains(t, err.Error(), tt.wantErr)
-				return
-			}
 
 			require.NoError(t, err)
 			sort.Slice(got, func(i, j int) bool {
