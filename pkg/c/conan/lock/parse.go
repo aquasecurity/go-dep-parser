@@ -3,13 +3,12 @@ package lock
 import (
 	"encoding/json"
 	"strings"
-	"sync"
+
+	"golang.org/x/xerrors"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
-
-	"golang.org/x/xerrors"
 )
 
 type LockFile struct {
@@ -17,10 +16,10 @@ type LockFile struct {
 }
 
 type GraphLock struct {
-	Nodes map[string]Nod `json:"nodes"`
+	Nodes map[string]Node `json:"nodes"`
 }
 
-type Nod struct {
+type Node struct {
 	Ref string `json:"ref"`
 }
 
@@ -31,7 +30,6 @@ func NewParser() types.Parser {
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
-	var once sync.Once
 	var lock LockFile
 	var libs []types.Library
 
@@ -47,9 +45,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			// 'pkgc/system'
 			ref := strings.Split(strings.Split(nod.Ref, "@")[0], "/")
 			if len(ref) != 2 {
-				once.Do(func() {
-					log.Logger.Debugf("Unable to detect conan dependency: %q", nod.Ref)
-				})
+				log.Logger.Debugf("Unable to detect conan dependency: %q", nod.Ref)
 				continue
 			}
 

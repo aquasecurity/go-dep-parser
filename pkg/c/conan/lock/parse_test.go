@@ -1,4 +1,4 @@
-package lock
+package lock_test
 
 import (
 	"os"
@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/aquasecurity/go-dep-parser/pkg/c/conan/lock"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -49,8 +50,12 @@ func TestParse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, err := os.Open(tt.inputFile)
 			require.NoError(t, err)
+			defer func() {
+				err := f.Close()
+				assert.NoError(t, err)
+			}()
 
-			got, _, err := NewParser().Parse(f)
+			got, _, err := lock.NewParser().Parse(f)
 
 			require.NoError(t, err)
 			sort.Slice(got, func(i, j int) bool {
