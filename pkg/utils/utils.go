@@ -21,6 +21,9 @@ func UniqueStrings(ss []string) []string {
 }
 
 func UniqueLibraries(libs []types.Library) []types.Library {
+	if len(libs) == 0 {
+		return nil
+	}
 	unique := map[string]types.Library{}
 	for _, lib := range libs {
 		identifier := fmt.Sprintf("%s@%s", lib.Name, lib.Version)
