@@ -21,7 +21,7 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			name:      "happy path",
-			inputFile: "testdata/happy.Podfile.lock",
+			inputFile: "testdata/happy.lock",
 			wantLibs: []types.Library{
 				{
 					ID:      "AppCenter/4.2.0",
@@ -76,11 +76,11 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:      "happy path. lock file without dependencies",
-			inputFile: "testdata/empty.Podfile.lock",
+			inputFile: "testdata/empty.lock",
 		},
 		{
 			name:      "sad path. wrong dep format",
-			inputFile: "testdata/sad.Podfile.lock",
+			inputFile: "testdata/sad.lock",
 		},
 	}
 
