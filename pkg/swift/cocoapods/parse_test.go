@@ -101,6 +101,10 @@ func TestParse(t *testing.T) {
 				return gotLibs[i].Version < gotLibs[j].Version
 			})
 
+			sort.Slice(gotDeps, func(i, j int) bool {
+				return gotDeps[i].ID < gotDeps[j].ID
+			})
+
 			assert.Equal(t, tt.wantLibs, gotLibs)
 			assert.Equal(t, tt.wantDeps, gotDeps)
 		})
