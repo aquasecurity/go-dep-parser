@@ -150,7 +150,6 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 			if err != nil {
 				log.Logger.Debugf("failed to parse %s: %s", fileInJar.Name, err)
 				continue
-				//return nil, nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
 			libs = append(libs, innerLibs...)
 		}
