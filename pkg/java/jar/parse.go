@@ -148,7 +148,7 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 		case isArtifact(fileInJar.Name):
 			innerLibs, _, err := p.parseInnerJar(fileInJar) //TODO process inner deps
 			if err != nil {
-				log.Logger.Debugf("failed to parse %s: %s", fileInJar.Name, err)
+				log.Logger.Debugf("Failed to parse %s: %s", fileInJar.Name, err)
 				continue
 			}
 			libs = append(libs, innerLibs...)
