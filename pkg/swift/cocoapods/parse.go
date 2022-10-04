@@ -36,16 +36,16 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	parsedDeps := map[string]types.Library{} // dependency name => Library
 	directDeps := map[string][]string{}      // dependency name => slice of child dependency names
 	for _, pod := range lock.Pods {
-		switch reflect.ValueOf(pod).Kind() {
-		case reflect.String: // dependency with version number
+		switch p := pod.(type) {
+		case string: // dependency with version number
 			lib, err := parseDep(pod.(string), false)
 			if err != nil {
 				log.Logger.Debug(err)
 				continue
 			}
 			parsedDeps[lib.Name] = lib
-		case reflect.Map: // dependency with its direct dependencies
-			for dep, childDeps := range pod.(map[string]interface{}) {
+		case map[string]interface{}: // dependency with its child dependencies
+			for dep, childDeps := range p {
 				lib, err := parseDep(dep, false)
 				if err != nil {
 					log.Logger.Debug(err)
@@ -68,14 +68,9 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	var deps []types.Dependency
 	for dep, childDeps := range directDeps {
 		var dependsOn []string
-		// find versions for direct dependencies
+		// find versions for child dependencies
 		for _, childDep := range childDeps {
-			// mark this dep as indirect
-			lib := parsedDeps[childDep]
-			lib.Indirect = true
-			parsedDeps[childDep] = lib
-
-			dependsOn = append(dependsOn, fmt.Sprintf(idFormat, childDep, lib.Version))
+			dependsOn = append(dependsOn, fmt.Sprintf(idFormat, childDep, parsedDeps[childDep].Version))
 		}
 		deps = append(deps, types.Dependency{
 			ID:        parsedDeps[dep].ID,
