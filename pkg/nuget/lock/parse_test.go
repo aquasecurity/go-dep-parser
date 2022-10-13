@@ -52,6 +52,12 @@ func TestParse(t *testing.T) {
 				return ret < 0
 			})
 
+			for _, lib := range got {
+				sort.Slice(lib.Locations, func(i, j int) bool {
+					return lib.Locations[i].StartLine < lib.Locations[j].StartLine
+				})
+			}
+
 			sort.Slice(v.want, func(i, j int) bool {
 				ret := strings.Compare(v.want[i].Name, v.want[j].Name)
 				if ret == 0 {
