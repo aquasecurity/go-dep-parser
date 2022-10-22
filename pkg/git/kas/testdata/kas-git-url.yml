@@ -1,0 +1,12 @@
+header:
+  version: 11
+  includes:
+    - repo: externalrepo
+      file: tests/test_layers/test.yml
+
+repos:
+  this:
+
+  externalrepo:
+    url: git@github.com:org/kas.git
+    refspec: 1.0.0
