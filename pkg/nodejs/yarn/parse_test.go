@@ -2,7 +2,6 @@ package yarn
 
 import (
 	"os"
-	"path"
 	"sort"
 	"strings"
 	"testing"
@@ -42,7 +41,7 @@ func TestGetPackageName(t *testing.T) {
 	}
 
 	for _, v := range vectors {
-		actual, _, err := parsePackageLocator(v.target)
+		actual, _, _, err := parsePackageLocators(v.target)
 
 		if v.occurErr != (err != nil) {
 			t.Errorf("expect error %t but err is %s", v.occurErr, err)
@@ -56,77 +55,118 @@ func TestGetPackageName(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
-	vectors := []struct {
-		file string // Test input file
-		want []types.Library
+	tests := []struct {
+		name     string
+		file     string // Test input file
+		want     []types.Library
+		wantDeps []types.Dependency
 	}{
 		{
-			file: "testdata/yarn_normal.lock",
-			want: yarnNormal,
+			name:     "normal",
+			file:     "testdata/yarn_normal.lock",
+			want:     yarnNormal,
+			wantDeps: yarnNormalDeps,
 		},
 		{
-			file: "testdata/yarn_react.lock",
-			want: yarnReact,
+			name:     "react",
+			file:     "testdata/yarn_react.lock",
+			want:     yarnReact,
+			wantDeps: yarnReactDeps,
 		},
 		{
-			file: "testdata/yarn_with_dev.lock",
-			want: yarnWithDev,
+			name:     "yarn with dev",
+			file:     "testdata/yarn_with_dev.lock",
+			want:     yarnWithDev,
+			wantDeps: yarnWithDevDeps,
 		},
 		{
-			file: "testdata/yarn_many.lock",
-			want: yarnMany,
+			name:     "yarn many",
+			file:     "testdata/yarn_many.lock",
+			want:     yarnMany,
+			wantDeps: yarnManyDeps,
 		},
 		{
-			file: "testdata/yarn_realworld.lock",
-			want: yarnRealWorld,
+			name:     "yarn real world",
+			file:     "testdata/yarn_realworld.lock",
+			want:     yarnRealWorld,
+			wantDeps: yarnRealWorldDeps,
 		},
 		{
 			file: "testdata/yarn_with_npm.lock",
 			want: yarnWithNpm,
 		},
 		{
-			file: "testdata/yarn_v2_normal.lock",
-			want: yarnV2Normal,
+			name:     "yarn v2 normal",
+			file:     "testdata/yarn_v2_normal.lock",
+			want:     yarnV2Normal,
+			wantDeps: yarnV2NormalDeps,
 		},
 		{
-			file: "testdata/yarn_v2_react.lock",
-			want: yarnV2React,
+			name:     "yarn v2 react",
+			file:     "testdata/yarn_v2_react.lock",
+			want:     yarnV2React,
+			wantDeps: yarnV2ReactDeps,
 		},
 		{
-			file: "testdata/yarn_v2_with_dev.lock",
-			want: yarnV2WithDev,
+			name:     "yarn v2 with dev",
+			file:     "testdata/yarn_v2_with_dev.lock",
+			want:     yarnV2WithDev,
+			wantDeps: yarnV2WithDevDeps,
 		},
 		{
-			file: "testdata/yarn_v2_many.lock",
-			want: yarnV2Many,
+			name:     "yarn v2 many",
+			file:     "testdata/yarn_v2_many.lock",
+			want:     yarnV2Many,
+			wantDeps: yarnV2ManyDeps,
 		},
 	}
 
-	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
-			f, err := os.Open(v.file)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f, err := os.Open(tt.file)
 			require.NoError(t, err)
 
-			got, _, err := NewParser().Parse(f)
+			got, deps, err := NewParser().Parse(f)
 			require.NoError(t, err)
 
-			sort.Slice(got, func(i, j int) bool {
-				ret := strings.Compare(got[i].Name, got[j].Name)
-				if ret == 0 {
-					return got[i].Version < got[j].Version
-				}
-				return ret < 0
-			})
+			sortLibs(got)
+			sortLibs(tt.want)
 
-			sort.Slice(v.want, func(i, j int) bool {
-				ret := strings.Compare(v.want[i].Name, v.want[j].Name)
-				if ret == 0 {
-					return v.want[i].Version < v.want[j].Version
-				}
-				return ret < 0
-			})
-
-			assert.Equal(t, v.want, got)
+			assert.Equal(t, tt.want, got)
+			if tt.wantDeps != nil {
+				sortDeps(deps)
+				sortDeps(tt.wantDeps)
+				assert.Equal(t, tt.wantDeps, deps)
+			}
 		})
 	}
+}
+
+func sortDeps(deps []types.Dependency) {
+	sort.Slice(deps, func(i, j int) bool {
+		return strings.Compare(deps[i].ID, deps[j].ID) < 0
+	})
+
+	for i := range deps {
+		sort.Strings(deps[i].DependsOn)
+	}
+}
+
+func sortLibs(libs []types.Library) {
+	sort.Slice(libs, func(i, j int) bool {
+		ret := strings.Compare(libs[i].Name, libs[j].Name)
+		if ret == 0 {
+			return libs[i].Version < libs[j].Version
+		}
+		return ret < 0
+	})
+	for _, lib := range libs {
+		sortLocations(lib.Locations)
+	}
+}
+
+func sortLocations(locs []types.Location) {
+	sort.Slice(locs, func(i, j int) bool {
+		return locs[i].StartLine < locs[j].StartLine
+	})
 }

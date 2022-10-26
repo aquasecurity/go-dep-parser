@@ -13,6 +13,16 @@ var (
 		{Name: "promise", Version: "8.0.3"},
 	}
 
+	// yarn list --json --no-progress | jq -r '[ .data.trees[] | { ID: .name, DependsOn: [ .children[] | { name: .name, color: .color } ] } ]'
+	yarnNormalDeps = []types.Dependency{
+		{
+			ID: "promise@8.0.3",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+	}
+
 	// ... and
 	// yarn add react redux
 	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}'
@@ -29,6 +39,52 @@ var (
 		{Name: "redux", Version: "4.0.1"},
 		{Name: "scheduler", Version: "0.13.6"},
 		{Name: "symbol-observable", Version: "1.2.0"},
+	}
+
+	yarnReactDeps = []types.Dependency{
+		{
+			ID: "loose-envify@1.4.0",
+			DependsOn: []string{
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "promise@8.0.3",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+		{
+			ID: "prop-types@15.7.2",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "react@16.8.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "redux@4.0.1",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "scheduler@0.13.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+			},
+		},
 	}
 
 	// ... and
@@ -163,6 +219,494 @@ var (
 		{Name: "yargs-parser", Version: "13.0.0"},
 		{Name: "yargs-parser", Version: "13.1.0"},
 		{Name: "yargs-unparser", Version: "1.5.0"},
+	}
+
+	yarnWithDevDeps = []types.Dependency{
+		{
+			ID: "ansi-styles@3.2.1",
+			DependsOn: []string{
+				"color-convert@1.9.3",
+			},
+		},
+		{
+			ID: "argparse@1.0.10",
+			DependsOn: []string{
+				"sprintf-js@1.0.3",
+			},
+		},
+		{
+			ID: "brace-expansion@1.1.11",
+			DependsOn: []string{
+				"balanced-match@1.0.0",
+				"concat-map@0.0.1",
+			},
+		},
+		{
+			ID: "chalk@2.4.2",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"escape-string-regexp@1.0.5",
+				"supports-color@5.5.0",
+			},
+		},
+		{
+			ID: "cliui@4.1.0",
+			DependsOn: []string{
+				"string-width@2.1.1",
+				"strip-ansi@4.0.0",
+				"wrap-ansi@2.1.0",
+			},
+		},
+		{
+			ID: "color-convert@1.9.3",
+			DependsOn: []string{
+				"color-name@1.1.3",
+			},
+		},
+		{
+			ID: "cross-spawn@6.0.5",
+			DependsOn: []string{
+				"nice-try@1.0.5",
+				"path-key@2.0.1",
+				"semver@5.7.0",
+				"shebang-command@1.2.0",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "debug@3.2.6",
+			DependsOn: []string{
+				"ms@2.1.1",
+			},
+		},
+		{
+			ID: "define-properties@1.1.3",
+			DependsOn: []string{
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "end-of-stream@1.4.1",
+			DependsOn: []string{
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "es-abstract@1.13.0",
+			DependsOn: []string{
+				"es-to-primitive@1.2.0",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+				"is-callable@1.1.4",
+				"is-regex@1.0.4",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "es-to-primitive@1.2.0",
+			DependsOn: []string{
+				"is-callable@1.1.4",
+				"is-date-object@1.0.1",
+				"is-symbol@1.0.2",
+			},
+		},
+		{
+			ID: "execa@1.0.0",
+			DependsOn: []string{
+				"cross-spawn@6.0.5",
+				"get-stream@4.1.0",
+				"is-stream@1.1.0",
+				"npm-run-path@2.0.2",
+				"p-finally@1.0.0",
+				"signal-exit@3.0.2",
+				"strip-eof@1.0.0",
+			},
+		},
+		{
+			ID: "find-up@3.0.0",
+			DependsOn: []string{
+				"locate-path@3.0.0",
+			},
+		},
+		{
+			ID: "flat@4.1.0",
+			DependsOn: []string{
+				"is-buffer@2.0.3",
+			},
+		},
+		{
+			ID: "get-stream@4.1.0",
+			DependsOn: []string{
+				"pump@3.0.0",
+			},
+		},
+		{
+			ID: "glob@7.1.3",
+			DependsOn: []string{
+				"fs.realpath@1.0.0",
+				"inflight@1.0.6",
+				"inherits@2.0.3",
+				"minimatch@3.0.4",
+				"once@1.4.0",
+				"path-is-absolute@1.0.1",
+			},
+		},
+		{
+			ID: "has@1.0.3",
+			DependsOn: []string{
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "inflight@1.0.6",
+			DependsOn: []string{
+				"once@1.4.0",
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "is-fullwidth-code-point@1.0.0",
+			DependsOn: []string{
+				"number-is-nan@1.0.1",
+			},
+		},
+		{
+			ID: "is-regex@1.0.4",
+			DependsOn: []string{
+				"has@1.0.3",
+			},
+		},
+		{
+			ID: "is-symbol@1.0.2",
+			DependsOn: []string{
+				"has-symbols@1.0.0",
+			},
+		},
+		{
+			ID: "js-yaml@3.13.1",
+			DependsOn: []string{
+				"argparse@1.0.10",
+				"esprima@4.0.1",
+			},
+		},
+		{
+			ID: "lcid@2.0.0",
+			DependsOn: []string{
+				"invert-kv@2.0.0",
+			},
+		},
+		{
+			ID: "locate-path@3.0.0",
+			DependsOn: []string{
+				"p-locate@3.0.0",
+				"path-exists@3.0.0",
+			},
+		},
+		{
+			ID: "log-symbols@2.2.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+			},
+		},
+		{
+			ID: "loose-envify@1.4.0",
+			DependsOn: []string{
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "map-age-cleaner@0.1.3",
+			DependsOn: []string{
+				"p-defer@1.0.0",
+			},
+		},
+		{
+			ID: "mem@4.3.0",
+			DependsOn: []string{
+				"map-age-cleaner@0.1.3",
+				"mimic-fn@2.1.0",
+				"p-is-promise@2.1.0",
+			},
+		},
+		{
+			ID: "minimatch@3.0.4",
+			DependsOn: []string{
+				"brace-expansion@1.1.11",
+			},
+		},
+		{
+			ID: "mkdirp@0.5.1",
+			DependsOn: []string{
+				"minimist@0.0.8",
+			},
+		},
+		{
+			ID: "mocha@6.1.4",
+			DependsOn: []string{
+				"ansi-colors@3.2.3",
+				"browser-stdout@1.3.1",
+				"debug@3.2.6",
+				"diff@3.5.0",
+				"escape-string-regexp@1.0.5",
+				"find-up@3.0.0",
+				"glob@7.1.3",
+				"growl@1.10.5",
+				"he@1.2.0",
+				"js-yaml@3.13.1",
+				"log-symbols@2.2.0",
+				"minimatch@3.0.4",
+				"mkdirp@0.5.1",
+				"ms@2.1.1",
+				"node-environment-flags@1.0.5",
+				"object.assign@4.1.0",
+				"strip-json-comments@2.0.1",
+				"supports-color@6.0.0",
+				"which@1.3.1",
+				"wide-align@1.1.3",
+				"yargs@13.2.2",
+				"yargs-parser@13.0.0",
+				"yargs-unparser@1.5.0",
+			},
+		},
+		{
+			ID: "node-environment-flags@1.0.5",
+			DependsOn: []string{
+				"object.getownpropertydescriptors@2.0.3",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "npm-run-path@2.0.2",
+			DependsOn: []string{
+				"path-key@2.0.1",
+			},
+		},
+		{
+			ID: "object.assign@4.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"function-bind@1.1.1",
+				"has-symbols@1.0.0",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "object.getownpropertydescriptors@2.0.3",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+			},
+		},
+		{
+			ID: "once@1.4.0",
+			DependsOn: []string{
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "os-locale@3.1.0",
+			DependsOn: []string{
+				"execa@1.0.0",
+				"lcid@2.0.0",
+				"mem@4.3.0",
+			},
+		},
+		{
+			ID: "p-limit@2.2.0",
+			DependsOn: []string{
+				"p-try@2.2.0",
+			},
+		},
+		{
+			ID: "p-locate@3.0.0",
+			DependsOn: []string{
+				"p-limit@2.2.0",
+			},
+		},
+		{
+			ID: "promise@8.0.3",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+		{
+			ID: "prop-types@15.7.2",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "pump@3.0.0",
+			DependsOn: []string{
+				"end-of-stream@1.4.1",
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "react@16.8.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "redux@4.0.1",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "scheduler@0.13.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "shebang-command@1.2.0",
+			DependsOn: []string{
+				"shebang-regex@1.0.0",
+			},
+		},
+		{
+			ID: "string-width@1.0.2",
+			DependsOn: []string{
+				"code-point-at@1.1.0",
+				"is-fullwidth-code-point@1.0.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "string-width@2.1.1",
+			DependsOn: []string{
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@4.0.0",
+			},
+		},
+		{
+			ID: "string-width@3.1.0",
+			DependsOn: []string{
+				"emoji-regex@7.0.3",
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@5.2.0",
+			},
+		},
+		{
+			ID: "strip-ansi@3.0.1",
+			DependsOn: []string{
+				"ansi-regex@2.1.1",
+			},
+		},
+		{
+			ID: "strip-ansi@4.0.0",
+			DependsOn: []string{
+				"ansi-regex@3.0.0",
+			},
+		},
+		{
+			ID: "strip-ansi@5.2.0",
+			DependsOn: []string{
+				"ansi-regex@4.1.0",
+			},
+		},
+		{
+			ID: "supports-color@6.0.0",
+			DependsOn: []string{
+				"has-flag@3.0.0",
+			},
+		},
+		{
+			ID: "supports-color@5.5.0",
+			DependsOn: []string{
+				"has-flag@3.0.0",
+			},
+		},
+		{
+			ID: "which@1.3.1",
+			DependsOn: []string{
+				"isexe@2.0.0",
+			},
+		},
+		{
+			ID: "wide-align@1.1.3",
+			DependsOn: []string{
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "wrap-ansi@2.1.0",
+			DependsOn: []string{
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "yargs-parser@13.0.0",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-parser@11.1.1",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-parser@13.1.0",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-unparser@1.5.0",
+			DependsOn: []string{
+				"flat@4.1.0",
+				"lodash@4.17.11",
+				"yargs@12.0.5",
+			},
+		},
+		{
+			ID: "yargs@13.2.2",
+			DependsOn: []string{
+				"cliui@4.1.0",
+				"find-up@3.0.0",
+				"get-caller-file@2.0.5",
+				"os-locale@3.1.0",
+				"require-directory@2.1.1",
+				"require-main-filename@2.0.0",
+				"set-blocking@2.0.0",
+				"string-width@3.1.0",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@13.1.0",
+			},
+		},
+		{
+			ID: "yargs@12.0.5",
+			DependsOn: []string{
+				"cliui@4.1.0",
+				"decamelize@1.2.0",
+				"find-up@3.0.0",
+				"get-caller-file@1.0.3",
+				"os-locale@3.1.0",
+				"require-directory@2.1.1",
+				"require-main-filename@1.0.1",
+				"set-blocking@2.0.0",
+				"string-width@2.1.1",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@11.1.1",
+			},
+		},
 	}
 
 	// ... and
@@ -397,6 +941,809 @@ var (
 		{Name: "yargs-unparser", Version: "1.5.0"},
 	}
 
+	yarnManyDeps = []types.Dependency{
+		{
+			ID: "accepts@1.3.7",
+			DependsOn: []string{
+				"mime-types@2.1.24",
+				"negotiator@0.6.2",
+			},
+		},
+		{
+			ID: "ajv@6.10.0",
+			DependsOn: []string{
+				"fast-deep-equal@2.0.1",
+				"fast-json-stable-stringify@2.0.0",
+				"json-schema-traverse@0.4.1",
+				"uri-js@4.2.2",
+			},
+		},
+		{
+			ID: "ansi-styles@3.2.1",
+			DependsOn: []string{
+				"color-convert@1.9.3",
+			},
+		},
+		{
+			ID: "argparse@1.0.10",
+			DependsOn: []string{
+				"sprintf-js@1.0.3",
+			},
+		},
+		{
+			ID: "asn1@0.2.4",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "async@2.6.2",
+			DependsOn: []string{
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "axios@0.18.0",
+			DependsOn: []string{
+				"follow-redirects@1.7.0",
+				"is-buffer@1.1.6",
+			},
+		},
+		{
+			ID: "bcrypt-pbkdf@1.0.2",
+			DependsOn: []string{
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "body-parser@1.18.3",
+			DependsOn: []string{
+				"bytes@3.0.0",
+				"content-type@1.0.4",
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"http-errors@1.6.3",
+				"iconv-lite@0.4.23",
+				"on-finished@2.3.0",
+				"qs@6.5.2",
+				"raw-body@2.3.3",
+				"type-is@1.6.18",
+			},
+		},
+		{
+			ID: "brace-expansion@1.1.11",
+			DependsOn: []string{
+				"balanced-match@1.0.0",
+				"concat-map@0.0.1",
+			},
+		},
+		{
+			ID: "chalk@2.4.2",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"escape-string-regexp@1.0.5",
+				"supports-color@5.5.0",
+			},
+		},
+		{
+			ID: "cliui@4.1.0",
+			DependsOn: []string{
+				"string-width@2.1.1",
+				"strip-ansi@4.0.0",
+				"wrap-ansi@2.1.0",
+			},
+		},
+		{
+			ID: "color-convert@1.9.3",
+			DependsOn: []string{
+				"color-name@1.1.3",
+			},
+		},
+		{
+			ID: "combined-stream@1.0.8",
+			DependsOn: []string{
+				"delayed-stream@1.0.0",
+			},
+		},
+		{
+			ID: "cross-spawn@6.0.5",
+			DependsOn: []string{
+				"nice-try@1.0.5",
+				"path-key@2.0.1",
+				"semver@5.7.0",
+				"shebang-command@1.2.0",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "dashdash@1.14.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "debug@2.6.9",
+			DependsOn: []string{
+				"ms@2.0.0",
+			},
+		},
+		{
+			ID: "debug@3.2.6",
+			DependsOn: []string{
+				"ms@2.1.1",
+			},
+		},
+		{
+			ID: "define-properties@1.1.3",
+			DependsOn: []string{
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "ecc-jsbn@0.1.2",
+			DependsOn: []string{
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "end-of-stream@1.4.1",
+			DependsOn: []string{
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "es-abstract@1.13.0",
+			DependsOn: []string{
+				"es-to-primitive@1.2.0",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+				"is-callable@1.1.4",
+				"is-regex@1.0.4",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "es-to-primitive@1.2.0",
+			DependsOn: []string{
+				"is-callable@1.1.4",
+				"is-date-object@1.0.1",
+				"is-symbol@1.0.2",
+			},
+		},
+		{
+			ID: "execa@1.0.0",
+			DependsOn: []string{
+				"cross-spawn@6.0.5",
+				"get-stream@4.1.0",
+				"is-stream@1.1.0",
+				"npm-run-path@2.0.2",
+				"p-finally@1.0.0",
+				"signal-exit@3.0.2",
+				"strip-eof@1.0.0",
+			},
+		},
+		{
+			ID: "express@4.16.4",
+			DependsOn: []string{
+				"accepts@1.3.7",
+				"array-flatten@1.1.1",
+				"body-parser@1.18.3",
+				"content-disposition@0.5.2",
+				"content-type@1.0.4",
+				"cookie@0.3.1",
+				"cookie-signature@1.0.6",
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"etag@1.8.1",
+				"finalhandler@1.1.1",
+				"fresh@0.5.2",
+				"merge-descriptors@1.0.1",
+				"methods@1.1.2",
+				"on-finished@2.3.0",
+				"parseurl@1.3.3",
+				"path-to-regexp@0.1.7",
+				"proxy-addr@2.0.5",
+				"qs@6.5.2",
+				"range-parser@1.2.1",
+				"safe-buffer@5.1.2",
+				"send@0.16.2",
+				"serve-static@1.13.2",
+				"setprototypeof@1.1.0",
+				"statuses@1.4.0",
+				"type-is@1.6.18",
+				"utils-merge@1.0.1",
+				"vary@1.1.2",
+			},
+		},
+		{
+			ID: "finalhandler@1.1.1",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"on-finished@2.3.0",
+				"parseurl@1.3.3",
+				"statuses@1.4.0",
+				"unpipe@1.0.0",
+			},
+		},
+		{
+			ID: "find-up@3.0.0",
+			DependsOn: []string{
+				"locate-path@3.0.0",
+			},
+		},
+		{
+			ID: "flat@4.1.0",
+			DependsOn: []string{
+				"is-buffer@2.0.3",
+			},
+		},
+		{
+			ID: "follow-redirects@1.7.0",
+			DependsOn: []string{
+				"debug@3.2.6",
+			},
+		},
+		{
+			ID: "form-data@2.3.3",
+			DependsOn: []string{
+				"asynckit@0.4.0",
+				"combined-stream@1.0.8",
+				"mime-types@2.1.24",
+			},
+		},
+		{
+			ID: "get-stream@4.1.0",
+			DependsOn: []string{
+				"pump@3.0.0",
+			},
+		},
+		{
+			ID: "getpass@0.1.7",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "glob@7.1.3",
+			DependsOn: []string{
+				"fs.realpath@1.0.0",
+				"inflight@1.0.6",
+				"inherits@2.0.3",
+				"minimatch@3.0.4",
+				"once@1.4.0",
+				"path-is-absolute@1.0.1",
+			},
+		},
+		{
+			ID: "har-validator@5.1.3",
+			DependsOn: []string{
+				"ajv@6.10.0",
+				"har-schema@2.0.0",
+			},
+		},
+		{
+			ID: "has@1.0.3",
+			DependsOn: []string{
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "http-errors@1.6.3",
+			DependsOn: []string{
+				"depd@1.1.2",
+				"inherits@2.0.3",
+				"setprototypeof@1.1.0",
+				"statuses@1.5.0",
+			},
+		},
+		{
+			ID: "http-signature@1.2.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"jsprim@1.4.1",
+				"sshpk@1.16.1",
+			},
+		},
+		{
+			ID: "iconv-lite@0.4.23",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "inflight@1.0.6",
+			DependsOn: []string{
+				"once@1.4.0",
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "is-fullwidth-code-point@1.0.0",
+			DependsOn: []string{
+				"number-is-nan@1.0.1",
+			},
+		},
+		{
+			ID: "is-regex@1.0.4",
+			DependsOn: []string{
+				"has@1.0.3",
+			},
+		},
+		{
+			ID: "is-symbol@1.0.2",
+			DependsOn: []string{
+				"has-symbols@1.0.0",
+			},
+		},
+		{
+			ID: "js-yaml@3.13.1",
+			DependsOn: []string{
+				"argparse@1.0.10",
+				"esprima@4.0.1",
+			},
+		},
+		{
+			ID: "jsprim@1.4.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"extsprintf@1.3.0",
+				"json-schema@0.2.3",
+				"verror@1.10.0",
+			},
+		},
+		{
+			ID: "lcid@2.0.0",
+			DependsOn: []string{
+				"invert-kv@2.0.0",
+			},
+		},
+		{
+			ID: "locate-path@3.0.0",
+			DependsOn: []string{
+				"p-locate@3.0.0",
+				"path-exists@3.0.0",
+			},
+		},
+		{
+			ID: "log-symbols@2.2.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+			},
+		},
+		{
+			ID: "loose-envify@1.4.0",
+			DependsOn: []string{
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "map-age-cleaner@0.1.3",
+			DependsOn: []string{
+				"p-defer@1.0.0",
+			},
+		},
+		{
+			ID: "mem@4.3.0",
+			DependsOn: []string{
+				"map-age-cleaner@0.1.3",
+				"mimic-fn@2.1.0",
+				"p-is-promise@2.1.0",
+			},
+		},
+		{
+			ID: "mime-types@2.1.24",
+			DependsOn: []string{
+				"mime-db@1.40.0",
+			},
+		},
+		{
+			ID: "minimatch@3.0.4",
+			DependsOn: []string{
+				"brace-expansion@1.1.11",
+			},
+		},
+		{
+			ID: "mkdirp@0.5.1",
+			DependsOn: []string{
+				"minimist@0.0.8",
+			},
+		},
+		{
+			ID: "mocha@6.1.4",
+			DependsOn: []string{
+				"ansi-colors@3.2.3",
+				"browser-stdout@1.3.1",
+				"debug@3.2.6",
+				"diff@3.5.0",
+				"escape-string-regexp@1.0.5",
+				"find-up@3.0.0",
+				"glob@7.1.3",
+				"growl@1.10.5",
+				"he@1.2.0",
+				"js-yaml@3.13.1",
+				"log-symbols@2.2.0",
+				"minimatch@3.0.4",
+				"mkdirp@0.5.1",
+				"ms@2.1.1",
+				"node-environment-flags@1.0.5",
+				"object.assign@4.1.0",
+				"strip-json-comments@2.0.1",
+				"supports-color@6.0.0",
+				"which@1.3.1",
+				"wide-align@1.1.3",
+				"yargs@13.2.2",
+				"yargs-parser@13.0.0",
+				"yargs-unparser@1.5.0",
+			},
+		},
+		{
+			ID: "node-environment-flags@1.0.5",
+			DependsOn: []string{
+				"object.getownpropertydescriptors@2.0.3",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "npm-run-path@2.0.2",
+			DependsOn: []string{
+				"path-key@2.0.1",
+			},
+		},
+		{
+			ID: "object.assign@4.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"function-bind@1.1.1",
+				"has-symbols@1.0.0",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "object.getownpropertydescriptors@2.0.3",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+			},
+		},
+		{
+			ID: "on-finished@2.3.0",
+			DependsOn: []string{
+				"ee-first@1.1.1",
+			},
+		},
+		{
+			ID: "once@1.4.0",
+			DependsOn: []string{
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "os-locale@3.1.0",
+			DependsOn: []string{
+				"execa@1.0.0",
+				"lcid@2.0.0",
+				"mem@4.3.0",
+			},
+		},
+		{
+			ID: "p-limit@2.2.0",
+			DependsOn: []string{
+				"p-try@2.2.0",
+			},
+		},
+		{
+			ID: "p-locate@3.0.0",
+			DependsOn: []string{
+				"p-limit@2.2.0",
+			},
+		},
+		{
+			ID: "promise@8.0.3",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+		{
+			ID: "prop-types@15.7.2",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "proxy-addr@2.0.5",
+			DependsOn: []string{
+				"forwarded@0.1.2",
+				"ipaddr.js@1.9.0",
+			},
+		},
+		{
+			ID: "pump@3.0.0",
+			DependsOn: []string{
+				"end-of-stream@1.4.1",
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "raw-body@2.3.3",
+			DependsOn: []string{
+				"bytes@3.0.0",
+				"http-errors@1.6.3",
+				"iconv-lite@0.4.23",
+				"unpipe@1.0.0",
+			},
+		},
+		{
+			ID: "react@16.8.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "redux@4.0.1",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "request@2.88.0",
+			DependsOn: []string{
+				"aws-sign2@0.7.0",
+				"aws4@1.8.0",
+				"caseless@0.12.0",
+				"combined-stream@1.0.8",
+				"extend@3.0.2",
+				"forever-agent@0.6.1",
+				"form-data@2.3.3",
+				"har-validator@5.1.3",
+				"http-signature@1.2.0",
+				"is-typedarray@1.0.0",
+				"isstream@0.1.2",
+				"json-stringify-safe@5.0.1",
+				"mime-types@2.1.24",
+				"oauth-sign@0.9.0",
+				"performance-now@2.1.0",
+				"qs@6.5.2",
+				"safe-buffer@5.1.2",
+				"tough-cookie@2.4.3",
+				"tunnel-agent@0.6.0",
+				"uuid@3.3.2",
+			},
+		},
+		{
+			ID: "scheduler@0.13.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "send@0.16.2",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"destroy@1.0.4",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"etag@1.8.1",
+				"fresh@0.5.2",
+				"http-errors@1.6.3",
+				"mime@1.4.1",
+				"ms@2.0.0",
+				"on-finished@2.3.0",
+				"range-parser@1.2.1",
+				"statuses@1.4.0",
+			},
+		},
+		{
+			ID: "serve-static@1.13.2",
+			DependsOn: []string{
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"parseurl@1.3.3",
+				"send@0.16.2",
+			},
+		},
+		{
+			ID: "shebang-command@1.2.0",
+			DependsOn: []string{
+				"shebang-regex@1.0.0",
+			},
+		},
+		{
+			ID: "sshpk@1.16.1",
+			DependsOn: []string{
+				"asn1@0.2.4",
+				"assert-plus@1.0.0",
+				"bcrypt-pbkdf@1.0.2",
+				"dashdash@1.14.1",
+				"ecc-jsbn@0.1.2",
+				"getpass@0.1.7",
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "string-width@1.0.2",
+			DependsOn: []string{
+				"code-point-at@1.1.0",
+				"is-fullwidth-code-point@1.0.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "string-width@2.1.1",
+			DependsOn: []string{
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@4.0.0",
+			},
+		},
+		{
+			ID: "string-width@3.1.0",
+			DependsOn: []string{
+				"emoji-regex@7.0.3",
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@5.2.0",
+			},
+		},
+		{
+			ID: "strip-ansi@3.0.1",
+			DependsOn: []string{
+				"ansi-regex@2.1.1",
+			},
+		},
+		{
+			ID: "strip-ansi@4.0.0",
+			DependsOn: []string{
+				"ansi-regex@3.0.0",
+			},
+		},
+		{
+			ID: "strip-ansi@5.2.0",
+			DependsOn: []string{
+				"ansi-regex@4.1.0",
+			},
+		},
+		{
+			ID: "supports-color@6.0.0",
+			DependsOn: []string{
+				"has-flag@3.0.0",
+			},
+		},
+		{
+			ID: "supports-color@5.5.0",
+			DependsOn: []string{
+				"has-flag@3.0.0",
+			},
+		},
+		{
+			ID: "tough-cookie@2.4.3",
+			DependsOn: []string{
+				"psl@1.1.31",
+				"punycode@1.4.1",
+			},
+		},
+		{
+			ID: "tunnel-agent@0.6.0",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "type-is@1.6.18",
+			DependsOn: []string{
+				"media-typer@0.3.0",
+				"mime-types@2.1.24",
+			},
+		},
+		{
+			ID: "uri-js@4.2.2",
+			DependsOn: []string{
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "verror@1.10.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"core-util-is@1.0.2",
+				"extsprintf@1.4.0",
+			},
+		},
+		{
+			ID: "which@1.3.1",
+			DependsOn: []string{
+				"isexe@2.0.0",
+			},
+		},
+		{
+			ID: "wide-align@1.1.3",
+			DependsOn: []string{
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "wrap-ansi@2.1.0",
+			DependsOn: []string{
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "yargs-parser@13.0.0",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-parser@11.1.1",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-parser@13.1.0",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-unparser@1.5.0",
+			DependsOn: []string{
+				"flat@4.1.0",
+				"lodash@4.17.11",
+				"yargs@12.0.5",
+			},
+		},
+		{
+			ID: "yargs@13.2.2",
+			DependsOn: []string{
+				"cliui@4.1.0",
+				"find-up@3.0.0",
+				"get-caller-file@2.0.5",
+				"os-locale@3.1.0",
+				"require-directory@2.1.1",
+				"require-main-filename@2.0.0",
+				"set-blocking@2.0.0",
+				"string-width@3.1.0",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@13.1.0",
+			},
+		},
+		{
+			ID: "yargs@12.0.5",
+			DependsOn: []string{
+				"cliui@4.1.0",
+				"decamelize@1.2.0",
+				"find-up@3.0.0",
+				"get-caller-file@1.0.3",
+				"os-locale@3.1.0",
+				"require-directory@2.1.1",
+				"require-main-filename@1.0.1",
+				"set-blocking@2.0.0",
+				"string-width@2.1.1",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@11.1.1",
+			},
+		},
+	}
+
 	// yarn list | grep -E -o "\S+@[^\^~]\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\", \"\"},\n")}' | sort | uniq
 	yarnRealWorld = []types.Library{
 		{Name: "@babel/code-frame", Version: "7.0.0"},
@@ -605,7 +1952,6 @@ var (
 		{Name: "@webassemblyjs/wast-printer", Version: "1.8.5"},
 		{Name: "@xtuc/ieee754", Version: "1.2.0"},
 		{Name: "@xtuc/long", Version: "4.2.2"},
-
 		{Name: "JSONStream", Version: "1.3.5"},
 		{Name: "abab", Version: "2.0.0"},
 		{Name: "abbrev", Version: "1.1.1"},
@@ -2316,6 +3662,9811 @@ var (
 		{Name: "yeast", Version: "0.1.2"},
 	}
 
+	yarnRealWorldDeps = []types.Dependency{
+		{
+			ID: "@babel/code-frame@7.0.0",
+			DependsOn: []string{
+				"@babel/highlight@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/code-frame@7.0.0-beta.44",
+			DependsOn: []string{
+				"@babel/highlight@7.0.0-beta.44",
+			},
+		},
+		{
+			ID: "@babel/core@7.1.0",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0",
+				"@babel/generator@7.4.4",
+				"@babel/helpers@7.4.4",
+				"@babel/parser@7.4.4",
+				"@babel/template@7.4.4",
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+				"convert-source-map@1.6.0",
+				"debug@3.2.6",
+				"json5@0.5.1",
+				"lodash@4.17.11",
+				"resolve@1.10.1",
+				"semver@5.7.0",
+				"source-map@0.5.7",
+			},
+		},
+		{
+			ID: "@babel/core@7.4.4",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0",
+				"@babel/generator@7.4.4",
+				"@babel/helpers@7.4.4",
+				"@babel/parser@7.4.4",
+				"@babel/template@7.4.4",
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+				"convert-source-map@1.6.0",
+				"debug@4.1.1",
+				"json5@2.1.0",
+				"lodash@4.17.11",
+				"resolve@1.10.1",
+				"semver@5.7.0",
+				"source-map@0.5.7",
+			},
+		},
+		{
+			ID: "@babel/generator@7.0.0-beta.44",
+			DependsOn: []string{
+				"@babel/types@7.0.0-beta.44",
+				"jsesc@2.5.2",
+				"lodash@4.17.11",
+				"source-map@0.5.7",
+				"trim-right@1.0.1",
+			},
+		},
+		{
+			ID: "@babel/generator@7.4.4",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+				"jsesc@2.5.2",
+				"lodash@4.17.11",
+				"source-map@0.5.7",
+				"trim-right@1.0.1",
+			},
+		},
+		{
+			ID: "@babel/helper-annotate-as-pure@7.0.0",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-builder-binary-assignment-operator-visitor@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-explode-assignable-expression@7.1.0",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-builder-react-jsx@7.3.0",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+				"esutils@2.0.2",
+			},
+		},
+		{
+			ID: "@babel/helper-call-delegate@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-hoist-variables@7.4.4",
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-create-class-features-plugin@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-function-name@7.1.0",
+				"@babel/helper-member-expression-to-functions@7.0.0",
+				"@babel/helper-optimise-call-expression@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-replace-supers@7.4.4",
+				"@babel/helper-split-export-declaration@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-define-map@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-function-name@7.1.0",
+				"@babel/types@7.4.4",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "@babel/helper-explode-assignable-expression@7.1.0",
+			DependsOn: []string{
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-function-name@7.0.0-beta.44",
+			DependsOn: []string{
+				"@babel/helper-get-function-arity@7.0.0-beta.44",
+				"@babel/template@7.0.0-beta.44",
+				"@babel/types@7.0.0-beta.44",
+			},
+		},
+		{
+			ID: "@babel/helper-function-name@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-get-function-arity@7.0.0",
+				"@babel/template@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-get-function-arity@7.0.0-beta.44",
+			DependsOn: []string{
+				"@babel/types@7.0.0-beta.44",
+			},
+		},
+		{
+			ID: "@babel/helper-get-function-arity@7.0.0",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-hoist-variables@7.4.4",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-member-expression-to-functions@7.0.0",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-module-imports@7.0.0",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-module-transforms@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-module-imports@7.0.0",
+				"@babel/helper-simple-access@7.1.0",
+				"@babel/helper-split-export-declaration@7.4.4",
+				"@babel/template@7.4.4",
+				"@babel/types@7.4.4",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "@babel/helper-optimise-call-expression@7.0.0",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-regex@7.4.4",
+			DependsOn: []string{
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "@babel/helper-remap-async-to-generator@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-annotate-as-pure@7.0.0",
+				"@babel/helper-wrap-function@7.2.0",
+				"@babel/template@7.4.4",
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-replace-supers@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-member-expression-to-functions@7.0.0",
+				"@babel/helper-optimise-call-expression@7.0.0",
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-simple-access@7.1.0",
+			DependsOn: []string{
+				"@babel/template@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-split-export-declaration@7.0.0-beta.44",
+			DependsOn: []string{
+				"@babel/types@7.0.0-beta.44",
+			},
+		},
+		{
+			ID: "@babel/helper-split-export-declaration@7.4.4",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helper-wrap-function@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-function-name@7.1.0",
+				"@babel/template@7.4.4",
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/helpers@7.4.4",
+			DependsOn: []string{
+				"@babel/template@7.4.4",
+				"@babel/traverse@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/highlight@7.0.0-beta.44",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"esutils@2.0.2",
+				"js-tokens@3.0.2",
+			},
+		},
+		{
+			ID: "@babel/highlight@7.0.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"esutils@2.0.2",
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-async-generator-functions@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-remap-async-to-generator@7.1.0",
+				"@babel/plugin-syntax-async-generators@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-class-properties@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-function-name@7.1.0",
+				"@babel/helper-member-expression-to-functions@7.0.0",
+				"@babel/helper-optimise-call-expression@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-replace-supers@7.4.4",
+				"@babel/plugin-syntax-class-properties@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-class-properties@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-create-class-features-plugin@7.4.4",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-decorators@7.1.2",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-replace-supers@7.4.4",
+				"@babel/helper-split-export-declaration@7.4.4",
+				"@babel/plugin-syntax-decorators@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-json-strings@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-json-strings@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-object-rest-spread@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-object-rest-spread@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-object-rest-spread@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-object-rest-spread@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-optional-catch-binding@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-optional-catch-binding@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-proposal-unicode-property-regex@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-regex@7.4.4",
+				"regexpu-core@4.5.4",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-async-generators@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-class-properties@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-decorators@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-dynamic-import@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-dynamic-import@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-flow@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-json-strings@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-jsx@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-object-rest-spread@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-optional-catch-binding@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-syntax-typescript@7.3.3",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-arrow-functions@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-async-to-generator@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-module-imports@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-remap-async-to-generator@7.1.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-block-scoped-functions@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-block-scoping@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-classes@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-annotate-as-pure@7.0.0",
+				"@babel/helper-define-map@7.4.4",
+				"@babel/helper-function-name@7.1.0",
+				"@babel/helper-optimise-call-expression@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-replace-supers@7.4.4",
+				"@babel/helper-split-export-declaration@7.4.4",
+				"globals@11.12.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-classes@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-annotate-as-pure@7.0.0",
+				"@babel/helper-define-map@7.4.4",
+				"@babel/helper-function-name@7.1.0",
+				"@babel/helper-optimise-call-expression@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-replace-supers@7.4.4",
+				"@babel/helper-split-export-declaration@7.4.4",
+				"globals@11.12.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-computed-properties@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-destructuring@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-destructuring@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-dotall-regex@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-regex@7.4.4",
+				"regexpu-core@4.5.4",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-duplicate-keys@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-exponentiation-operator@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-builder-binary-assignment-operator-visitor@7.1.0",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-flow-strip-types@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-flow@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-flow-strip-types@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-flow@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-for-of@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-function-name@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-function-name@7.1.0",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-literals@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-member-expression-literals@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-modules-amd@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-module-transforms@7.4.4",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-modules-commonjs@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-module-transforms@7.4.4",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-simple-access@7.1.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-modules-systemjs@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-hoist-variables@7.4.4",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-modules-umd@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-module-transforms@7.4.4",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-named-capturing-groups-regex@7.4.4",
+			DependsOn: []string{
+				"regexp-tree@0.1.6",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-new-target@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-object-super@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-replace-supers@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-parameters@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-call-delegate@7.4.4",
+				"@babel/helper-get-function-arity@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-property-literals@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-react-constant-elements@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-annotate-as-pure@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-react-constant-elements@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-annotate-as-pure@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-react-display-name@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-react-display-name@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-react-jsx-self@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-jsx@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-react-jsx-source@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-jsx@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-react-jsx@7.3.0",
+			DependsOn: []string{
+				"@babel/helper-builder-react-jsx@7.3.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-jsx@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-regenerator@7.4.4",
+			DependsOn: []string{
+				"regenerator-transform@0.13.4",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-reserved-words@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-runtime@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-module-imports@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"resolve@1.10.1",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-shorthand-properties@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-spread@7.2.2",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-sticky-regex@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-regex@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-template-literals@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-annotate-as-pure@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-typeof-symbol@7.2.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-typescript@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-syntax-typescript@7.3.3",
+			},
+		},
+		{
+			ID: "@babel/plugin-transform-unicode-regex@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/helper-regex@7.4.4",
+				"regexpu-core@4.5.4",
+			},
+		},
+		{
+			ID: "@babel/preset-env@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-module-imports@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-proposal-async-generator-functions@7.2.0",
+				"@babel/plugin-proposal-json-strings@7.2.0",
+				"@babel/plugin-proposal-object-rest-spread@7.4.4",
+				"@babel/plugin-proposal-optional-catch-binding@7.2.0",
+				"@babel/plugin-proposal-unicode-property-regex@7.4.4",
+				"@babel/plugin-syntax-async-generators@7.2.0",
+				"@babel/plugin-syntax-object-rest-spread@7.2.0",
+				"@babel/plugin-syntax-optional-catch-binding@7.2.0",
+				"@babel/plugin-transform-arrow-functions@7.2.0",
+				"@babel/plugin-transform-async-to-generator@7.4.4",
+				"@babel/plugin-transform-block-scoped-functions@7.2.0",
+				"@babel/plugin-transform-block-scoping@7.4.4",
+				"@babel/plugin-transform-classes@7.4.4",
+				"@babel/plugin-transform-computed-properties@7.2.0",
+				"@babel/plugin-transform-destructuring@7.4.4",
+				"@babel/plugin-transform-dotall-regex@7.4.4",
+				"@babel/plugin-transform-duplicate-keys@7.2.0",
+				"@babel/plugin-transform-exponentiation-operator@7.2.0",
+				"@babel/plugin-transform-for-of@7.4.4",
+				"@babel/plugin-transform-function-name@7.4.4",
+				"@babel/plugin-transform-literals@7.2.0",
+				"@babel/plugin-transform-modules-amd@7.2.0",
+				"@babel/plugin-transform-modules-commonjs@7.4.4",
+				"@babel/plugin-transform-modules-systemjs@7.4.4",
+				"@babel/plugin-transform-modules-umd@7.2.0",
+				"@babel/plugin-transform-new-target@7.4.4",
+				"@babel/plugin-transform-object-super@7.2.0",
+				"@babel/plugin-transform-parameters@7.4.4",
+				"@babel/plugin-transform-regenerator@7.4.4",
+				"@babel/plugin-transform-shorthand-properties@7.2.0",
+				"@babel/plugin-transform-spread@7.2.2",
+				"@babel/plugin-transform-sticky-regex@7.2.0",
+				"@babel/plugin-transform-template-literals@7.4.4",
+				"@babel/plugin-transform-typeof-symbol@7.2.0",
+				"@babel/plugin-transform-unicode-regex@7.4.4",
+				"browserslist@4.6.0",
+				"invariant@2.2.4",
+				"js-levenshtein@1.1.6",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "@babel/preset-env@7.4.4",
+			DependsOn: []string{
+				"@babel/helper-module-imports@7.0.0",
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-proposal-async-generator-functions@7.2.0",
+				"@babel/plugin-proposal-json-strings@7.2.0",
+				"@babel/plugin-proposal-object-rest-spread@7.4.4",
+				"@babel/plugin-proposal-optional-catch-binding@7.2.0",
+				"@babel/plugin-proposal-unicode-property-regex@7.4.4",
+				"@babel/plugin-syntax-async-generators@7.2.0",
+				"@babel/plugin-syntax-json-strings@7.2.0",
+				"@babel/plugin-syntax-object-rest-spread@7.2.0",
+				"@babel/plugin-syntax-optional-catch-binding@7.2.0",
+				"@babel/plugin-transform-arrow-functions@7.2.0",
+				"@babel/plugin-transform-async-to-generator@7.4.4",
+				"@babel/plugin-transform-block-scoped-functions@7.2.0",
+				"@babel/plugin-transform-block-scoping@7.4.4",
+				"@babel/plugin-transform-classes@7.4.4",
+				"@babel/plugin-transform-computed-properties@7.2.0",
+				"@babel/plugin-transform-destructuring@7.4.4",
+				"@babel/plugin-transform-dotall-regex@7.4.4",
+				"@babel/plugin-transform-duplicate-keys@7.2.0",
+				"@babel/plugin-transform-exponentiation-operator@7.2.0",
+				"@babel/plugin-transform-for-of@7.4.4",
+				"@babel/plugin-transform-function-name@7.4.4",
+				"@babel/plugin-transform-literals@7.2.0",
+				"@babel/plugin-transform-member-expression-literals@7.2.0",
+				"@babel/plugin-transform-modules-amd@7.2.0",
+				"@babel/plugin-transform-modules-commonjs@7.4.4",
+				"@babel/plugin-transform-modules-systemjs@7.4.4",
+				"@babel/plugin-transform-modules-umd@7.2.0",
+				"@babel/plugin-transform-named-capturing-groups-regex@7.4.4",
+				"@babel/plugin-transform-new-target@7.4.4",
+				"@babel/plugin-transform-object-super@7.2.0",
+				"@babel/plugin-transform-parameters@7.4.4",
+				"@babel/plugin-transform-property-literals@7.2.0",
+				"@babel/plugin-transform-regenerator@7.4.4",
+				"@babel/plugin-transform-reserved-words@7.2.0",
+				"@babel/plugin-transform-shorthand-properties@7.2.0",
+				"@babel/plugin-transform-spread@7.2.2",
+				"@babel/plugin-transform-sticky-regex@7.2.0",
+				"@babel/plugin-transform-template-literals@7.4.4",
+				"@babel/plugin-transform-typeof-symbol@7.2.0",
+				"@babel/plugin-transform-unicode-regex@7.4.4",
+				"@babel/types@7.4.4",
+				"browserslist@4.6.0",
+				"core-js-compat@3.0.1",
+				"invariant@2.2.4",
+				"js-levenshtein@1.1.6",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "@babel/preset-flow@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-transform-flow-strip-types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/preset-react@7.0.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-transform-react-display-name@7.2.0",
+				"@babel/plugin-transform-react-jsx@7.3.0",
+				"@babel/plugin-transform-react-jsx-self@7.2.0",
+				"@babel/plugin-transform-react-jsx-source@7.2.0",
+			},
+		},
+		{
+			ID: "@babel/preset-typescript@7.1.0",
+			DependsOn: []string{
+				"@babel/helper-plugin-utils@7.0.0",
+				"@babel/plugin-transform-typescript@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/register@7.4.4",
+			DependsOn: []string{
+				"core-js@3.0.1",
+				"find-cache-dir@2.1.0",
+				"lodash@4.17.11",
+				"mkdirp@0.5.1",
+				"pirates@4.0.1",
+				"source-map-support@0.5.12",
+			},
+		},
+		{
+			ID: "@babel/runtime@7.0.0",
+			DependsOn: []string{
+				"regenerator-runtime@0.12.1",
+			},
+		},
+		{
+			ID: "@babel/runtime@7.4.4",
+			DependsOn: []string{
+				"regenerator-runtime@0.13.2",
+			},
+		},
+		{
+			ID: "@babel/template@7.0.0-beta.44",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0-beta.44",
+				"@babel/types@7.0.0-beta.44",
+				"babylon@7.0.0-beta.44",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "@babel/template@7.4.4",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0",
+				"@babel/parser@7.4.4",
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@babel/traverse@7.0.0-beta.44",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0-beta.44",
+				"@babel/generator@7.0.0-beta.44",
+				"@babel/helper-function-name@7.0.0-beta.44",
+				"@babel/helper-split-export-declaration@7.0.0-beta.44",
+				"@babel/types@7.0.0-beta.44",
+				"babylon@7.0.0-beta.44",
+				"debug@3.2.6",
+				"globals@11.12.0",
+				"invariant@2.2.4",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "@babel/traverse@7.4.4",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0",
+				"@babel/generator@7.4.4",
+				"@babel/helper-function-name@7.1.0",
+				"@babel/helper-split-export-declaration@7.4.4",
+				"@babel/parser@7.4.4",
+				"@babel/types@7.4.4",
+				"debug@4.1.1",
+				"globals@11.12.0",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "@babel/types@7.0.0-beta.44",
+			DependsOn: []string{
+				"esutils@2.0.2",
+				"lodash@4.17.11",
+				"to-fast-properties@2.0.0",
+			},
+		},
+		{
+			ID: "@babel/types@7.4.4",
+			DependsOn: []string{
+				"esutils@2.0.2",
+				"lodash@4.17.11",
+				"to-fast-properties@2.0.0",
+			},
+		},
+		{
+			ID: "@emotion/cache@0.8.8",
+			DependsOn: []string{
+				"@emotion/sheet@0.8.1",
+				"@emotion/stylis@0.7.1",
+				"@emotion/utils@0.8.2",
+			},
+		},
+		{
+			ID: "@emotion/core@0.13.1",
+			DependsOn: []string{
+				"@emotion/cache@0.8.8",
+				"@emotion/css@0.9.8",
+				"@emotion/serialize@0.9.1",
+				"@emotion/sheet@0.8.1",
+				"@emotion/utils@0.8.2",
+			},
+		},
+		{
+			ID: "@emotion/css@0.9.8",
+			DependsOn: []string{
+				"@emotion/serialize@0.9.1",
+				"@emotion/utils@0.8.2",
+			},
+		},
+		{
+			ID: "@emotion/is-prop-valid@0.6.8",
+			DependsOn: []string{
+				"@emotion/memoize@0.6.6",
+			},
+		},
+		{
+			ID: "@emotion/is-prop-valid@0.7.3",
+			DependsOn: []string{
+				"@emotion/memoize@0.7.1",
+			},
+		},
+		{
+			ID: "@emotion/provider@0.11.2",
+			DependsOn: []string{
+				"@emotion/cache@0.8.8",
+				"@emotion/weak-memoize@0.1.3",
+			},
+		},
+		{
+			ID: "@emotion/serialize@0.9.1",
+			DependsOn: []string{
+				"@emotion/hash@0.6.6",
+				"@emotion/memoize@0.6.6",
+				"@emotion/unitless@0.6.7",
+				"@emotion/utils@0.8.2",
+			},
+		},
+		{
+			ID: "@emotion/styled-base@0.10.6",
+			DependsOn: []string{
+				"@emotion/is-prop-valid@0.6.8",
+				"@emotion/serialize@0.9.1",
+				"@emotion/utils@0.8.2",
+			},
+		},
+		{
+			ID: "@emotion/styled@0.10.6",
+			DependsOn: []string{
+				"@emotion/styled-base@0.10.6",
+			},
+		},
+		{
+			ID: "@loadable/component@5.10.1",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"hoist-non-react-statics@3.3.0",
+			},
+		},
+		{
+			ID: "@material-ui/core@3.9.3",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"@material-ui/system@3.0.0-alpha.2",
+				"@material-ui/utils@3.0.0-alpha.3",
+				"@types/jss@9.5.8",
+				"@types/react-transition-group@2.9.1",
+				"brcast@3.0.1",
+				"classnames@2.2.6",
+				"csstype@2.6.4",
+				"debounce@1.2.0",
+				"deepmerge@3.2.0",
+				"dom-helpers@3.4.0",
+				"hoist-non-react-statics@3.3.0",
+				"is-plain-object@2.0.4",
+				"jss@9.8.7",
+				"jss-camel-case@6.1.0",
+				"jss-default-unit@8.0.2",
+				"jss-global@3.0.0",
+				"jss-nested@6.0.1",
+				"jss-props-sort@6.0.0",
+				"jss-vendor-prefixer@7.0.0",
+				"normalize-scroll-left@0.1.2",
+				"popper.js@1.15.0",
+				"prop-types@15.7.2",
+				"react-event-listener@0.6.6",
+				"react-transition-group@2.9.0",
+				"recompose@0.30.0",
+				"warning@4.0.3",
+			},
+		},
+		{
+			ID: "@material-ui/icons@3.0.2",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"recompose@0.30.0",
+			},
+		},
+		{
+			ID: "@material-ui/system@3.0.0-alpha.2",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"deepmerge@3.2.0",
+				"prop-types@15.7.2",
+				"warning@4.0.3",
+			},
+		},
+		{
+			ID: "@material-ui/utils@3.0.0-alpha.3",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"prop-types@15.7.2",
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "@mrmlnc/readdir-enhanced@2.2.1",
+			DependsOn: []string{
+				"call-me-maybe@1.0.1",
+				"glob-to-regexp@0.3.0",
+			},
+		},
+		{
+			ID: "@octokit/rest@15.18.1",
+			DependsOn: []string{
+				"before-after-hook@1.4.0",
+				"btoa-lite@1.0.0",
+				"debug@3.2.6",
+				"http-proxy-agent@2.1.0",
+				"https-proxy-agent@2.2.1",
+				"lodash@4.17.11",
+				"node-fetch@2.5.0",
+				"universal-user-agent@2.1.0",
+				"url-template@2.0.8",
+			},
+		},
+		{
+			ID: "@samverschueren/stream-to-observable@0.3.0",
+			DependsOn: []string{
+				"any-observable@0.3.0",
+			},
+		},
+		{
+			ID: "@storybook/addon-actions@4.1.18",
+			DependsOn: []string{
+				"@emotion/core@0.13.1",
+				"@emotion/provider@0.11.2",
+				"@emotion/styled@0.10.6",
+				"@storybook/addons@4.1.18",
+				"@storybook/components@4.1.18",
+				"@storybook/core-events@4.1.18",
+				"core-js@2.6.5",
+				"deep-equal@1.0.1",
+				"global@4.3.2",
+				"lodash@4.17.11",
+				"make-error@1.3.5",
+				"prop-types@15.7.2",
+				"react-inspector@2.3.1",
+				"uuid@3.3.2",
+			},
+		},
+		{
+			ID: "@storybook/addon-info@4.1.18",
+			DependsOn: []string{
+				"@storybook/addons@4.1.18",
+				"@storybook/client-logger@4.1.18",
+				"@storybook/components@4.1.18",
+				"core-js@2.6.5",
+				"global@4.3.2",
+				"marksy@6.1.0",
+				"nested-object-assign@1.0.3",
+				"prop-types@15.7.2",
+				"react-addons-create-fragment@15.6.2",
+				"react-lifecycles-compat@3.0.4",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "@storybook/addon-knobs@4.1.18",
+			DependsOn: []string{
+				"@emotion/styled@0.10.6",
+				"@storybook/addons@4.1.18",
+				"@storybook/components@4.1.18",
+				"@storybook/core-events@4.1.18",
+				"copy-to-clipboard@3.2.0",
+				"core-js@2.6.5",
+				"escape-html@1.0.3",
+				"fast-deep-equal@2.0.1",
+				"global@4.3.2",
+				"prop-types@15.7.2",
+				"qs@6.7.0",
+				"react-color@2.17.3",
+				"react-lifecycles-compat@3.0.4",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "@storybook/addons@4.1.18",
+			DependsOn: []string{
+				"@storybook/channels@4.1.18",
+				"@storybook/components@4.1.18",
+				"global@4.3.2",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "@storybook/channel-postmessage@4.1.18",
+			DependsOn: []string{
+				"@storybook/channels@4.1.18",
+				"global@4.3.2",
+				"json-stringify-safe@5.0.1",
+			},
+		},
+		{
+			ID: "@storybook/cli@4.1.18",
+			DependsOn: []string{
+				"@babel/core@7.4.4",
+				"@babel/preset-env@7.4.4",
+				"@babel/register@7.4.4",
+				"@storybook/codemod@4.1.18",
+				"chalk@2.4.2",
+				"commander@2.20.0",
+				"core-js@2.6.5",
+				"cross-spawn@6.0.5",
+				"inquirer@6.3.1",
+				"jscodeshift@0.5.1",
+				"json5@2.1.0",
+				"merge-dirs@0.2.1",
+				"semver@5.7.0",
+				"shelljs@0.8.3",
+				"update-notifier@2.5.0",
+			},
+		},
+		{
+			ID: "@storybook/codemod@4.1.18",
+			DependsOn: []string{
+				"core-js@2.6.5",
+				"jscodeshift@0.5.1",
+				"regenerator-runtime@0.12.1",
+			},
+		},
+		{
+			ID: "@storybook/components@4.1.18",
+			DependsOn: []string{
+				"@emotion/core@0.13.1",
+				"@emotion/provider@0.11.2",
+				"@emotion/styled@0.10.6",
+				"global@4.3.2",
+				"lodash@4.17.11",
+				"prop-types@15.7.2",
+				"react-inspector@2.3.1",
+				"react-split-pane@0.1.87",
+				"react-textarea-autosize@7.1.0",
+				"render-fragment@0.1.1",
+			},
+		},
+		{
+			ID: "@storybook/core@4.1.18",
+			DependsOn: []string{
+				"@babel/plugin-proposal-class-properties@7.4.4",
+				"@babel/preset-env@7.4.4",
+				"@emotion/core@0.13.1",
+				"@emotion/provider@0.11.2",
+				"@emotion/styled@0.10.6",
+				"@storybook/addons@4.1.18",
+				"@storybook/channel-postmessage@4.1.18",
+				"@storybook/client-logger@4.1.18",
+				"@storybook/core-events@4.1.18",
+				"@storybook/node-logger@4.1.18",
+				"@storybook/ui@4.1.18",
+				"airbnb-js-shims@2.2.0",
+				"autoprefixer@9.5.1",
+				"babel-plugin-macros@2.5.1",
+				"babel-preset-minify@0.5.0",
+				"boxen@2.1.0",
+				"case-sensitive-paths-webpack-plugin@2.2.0",
+				"chalk@2.4.2",
+				"child-process-promise@2.2.1",
+				"cli-table3@0.5.1",
+				"commander@2.20.0",
+				"common-tags@1.8.0",
+				"core-js@2.6.5",
+				"css-loader@1.0.1",
+				"detect-port@1.3.0",
+				"dotenv-webpack@1.7.0",
+				"ejs@2.6.1",
+				"eventemitter3@3.1.2",
+				"express@4.16.4",
+				"file-loader@2.0.0",
+				"file-system-cache@1.0.5",
+				"find-cache-dir@2.1.0",
+				"fs-extra@7.0.1",
+				"global@4.3.2",
+				"html-webpack-plugin@4.0.0-beta.5",
+				"inquirer@6.3.1",
+				"interpret@1.2.0",
+				"ip@1.1.5",
+				"json5@2.1.0",
+				"lazy-universal-dotenv@2.0.0",
+				"node-fetch@2.5.0",
+				"opn@5.5.0",
+				"postcss-flexbugs-fixes@4.1.0",
+				"postcss-loader@3.0.0",
+				"pretty-hrtime@1.0.3",
+				"prop-types@15.7.2",
+				"qs@6.7.0",
+				"raw-loader@0.5.1",
+				"react-dev-utils@6.1.1",
+				"redux@4.0.1",
+				"regenerator-runtime@0.12.1",
+				"resolve@1.10.1",
+				"resolve-from@4.0.0",
+				"semver@5.7.0",
+				"serve-favicon@2.5.0",
+				"shelljs@0.8.3",
+				"spawn-promise@0.1.8",
+				"style-loader@0.23.1",
+				"svg-url-loader@2.3.2",
+				"terser-webpack-plugin@1.2.4",
+				"url-loader@1.1.2",
+				"webpack@4.31.0",
+				"webpack-dev-middleware@3.7.0",
+				"webpack-hot-middleware@2.25.0",
+			},
+		},
+		{
+			ID: "@storybook/mantra-core@1.7.2",
+			DependsOn: []string{
+				"@storybook/react-komposer@2.0.5",
+				"@storybook/react-simple-di@1.3.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "@storybook/node-logger@4.1.18",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"core-js@2.6.5",
+				"npmlog@4.1.2",
+				"pretty-hrtime@1.0.3",
+				"regenerator-runtime@0.12.1",
+			},
+		},
+		{
+			ID: "@storybook/podda@1.2.3",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"immutable@3.8.2",
+			},
+		},
+		{
+			ID: "@storybook/react-komposer@2.0.5",
+			DependsOn: []string{
+				"@storybook/react-stubber@1.0.1",
+				"babel-runtime@6.26.0",
+				"hoist-non-react-statics@1.2.0",
+				"lodash@4.17.11",
+				"shallowequal@1.1.0",
+			},
+		},
+		{
+			ID: "@storybook/react-simple-di@1.3.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"create-react-class@15.6.3",
+				"hoist-non-react-statics@1.2.0",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "@storybook/react-stubber@1.0.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "@storybook/react@4.1.18",
+			DependsOn: []string{
+				"@babel/plugin-transform-react-constant-elements@7.2.0",
+				"@babel/preset-flow@7.0.0",
+				"@babel/preset-react@7.0.0",
+				"@emotion/styled@0.10.6",
+				"@storybook/core@4.1.18",
+				"@storybook/node-logger@4.1.18",
+				"@svgr/webpack@4.2.0",
+				"babel-plugin-named-asset-import@0.2.3",
+				"babel-plugin-react-docgen@2.0.2",
+				"babel-preset-react-app@6.1.0",
+				"common-tags@1.8.0",
+				"core-js@2.6.5",
+				"global@4.3.2",
+				"lodash@4.17.11",
+				"mini-css-extract-plugin@0.4.5",
+				"prop-types@15.7.2",
+				"react-dev-utils@6.1.1",
+				"regenerator-runtime@0.12.1",
+				"semver@5.7.0",
+				"webpack@4.31.0",
+			},
+		},
+		{
+			ID: "@storybook/ui@4.1.18",
+			DependsOn: []string{
+				"@emotion/core@0.13.1",
+				"@emotion/provider@0.11.2",
+				"@emotion/styled@0.10.6",
+				"@storybook/components@4.1.18",
+				"@storybook/core-events@4.1.18",
+				"@storybook/mantra-core@1.7.2",
+				"@storybook/podda@1.2.3",
+				"@storybook/react-komposer@2.0.5",
+				"deep-equal@1.0.1",
+				"eventemitter3@3.1.2",
+				"fuse.js@3.4.4",
+				"global@4.3.2",
+				"keycode@2.2.0",
+				"lodash@4.17.11",
+				"prop-types@15.7.2",
+				"qs@6.7.0",
+				"react@16.8.6",
+				"react-dom@16.8.6",
+				"react-fuzzy@0.5.2",
+				"react-lifecycles-compat@3.0.4",
+				"react-modal@3.8.1",
+				"react-treebeard@3.1.0",
+			},
+		},
+		{
+			ID: "@svgr/babel-preset@4.2.0",
+			DependsOn: []string{
+				"@svgr/babel-plugin-add-jsx-attribute@4.2.0",
+				"@svgr/babel-plugin-remove-jsx-attribute@4.2.0",
+				"@svgr/babel-plugin-remove-jsx-empty-expression@4.2.0",
+				"@svgr/babel-plugin-replace-jsx-attribute-value@4.2.0",
+				"@svgr/babel-plugin-svg-dynamic-title@4.2.0",
+				"@svgr/babel-plugin-svg-em-dimensions@4.2.0",
+				"@svgr/babel-plugin-transform-react-native-svg@4.2.0",
+				"@svgr/babel-plugin-transform-svg-component@4.2.0",
+			},
+		},
+		{
+			ID: "@svgr/core@4.2.0",
+			DependsOn: []string{
+				"@svgr/plugin-jsx@4.2.0",
+				"camelcase@5.3.1",
+				"cosmiconfig@5.2.1",
+			},
+		},
+		{
+			ID: "@svgr/hast-util-to-babel-ast@4.2.0",
+			DependsOn: []string{
+				"@babel/types@7.4.4",
+			},
+		},
+		{
+			ID: "@svgr/plugin-jsx@4.2.0",
+			DependsOn: []string{
+				"@babel/core@7.4.4",
+				"@svgr/babel-preset@4.2.0",
+				"@svgr/hast-util-to-babel-ast@4.2.0",
+				"rehype-parse@6.0.0",
+				"unified@7.1.0",
+				"vfile@4.0.0",
+			},
+		},
+		{
+			ID: "@svgr/plugin-svgo@4.2.0",
+			DependsOn: []string{
+				"cosmiconfig@5.2.1",
+				"merge-deep@3.0.2",
+				"svgo@1.2.2",
+			},
+		},
+		{
+			ID: "@svgr/webpack@4.2.0",
+			DependsOn: []string{
+				"@babel/core@7.4.4",
+				"@babel/plugin-transform-react-constant-elements@7.2.0",
+				"@babel/preset-env@7.4.4",
+				"@babel/preset-react@7.0.0",
+				"@svgr/core@4.2.0",
+				"@svgr/plugin-jsx@4.2.0",
+				"@svgr/plugin-svgo@4.2.0",
+				"loader-utils@1.2.3",
+			},
+		},
+		{
+			ID: "@types/glob@7.1.1",
+			DependsOn: []string{
+				"@types/events@3.0.0",
+				"@types/minimatch@3.0.3",
+				"@types/node@12.0.2",
+			},
+		},
+		{
+			ID: "@types/jss@9.5.8",
+			DependsOn: []string{
+				"csstype@2.6.4",
+				"indefinite-observable@1.0.2",
+			},
+		},
+		{
+			ID: "@types/react-transition-group@2.9.1",
+			DependsOn: []string{
+				"@types/react@16.8.17",
+			},
+		},
+		{
+			ID: "@types/react@16.8.17",
+			DependsOn: []string{
+				"@types/prop-types@15.7.1",
+				"csstype@2.6.4",
+			},
+		},
+		{
+			ID: "@types/vfile-message@1.0.1",
+			DependsOn: []string{
+				"@types/node@12.0.2",
+				"@types/unist@2.0.3",
+			},
+		},
+		{
+			ID: "@types/vfile@3.0.2",
+			DependsOn: []string{
+				"@types/node@12.0.2",
+				"@types/unist@2.0.3",
+				"@types/vfile-message@1.0.1",
+			},
+		},
+		{
+			ID: "@webassemblyjs/ast@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/helper-module-context@1.8.5",
+				"@webassemblyjs/helper-wasm-bytecode@1.8.5",
+				"@webassemblyjs/wast-parser@1.8.5",
+			},
+		},
+		{
+			ID: "@webassemblyjs/helper-code-frame@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/wast-printer@1.8.5",
+			},
+		},
+		{
+			ID: "@webassemblyjs/helper-module-context@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"mamacro@0.0.3",
+			},
+		},
+		{
+			ID: "@webassemblyjs/helper-wasm-section@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/helper-buffer@1.8.5",
+				"@webassemblyjs/helper-wasm-bytecode@1.8.5",
+				"@webassemblyjs/wasm-gen@1.8.5",
+			},
+		},
+		{
+			ID: "@webassemblyjs/ieee754@1.8.5",
+			DependsOn: []string{
+				"@xtuc/ieee754@1.2.0",
+			},
+		},
+		{
+			ID: "@webassemblyjs/leb128@1.8.5",
+			DependsOn: []string{
+				"@xtuc/long@4.2.2",
+			},
+		},
+		{
+			ID: "@webassemblyjs/wasm-edit@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/helper-buffer@1.8.5",
+				"@webassemblyjs/helper-wasm-bytecode@1.8.5",
+				"@webassemblyjs/helper-wasm-section@1.8.5",
+				"@webassemblyjs/wasm-gen@1.8.5",
+				"@webassemblyjs/wasm-opt@1.8.5",
+				"@webassemblyjs/wasm-parser@1.8.5",
+				"@webassemblyjs/wast-printer@1.8.5",
+			},
+		},
+		{
+			ID: "@webassemblyjs/wasm-gen@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/helper-wasm-bytecode@1.8.5",
+				"@webassemblyjs/ieee754@1.8.5",
+				"@webassemblyjs/leb128@1.8.5",
+				"@webassemblyjs/utf8@1.8.5",
+			},
+		},
+		{
+			ID: "@webassemblyjs/wasm-opt@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/helper-buffer@1.8.5",
+				"@webassemblyjs/wasm-gen@1.8.5",
+				"@webassemblyjs/wasm-parser@1.8.5",
+			},
+		},
+		{
+			ID: "@webassemblyjs/wasm-parser@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/helper-api-error@1.8.5",
+				"@webassemblyjs/helper-wasm-bytecode@1.8.5",
+				"@webassemblyjs/ieee754@1.8.5",
+				"@webassemblyjs/leb128@1.8.5",
+				"@webassemblyjs/utf8@1.8.5",
+			},
+		},
+		{
+			ID: "@webassemblyjs/wast-parser@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/floating-point-hex-parser@1.8.5",
+				"@webassemblyjs/helper-api-error@1.8.5",
+				"@webassemblyjs/helper-code-frame@1.8.5",
+				"@webassemblyjs/helper-fsm@1.8.5",
+				"@xtuc/long@4.2.2",
+			},
+		},
+		{
+			ID: "@webassemblyjs/wast-printer@1.8.5",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/wast-parser@1.8.5",
+				"@xtuc/long@4.2.2",
+			},
+		},
+		{
+			ID: "JSONStream@1.3.5",
+			DependsOn: []string{
+				"jsonparse@1.3.1",
+				"through@2.3.8",
+			},
+		},
+		{
+			ID: "accepts@1.3.7",
+			DependsOn: []string{
+				"mime-types@2.1.24",
+				"negotiator@0.6.2",
+			},
+		},
+		{
+			ID: "acorn-globals@4.3.2",
+			DependsOn: []string{
+				"acorn@6.1.1",
+				"acorn-walk@6.1.1",
+			},
+		},
+		{
+			ID: "agent-base@4.2.1",
+			DependsOn: []string{
+				"es6-promisify@5.0.0",
+			},
+		},
+		{
+			ID: "agentkeepalive@3.5.2",
+			DependsOn: []string{
+				"humanize-ms@1.2.1",
+			},
+		},
+		{
+			ID: "airbnb-js-shims@2.2.0",
+			DependsOn: []string{
+				"array-includes@3.0.3",
+				"array.prototype.flat@1.2.1",
+				"array.prototype.flatmap@1.2.1",
+				"es5-shim@4.5.13",
+				"es6-shim@0.35.5",
+				"function.prototype.name@1.1.0",
+				"globalthis@1.0.0",
+				"object.entries@1.1.0",
+				"object.fromentries@2.0.0",
+				"object.getownpropertydescriptors@2.0.3",
+				"object.values@1.1.0",
+				"promise.allsettled@1.0.1",
+				"promise.prototype.finally@3.1.0",
+				"string.prototype.matchall@3.0.1",
+				"string.prototype.padend@3.0.0",
+				"string.prototype.padstart@3.0.0",
+				"symbol.prototype.description@1.0.0",
+			},
+		},
+		{
+			ID: "airbnb-prop-types@2.13.2",
+			DependsOn: []string{
+				"array.prototype.find@2.0.4",
+				"function.prototype.name@1.1.0",
+				"has@1.0.3",
+				"is-regex@1.0.4",
+				"object-is@1.0.1",
+				"object.assign@4.1.0",
+				"object.entries@1.1.0",
+				"prop-types@15.7.2",
+				"prop-types-exact@1.2.0",
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "ajv@6.10.0",
+			DependsOn: []string{
+				"fast-deep-equal@2.0.1",
+				"fast-json-stable-stringify@2.0.0",
+				"json-schema-traverse@0.4.1",
+				"uri-js@4.2.2",
+			},
+		},
+		{
+			ID: "ansi-align@2.0.0",
+			DependsOn: []string{
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "ansi-align@3.0.0",
+			DependsOn: []string{
+				"string-width@3.1.0",
+			},
+		},
+		{
+			ID: "ansi-styles@3.2.1",
+			DependsOn: []string{
+				"color-convert@1.9.3",
+			},
+		},
+		{
+			ID: "anymatch@1.3.2",
+			DependsOn: []string{
+				"micromatch@2.3.11",
+				"normalize-path@2.1.1",
+			},
+		},
+		{
+			ID: "anymatch@2.0.0",
+			DependsOn: []string{
+				"micromatch@3.1.10",
+				"normalize-path@2.1.1",
+			},
+		},
+		{
+			ID: "append-transform@0.4.0",
+			DependsOn: []string{
+				"default-require-extensions@1.0.0",
+			},
+		},
+		{
+			ID: "are-we-there-yet@1.1.5",
+			DependsOn: []string{
+				"delegates@1.0.0",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "argparse@1.0.10",
+			DependsOn: []string{
+				"sprintf-js@1.0.3",
+			},
+		},
+		{
+			ID: "aria-query@3.0.0",
+			DependsOn: []string{
+				"ast-types-flow@0.0.7",
+				"commander@2.20.0",
+			},
+		},
+		{
+			ID: "arr-diff@2.0.0",
+			DependsOn: []string{
+				"arr-flatten@1.1.0",
+			},
+		},
+		{
+			ID: "array-includes@3.0.3",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+			},
+		},
+		{
+			ID: "array-union@1.0.2",
+			DependsOn: []string{
+				"array-uniq@1.0.3",
+			},
+		},
+		{
+			ID: "array.prototype.find@2.0.4",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+			},
+		},
+		{
+			ID: "array.prototype.flat@1.2.1",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "array.prototype.flatmap@1.2.1",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "asn1.js@4.10.1",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"inherits@2.0.3",
+				"minimalistic-assert@1.0.1",
+			},
+		},
+		{
+			ID: "asn1@0.2.4",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "assert@1.5.0",
+			DependsOn: []string{
+				"object-assign@4.1.1",
+				"util@0.10.3",
+			},
+		},
+		{
+			ID: "async@2.6.2",
+			DependsOn: []string{
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "attr-accept@1.1.3",
+			DependsOn: []string{
+				"core-js@2.6.5",
+			},
+		},
+		{
+			ID: "autodll-webpack-plugin@0.4.2",
+			DependsOn: []string{
+				"bluebird@3.5.4",
+				"del@3.0.0",
+				"find-cache-dir@1.0.0",
+				"lodash@4.17.11",
+				"make-dir@1.3.0",
+				"memory-fs@0.4.1",
+				"read-pkg@2.0.0",
+				"tapable@1.1.3",
+				"webpack-merge@4.2.1",
+				"webpack-sources@1.3.0",
+			},
+		},
+		{
+			ID: "autoprefixer@8.6.5",
+			DependsOn: []string{
+				"browserslist@3.2.8",
+				"caniuse-lite@1.0.30000967",
+				"normalize-range@0.1.2",
+				"num2fraction@1.2.2",
+				"postcss@6.0.23",
+				"postcss-value-parser@3.3.1",
+			},
+		},
+		{
+			ID: "autoprefixer@9.5.1",
+			DependsOn: []string{
+				"browserslist@4.6.0",
+				"caniuse-lite@1.0.30000967",
+				"normalize-range@0.1.2",
+				"num2fraction@1.2.2",
+				"postcss@7.0.16",
+				"postcss-value-parser@3.3.1",
+			},
+		},
+		{
+			ID: "axios@0.18.0",
+			DependsOn: []string{
+				"follow-redirects@1.7.0",
+				"is-buffer@1.1.6",
+			},
+		},
+		{
+			ID: "axobject-query@2.0.2",
+			DependsOn: []string{
+				"ast-types-flow@0.0.7",
+			},
+		},
+		{
+			ID: "babel-cli@6.26.0",
+			DependsOn: []string{
+				"babel-core@6.26.3",
+				"babel-polyfill@6.26.0",
+				"babel-register@6.26.0",
+				"babel-runtime@6.26.0",
+				"commander@2.20.0",
+				"convert-source-map@1.6.0",
+				"fs-readdir-recursive@1.1.0",
+				"glob@7.1.4",
+				"lodash@4.17.11",
+				"output-file-sync@1.1.2",
+				"path-is-absolute@1.0.1",
+				"slash@1.0.0",
+				"source-map@0.5.7",
+				"v8flags@2.1.1",
+			},
+		},
+		{
+			ID: "babel-code-frame@6.26.0",
+			DependsOn: []string{
+				"chalk@1.1.3",
+				"esutils@2.0.2",
+				"js-tokens@3.0.2",
+			},
+		},
+		{
+			ID: "babel-core@6.26.3",
+			DependsOn: []string{
+				"babel-code-frame@6.26.0",
+				"babel-generator@6.26.1",
+				"babel-helpers@6.24.1",
+				"babel-messages@6.23.0",
+				"babel-register@6.26.0",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+				"babylon@6.18.0",
+				"convert-source-map@1.6.0",
+				"debug@2.6.9",
+				"json5@0.5.1",
+				"lodash@4.17.11",
+				"minimatch@3.0.4",
+				"path-is-absolute@1.0.1",
+				"private@0.1.8",
+				"slash@1.0.0",
+				"source-map@0.5.7",
+			},
+		},
+		{
+			ID: "babel-eslint@8.2.6",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0-beta.44",
+				"@babel/traverse@7.0.0-beta.44",
+				"@babel/types@7.0.0-beta.44",
+				"babylon@7.0.0-beta.44",
+				"eslint-scope@3.7.1",
+				"eslint-visitor-keys@1.0.0",
+			},
+		},
+		{
+			ID: "babel-generator@6.26.1",
+			DependsOn: []string{
+				"babel-messages@6.23.0",
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+				"detect-indent@4.0.0",
+				"jsesc@1.3.0",
+				"lodash@4.17.11",
+				"source-map@0.5.7",
+				"trim-right@1.0.1",
+			},
+		},
+		{
+			ID: "babel-helper-bindify-decorators@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-builder-binary-assignment-operator-visitor@6.24.1",
+			DependsOn: []string{
+				"babel-helper-explode-assignable-expression@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-builder-react-jsx@6.26.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+				"esutils@2.0.2",
+			},
+		},
+		{
+			ID: "babel-helper-call-delegate@6.24.1",
+			DependsOn: []string{
+				"babel-helper-hoist-variables@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-define-map@6.26.0",
+			DependsOn: []string{
+				"babel-helper-function-name@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "babel-helper-explode-assignable-expression@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-explode-class@6.24.1",
+			DependsOn: []string{
+				"babel-helper-bindify-decorators@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-function-name@6.24.1",
+			DependsOn: []string{
+				"babel-helper-get-function-arity@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-get-function-arity@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-hoist-variables@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-optimise-call-expression@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-regex@6.26.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "babel-helper-remap-async-to-generator@6.24.1",
+			DependsOn: []string{
+				"babel-helper-function-name@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helper-replace-supers@6.24.1",
+			DependsOn: []string{
+				"babel-helper-optimise-call-expression@6.24.1",
+				"babel-messages@6.23.0",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-helpers@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+			},
+		},
+		{
+			ID: "babel-jest@23.6.0",
+			DependsOn: []string{
+				"babel-plugin-istanbul@4.1.6",
+				"babel-preset-jest@23.2.0",
+			},
+		},
+		{
+			ID: "babel-loader@8.0.4",
+			DependsOn: []string{
+				"find-cache-dir@1.0.0",
+				"loader-utils@1.2.3",
+				"mkdirp@0.5.1",
+				"util.promisify@1.0.0",
+			},
+		},
+		{
+			ID: "babel-loader@7.1.5",
+			DependsOn: []string{
+				"find-cache-dir@1.0.0",
+				"loader-utils@1.2.3",
+				"mkdirp@0.5.1",
+			},
+		},
+		{
+			ID: "babel-messages@6.23.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-check-es2015-constants@6.22.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-dynamic-import-node@2.2.0",
+			DependsOn: []string{
+				"object.assign@4.1.0",
+			},
+		},
+		{
+			ID: "babel-plugin-istanbul@4.1.6",
+			DependsOn: []string{
+				"babel-plugin-syntax-object-rest-spread@6.13.0",
+				"find-up@2.1.0",
+				"istanbul-lib-instrument@1.10.2",
+				"test-exclude@4.2.3",
+			},
+		},
+		{
+			ID: "babel-plugin-macros@2.4.2",
+			DependsOn: []string{
+				"cosmiconfig@5.2.1",
+				"resolve@1.10.1",
+			},
+		},
+		{
+			ID: "babel-plugin-macros@2.5.1",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"cosmiconfig@5.2.1",
+				"resolve@1.10.1",
+			},
+		},
+		{
+			ID: "babel-plugin-minify-constant-folding@0.5.0",
+			DependsOn: []string{
+				"babel-helper-evaluate-path@0.5.0",
+			},
+		},
+		{
+			ID: "babel-plugin-minify-dead-code-elimination@0.5.0",
+			DependsOn: []string{
+				"babel-helper-evaluate-path@0.5.0",
+				"babel-helper-mark-eval-scopes@0.4.3",
+				"babel-helper-remove-or-void@0.4.3",
+				"lodash.some@4.6.0",
+			},
+		},
+		{
+			ID: "babel-plugin-minify-flip-comparisons@0.4.3",
+			DependsOn: []string{
+				"babel-helper-is-void-0@0.4.3",
+			},
+		},
+		{
+			ID: "babel-plugin-minify-guarded-expressions@0.4.3",
+			DependsOn: []string{
+				"babel-helper-flip-expressions@0.4.3",
+			},
+		},
+		{
+			ID: "babel-plugin-minify-mangle-names@0.5.0",
+			DependsOn: []string{
+				"babel-helper-mark-eval-scopes@0.4.3",
+			},
+		},
+		{
+			ID: "babel-plugin-minify-simplify@0.5.0",
+			DependsOn: []string{
+				"babel-helper-flip-expressions@0.4.3",
+				"babel-helper-is-nodes-equiv@0.0.1",
+				"babel-helper-to-multiple-sequence-expressions@0.5.0",
+			},
+		},
+		{
+			ID: "babel-plugin-minify-type-constructors@0.4.3",
+			DependsOn: []string{
+				"babel-helper-is-void-0@0.4.3",
+			},
+		},
+		{
+			ID: "babel-plugin-react-docgen@2.0.2",
+			DependsOn: []string{
+				"lodash@4.17.11",
+				"react-docgen@3.0.0",
+				"recast@0.14.7",
+			},
+		},
+		{
+			ID: "babel-plugin-styled-components@1.10.0",
+			DependsOn: []string{
+				"@babel/helper-annotate-as-pure@7.0.0",
+				"@babel/helper-module-imports@7.0.0",
+				"babel-plugin-syntax-jsx@6.18.0",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-async-generator-functions@6.24.1",
+			DependsOn: []string{
+				"babel-helper-remap-async-to-generator@6.24.1",
+				"babel-plugin-syntax-async-generators@6.13.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-async-to-generator@6.24.1",
+			DependsOn: []string{
+				"babel-helper-remap-async-to-generator@6.24.1",
+				"babel-plugin-syntax-async-functions@6.13.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-class-constructor-call@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-syntax-class-constructor-call@6.18.0",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-class-properties@6.24.1",
+			DependsOn: []string{
+				"babel-helper-function-name@6.24.1",
+				"babel-plugin-syntax-class-properties@6.13.0",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-decorators@6.24.1",
+			DependsOn: []string{
+				"babel-helper-explode-class@6.24.1",
+				"babel-plugin-syntax-decorators@6.13.0",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-arrow-functions@6.22.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-block-scoped-functions@6.22.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-block-scoping@6.26.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-classes@6.24.1",
+			DependsOn: []string{
+				"babel-helper-define-map@6.26.0",
+				"babel-helper-function-name@6.24.1",
+				"babel-helper-optimise-call-expression@6.24.1",
+				"babel-helper-replace-supers@6.24.1",
+				"babel-messages@6.23.0",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-computed-properties@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-destructuring@6.23.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-duplicate-keys@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-for-of@6.23.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-function-name@6.24.1",
+			DependsOn: []string{
+				"babel-helper-function-name@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-literals@6.22.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-modules-amd@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-transform-es2015-modules-commonjs@6.26.2",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-modules-commonjs@6.26.2",
+			DependsOn: []string{
+				"babel-plugin-transform-strict-mode@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-modules-systemjs@6.24.1",
+			DependsOn: []string{
+				"babel-helper-hoist-variables@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-modules-umd@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-transform-es2015-modules-amd@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-object-super@6.24.1",
+			DependsOn: []string{
+				"babel-helper-replace-supers@6.24.1",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-parameters@6.24.1",
+			DependsOn: []string{
+				"babel-helper-call-delegate@6.24.1",
+				"babel-helper-get-function-arity@6.24.1",
+				"babel-runtime@6.26.0",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-shorthand-properties@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-spread@6.22.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-sticky-regex@6.24.1",
+			DependsOn: []string{
+				"babel-helper-regex@6.26.0",
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-template-literals@6.22.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-typeof-symbol@6.23.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-es2015-unicode-regex@6.24.1",
+			DependsOn: []string{
+				"babel-helper-regex@6.26.0",
+				"babel-runtime@6.26.0",
+				"regexpu-core@2.0.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-exponentiation-operator@6.24.1",
+			DependsOn: []string{
+				"babel-helper-builder-binary-assignment-operator-visitor@6.24.1",
+				"babel-plugin-syntax-exponentiation-operator@6.13.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-export-extensions@6.22.0",
+			DependsOn: []string{
+				"babel-plugin-syntax-export-extensions@6.13.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-flow-strip-types@6.22.0",
+			DependsOn: []string{
+				"babel-plugin-syntax-flow@6.18.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-object-rest-spread@6.26.0",
+			DependsOn: []string{
+				"babel-plugin-syntax-object-rest-spread@6.13.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-property-literals@6.9.4",
+			DependsOn: []string{
+				"esutils@2.0.2",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-react-display-name@6.25.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-react-jsx-self@6.22.0",
+			DependsOn: []string{
+				"babel-plugin-syntax-jsx@6.18.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-react-jsx-source@6.22.0",
+			DependsOn: []string{
+				"babel-plugin-syntax-jsx@6.18.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-react-jsx@6.24.1",
+			DependsOn: []string{
+				"babel-helper-builder-react-jsx@6.26.0",
+				"babel-plugin-syntax-jsx@6.18.0",
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-regenerator@6.26.0",
+			DependsOn: []string{
+				"regenerator-transform@0.10.1",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-remove-undefined@0.5.0",
+			DependsOn: []string{
+				"babel-helper-evaluate-path@0.5.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-runtime@6.23.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+			},
+		},
+		{
+			ID: "babel-plugin-transform-strict-mode@6.24.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+			},
+		},
+		{
+			ID: "babel-polyfill@6.26.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"core-js@2.6.5",
+				"regenerator-runtime@0.10.5",
+			},
+		},
+		{
+			ID: "babel-preset-env@1.7.0",
+			DependsOn: []string{
+				"babel-plugin-check-es2015-constants@6.22.0",
+				"babel-plugin-syntax-trailing-function-commas@6.22.0",
+				"babel-plugin-transform-async-to-generator@6.24.1",
+				"babel-plugin-transform-es2015-arrow-functions@6.22.0",
+				"babel-plugin-transform-es2015-block-scoped-functions@6.22.0",
+				"babel-plugin-transform-es2015-block-scoping@6.26.0",
+				"babel-plugin-transform-es2015-classes@6.24.1",
+				"babel-plugin-transform-es2015-computed-properties@6.24.1",
+				"babel-plugin-transform-es2015-destructuring@6.23.0",
+				"babel-plugin-transform-es2015-duplicate-keys@6.24.1",
+				"babel-plugin-transform-es2015-for-of@6.23.0",
+				"babel-plugin-transform-es2015-function-name@6.24.1",
+				"babel-plugin-transform-es2015-literals@6.22.0",
+				"babel-plugin-transform-es2015-modules-amd@6.24.1",
+				"babel-plugin-transform-es2015-modules-commonjs@6.26.2",
+				"babel-plugin-transform-es2015-modules-systemjs@6.24.1",
+				"babel-plugin-transform-es2015-modules-umd@6.24.1",
+				"babel-plugin-transform-es2015-object-super@6.24.1",
+				"babel-plugin-transform-es2015-parameters@6.24.1",
+				"babel-plugin-transform-es2015-shorthand-properties@6.24.1",
+				"babel-plugin-transform-es2015-spread@6.22.0",
+				"babel-plugin-transform-es2015-sticky-regex@6.24.1",
+				"babel-plugin-transform-es2015-template-literals@6.22.0",
+				"babel-plugin-transform-es2015-typeof-symbol@6.23.0",
+				"babel-plugin-transform-es2015-unicode-regex@6.24.1",
+				"babel-plugin-transform-exponentiation-operator@6.24.1",
+				"babel-plugin-transform-regenerator@6.26.0",
+				"browserslist@3.2.8",
+				"invariant@2.2.4",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "babel-preset-es2015@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-check-es2015-constants@6.22.0",
+				"babel-plugin-transform-es2015-arrow-functions@6.22.0",
+				"babel-plugin-transform-es2015-block-scoped-functions@6.22.0",
+				"babel-plugin-transform-es2015-block-scoping@6.26.0",
+				"babel-plugin-transform-es2015-classes@6.24.1",
+				"babel-plugin-transform-es2015-computed-properties@6.24.1",
+				"babel-plugin-transform-es2015-destructuring@6.23.0",
+				"babel-plugin-transform-es2015-duplicate-keys@6.24.1",
+				"babel-plugin-transform-es2015-for-of@6.23.0",
+				"babel-plugin-transform-es2015-function-name@6.24.1",
+				"babel-plugin-transform-es2015-literals@6.22.0",
+				"babel-plugin-transform-es2015-modules-amd@6.24.1",
+				"babel-plugin-transform-es2015-modules-commonjs@6.26.2",
+				"babel-plugin-transform-es2015-modules-systemjs@6.24.1",
+				"babel-plugin-transform-es2015-modules-umd@6.24.1",
+				"babel-plugin-transform-es2015-object-super@6.24.1",
+				"babel-plugin-transform-es2015-parameters@6.24.1",
+				"babel-plugin-transform-es2015-shorthand-properties@6.24.1",
+				"babel-plugin-transform-es2015-spread@6.22.0",
+				"babel-plugin-transform-es2015-sticky-regex@6.24.1",
+				"babel-plugin-transform-es2015-template-literals@6.22.0",
+				"babel-plugin-transform-es2015-typeof-symbol@6.23.0",
+				"babel-plugin-transform-es2015-unicode-regex@6.24.1",
+				"babel-plugin-transform-regenerator@6.26.0",
+			},
+		},
+		{
+			ID: "babel-preset-flow@6.23.0",
+			DependsOn: []string{
+				"babel-plugin-transform-flow-strip-types@6.22.0",
+			},
+		},
+		{
+			ID: "babel-preset-jest@23.2.0",
+			DependsOn: []string{
+				"babel-plugin-jest-hoist@23.2.0",
+				"babel-plugin-syntax-object-rest-spread@6.13.0",
+			},
+		},
+		{
+			ID: "babel-preset-minify@0.5.0",
+			DependsOn: []string{
+				"babel-plugin-minify-builtins@0.5.0",
+				"babel-plugin-minify-constant-folding@0.5.0",
+				"babel-plugin-minify-dead-code-elimination@0.5.0",
+				"babel-plugin-minify-flip-comparisons@0.4.3",
+				"babel-plugin-minify-guarded-expressions@0.4.3",
+				"babel-plugin-minify-infinity@0.4.3",
+				"babel-plugin-minify-mangle-names@0.5.0",
+				"babel-plugin-minify-numeric-literals@0.4.3",
+				"babel-plugin-minify-replace@0.5.0",
+				"babel-plugin-minify-simplify@0.5.0",
+				"babel-plugin-minify-type-constructors@0.4.3",
+				"babel-plugin-transform-inline-consecutive-adds@0.4.3",
+				"babel-plugin-transform-member-expression-literals@6.9.4",
+				"babel-plugin-transform-merge-sibling-variables@6.9.4",
+				"babel-plugin-transform-minify-booleans@6.9.4",
+				"babel-plugin-transform-property-literals@6.9.4",
+				"babel-plugin-transform-regexp-constructors@0.4.3",
+				"babel-plugin-transform-remove-console@6.9.4",
+				"babel-plugin-transform-remove-debugger@6.9.4",
+				"babel-plugin-transform-remove-undefined@0.5.0",
+				"babel-plugin-transform-simplify-comparison-operators@6.9.4",
+				"babel-plugin-transform-undefined-to-void@6.9.4",
+				"lodash.isplainobject@4.0.6",
+			},
+		},
+		{
+			ID: "babel-preset-react-app@6.1.0",
+			DependsOn: []string{
+				"@babel/core@7.1.0",
+				"@babel/plugin-proposal-class-properties@7.1.0",
+				"@babel/plugin-proposal-decorators@7.1.2",
+				"@babel/plugin-proposal-object-rest-spread@7.0.0",
+				"@babel/plugin-syntax-dynamic-import@7.0.0",
+				"@babel/plugin-transform-classes@7.1.0",
+				"@babel/plugin-transform-destructuring@7.0.0",
+				"@babel/plugin-transform-flow-strip-types@7.0.0",
+				"@babel/plugin-transform-react-constant-elements@7.0.0",
+				"@babel/plugin-transform-react-display-name@7.0.0",
+				"@babel/plugin-transform-runtime@7.1.0",
+				"@babel/preset-env@7.1.0",
+				"@babel/preset-react@7.0.0",
+				"@babel/preset-typescript@7.1.0",
+				"@babel/runtime@7.0.0",
+				"babel-loader@8.0.4",
+				"babel-plugin-dynamic-import-node@2.2.0",
+				"babel-plugin-macros@2.4.2",
+				"babel-plugin-transform-react-remove-prop-types@0.4.18",
+			},
+		},
+		{
+			ID: "babel-preset-react@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-syntax-jsx@6.18.0",
+				"babel-plugin-transform-react-display-name@6.25.0",
+				"babel-plugin-transform-react-jsx@6.24.1",
+				"babel-plugin-transform-react-jsx-self@6.22.0",
+				"babel-plugin-transform-react-jsx-source@6.22.0",
+				"babel-preset-flow@6.23.0",
+			},
+		},
+		{
+			ID: "babel-preset-stage-1@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-transform-class-constructor-call@6.24.1",
+				"babel-plugin-transform-export-extensions@6.22.0",
+				"babel-preset-stage-2@6.24.1",
+			},
+		},
+		{
+			ID: "babel-preset-stage-2@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-syntax-dynamic-import@6.18.0",
+				"babel-plugin-transform-class-properties@6.24.1",
+				"babel-plugin-transform-decorators@6.24.1",
+				"babel-preset-stage-3@6.24.1",
+			},
+		},
+		{
+			ID: "babel-preset-stage-3@6.24.1",
+			DependsOn: []string{
+				"babel-plugin-syntax-trailing-function-commas@6.22.0",
+				"babel-plugin-transform-async-generator-functions@6.24.1",
+				"babel-plugin-transform-async-to-generator@6.24.1",
+				"babel-plugin-transform-exponentiation-operator@6.24.1",
+				"babel-plugin-transform-object-rest-spread@6.26.0",
+			},
+		},
+		{
+			ID: "babel-register@6.26.0",
+			DependsOn: []string{
+				"babel-core@6.26.3",
+				"babel-runtime@6.26.0",
+				"core-js@2.6.5",
+				"home-or-tmp@2.0.0",
+				"lodash@4.17.11",
+				"mkdirp@0.5.1",
+				"source-map-support@0.4.18",
+			},
+		},
+		{
+			ID: "babel-runtime@6.26.0",
+			DependsOn: []string{
+				"core-js@2.6.5",
+				"regenerator-runtime@0.11.1",
+			},
+		},
+		{
+			ID: "babel-template@6.26.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+				"babylon@6.18.0",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "babel-traverse@6.26.0",
+			DependsOn: []string{
+				"babel-code-frame@6.26.0",
+				"babel-messages@6.23.0",
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+				"babylon@6.18.0",
+				"debug@2.6.9",
+				"globals@9.18.0",
+				"invariant@2.2.4",
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "babel-types@6.26.0",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"esutils@2.0.2",
+				"lodash@4.17.11",
+				"to-fast-properties@1.0.3",
+			},
+		},
+		{
+			ID: "base@0.11.2",
+			DependsOn: []string{
+				"cache-base@1.0.1",
+				"class-utils@0.3.6",
+				"component-emitter@1.3.0",
+				"define-property@1.0.0",
+				"isobject@3.0.1",
+				"mixin-deep@1.3.1",
+				"pascalcase@0.1.1",
+			},
+		},
+		{
+			ID: "bcrypt-pbkdf@1.0.2",
+			DependsOn: []string{
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "better-assert@1.0.2",
+			DependsOn: []string{
+				"callsite@1.0.0",
+			},
+		},
+		{
+			ID: "bfj@6.1.1",
+			DependsOn: []string{
+				"bluebird@3.5.4",
+				"check-types@7.4.0",
+				"hoopy@0.1.4",
+				"tryer@1.0.1",
+			},
+		},
+		{
+			ID: "bin-links@1.1.2",
+			DependsOn: []string{
+				"bluebird@3.5.4",
+				"cmd-shim@2.0.2",
+				"gentle-fs@2.0.1",
+				"graceful-fs@4.1.15",
+				"write-file-atomic@2.4.2",
+			},
+		},
+		{
+			ID: "binary@0.3.0",
+			DependsOn: []string{
+				"buffers@0.1.1",
+				"chainsaw@0.1.0",
+			},
+		},
+		{
+			ID: "block-stream@0.0.9",
+			DependsOn: []string{
+				"inherits@2.0.3",
+			},
+		},
+		{
+			ID: "body-parser@1.18.3",
+			DependsOn: []string{
+				"bytes@3.0.0",
+				"content-type@1.0.4",
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"http-errors@1.6.3",
+				"iconv-lite@0.4.23",
+				"on-finished@2.3.0",
+				"qs@6.5.2",
+				"raw-body@2.3.3",
+				"type-is@1.6.18",
+			},
+		},
+		{
+			ID: "bonjour@3.5.0",
+			DependsOn: []string{
+				"array-flatten@2.1.2",
+				"deep-equal@1.0.1",
+				"dns-equal@1.0.0",
+				"dns-txt@2.0.2",
+				"multicast-dns@6.2.3",
+				"multicast-dns-service-types@1.1.0",
+			},
+		},
+		{
+			ID: "boxen@1.3.0",
+			DependsOn: []string{
+				"ansi-align@2.0.0",
+				"camelcase@4.1.0",
+				"chalk@2.4.2",
+				"cli-boxes@1.0.0",
+				"string-width@2.1.1",
+				"term-size@1.2.0",
+				"widest-line@2.0.1",
+			},
+		},
+		{
+			ID: "boxen@2.1.0",
+			DependsOn: []string{
+				"ansi-align@3.0.0",
+				"camelcase@5.3.1",
+				"chalk@2.4.2",
+				"cli-boxes@1.0.0",
+				"string-width@3.1.0",
+				"term-size@1.2.0",
+				"widest-line@2.0.1",
+			},
+		},
+		{
+			ID: "brace-expansion@1.1.11",
+			DependsOn: []string{
+				"balanced-match@1.0.0",
+				"concat-map@0.0.1",
+			},
+		},
+		{
+			ID: "braces@1.8.5",
+			DependsOn: []string{
+				"expand-range@1.8.2",
+				"preserve@0.2.0",
+				"repeat-element@1.1.3",
+			},
+		},
+		{
+			ID: "braces@2.3.2",
+			DependsOn: []string{
+				"arr-flatten@1.1.0",
+				"array-unique@0.3.2",
+				"extend-shallow@2.0.1",
+				"fill-range@4.0.0",
+				"isobject@3.0.1",
+				"repeat-element@1.1.3",
+				"snapdragon@0.8.2",
+				"snapdragon-node@2.1.1",
+				"split-string@3.1.0",
+				"to-regex@3.0.2",
+			},
+		},
+		{
+			ID: "browser-resolve@1.11.3",
+			DependsOn: []string{
+				"resolve@1.1.7",
+			},
+		},
+		{
+			ID: "browserify-aes@1.2.0",
+			DependsOn: []string{
+				"buffer-xor@1.0.3",
+				"cipher-base@1.0.4",
+				"create-hash@1.2.0",
+				"evp_bytestokey@1.0.3",
+				"inherits@2.0.3",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "browserify-cipher@1.0.1",
+			DependsOn: []string{
+				"browserify-aes@1.2.0",
+				"browserify-des@1.0.2",
+				"evp_bytestokey@1.0.3",
+			},
+		},
+		{
+			ID: "browserify-des@1.0.2",
+			DependsOn: []string{
+				"cipher-base@1.0.4",
+				"des.js@1.0.0",
+				"inherits@2.0.3",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "browserify-rsa@4.0.1",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"randombytes@2.1.0",
+			},
+		},
+		{
+			ID: "browserify-sign@4.0.4",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"browserify-rsa@4.0.1",
+				"create-hash@1.2.0",
+				"create-hmac@1.1.7",
+				"elliptic@6.4.1",
+				"inherits@2.0.3",
+				"parse-asn1@5.1.4",
+			},
+		},
+		{
+			ID: "browserify-zlib@0.2.0",
+			DependsOn: []string{
+				"pako@1.0.10",
+			},
+		},
+		{
+			ID: "browserslist@4.1.1",
+			DependsOn: []string{
+				"caniuse-lite@1.0.30000967",
+				"electron-to-chromium@1.3.134",
+				"node-releases@1.1.19",
+			},
+		},
+		{
+			ID: "browserslist@3.2.8",
+			DependsOn: []string{
+				"caniuse-lite@1.0.30000967",
+				"electron-to-chromium@1.3.134",
+			},
+		},
+		{
+			ID: "browserslist@4.6.0",
+			DependsOn: []string{
+				"caniuse-lite@1.0.30000967",
+				"electron-to-chromium@1.3.134",
+				"node-releases@1.1.19",
+			},
+		},
+		{
+			ID: "bser@2.0.0",
+			DependsOn: []string{
+				"node-int64@0.4.0",
+			},
+		},
+		{
+			ID: "buffer@4.9.1",
+			DependsOn: []string{
+				"base64-js@1.3.0",
+				"ieee754@1.1.13",
+				"isarray@1.0.0",
+			},
+		},
+		{
+			ID: "cacache@10.0.4",
+			DependsOn: []string{
+				"bluebird@3.5.4",
+				"chownr@1.1.1",
+				"glob@7.1.4",
+				"graceful-fs@4.1.15",
+				"lru-cache@4.1.5",
+				"mississippi@2.0.0",
+				"mkdirp@0.5.1",
+				"move-concurrently@1.0.1",
+				"promise-inflight@1.0.1",
+				"rimraf@2.6.3",
+				"ssri@5.3.0",
+				"unique-filename@1.1.1",
+				"y18n@4.0.0",
+			},
+		},
+		{
+			ID: "cacache@11.3.2",
+			DependsOn: []string{
+				"bluebird@3.5.4",
+				"chownr@1.1.1",
+				"figgy-pudding@3.5.1",
+				"glob@7.1.4",
+				"graceful-fs@4.1.15",
+				"lru-cache@5.1.1",
+				"mississippi@3.0.0",
+				"mkdirp@0.5.1",
+				"move-concurrently@1.0.1",
+				"promise-inflight@1.0.1",
+				"rimraf@2.6.3",
+				"ssri@6.0.1",
+				"unique-filename@1.1.1",
+				"y18n@4.0.0",
+			},
+		},
+		{
+			ID: "cache-base@1.0.1",
+			DependsOn: []string{
+				"collection-visit@1.0.0",
+				"component-emitter@1.3.0",
+				"get-value@2.0.6",
+				"has-value@1.0.0",
+				"isobject@3.0.1",
+				"set-value@2.0.0",
+				"to-object-path@0.3.0",
+				"union-value@1.0.0",
+				"unset-value@1.0.0",
+			},
+		},
+		{
+			ID: "cache-loader@1.2.5",
+			DependsOn: []string{
+				"loader-utils@1.2.3",
+				"mkdirp@0.5.1",
+				"neo-async@2.6.1",
+				"schema-utils@0.4.7",
+			},
+		},
+		{
+			ID: "caller-callsite@2.0.0",
+			DependsOn: []string{
+				"callsites@2.0.0",
+			},
+		},
+		{
+			ID: "caller-path@2.0.0",
+			DependsOn: []string{
+				"caller-callsite@2.0.0",
+			},
+		},
+		{
+			ID: "camel-case@3.0.0",
+			DependsOn: []string{
+				"no-case@2.3.2",
+				"upper-case@1.1.3",
+			},
+		},
+		{
+			ID: "capture-exit@1.2.0",
+			DependsOn: []string{
+				"rsvp@3.6.2",
+			},
+		},
+		{
+			ID: "chainsaw@0.1.0",
+			DependsOn: []string{
+				"traverse@0.3.9",
+			},
+		},
+		{
+			ID: "chalk@2.4.1",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"escape-string-regexp@1.0.5",
+				"supports-color@5.5.0",
+			},
+		},
+		{
+			ID: "chalk@1.1.3",
+			DependsOn: []string{
+				"ansi-styles@2.2.1",
+				"escape-string-regexp@1.0.5",
+				"has-ansi@2.0.0",
+				"strip-ansi@3.0.1",
+				"supports-color@2.0.0",
+			},
+		},
+		{
+			ID: "chalk@2.4.2",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"escape-string-regexp@1.0.5",
+				"supports-color@5.5.0",
+			},
+		},
+		{
+			ID: "chalk@0.4.0",
+			DependsOn: []string{
+				"ansi-styles@1.0.0",
+				"has-color@0.1.7",
+				"strip-ansi@0.1.1",
+			},
+		},
+		{
+			ID: "cheerio@1.0.0-rc.3",
+			DependsOn: []string{
+				"css-select@1.2.0",
+				"dom-serializer@0.1.1",
+				"entities@1.1.2",
+				"htmlparser2@3.10.1",
+				"lodash@4.17.11",
+				"parse5@3.0.3",
+			},
+		},
+		{
+			ID: "child-process-promise@2.2.1",
+			DependsOn: []string{
+				"cross-spawn@4.0.2",
+				"node-version@1.2.0",
+				"promise-polyfill@6.1.0",
+			},
+		},
+		{
+			ID: "chokidar@1.7.0",
+			DependsOn: []string{
+				"anymatch@1.3.2",
+				"async-each@1.0.3",
+				"glob-parent@2.0.0",
+				"inherits@2.0.3",
+				"is-binary-path@1.0.1",
+				"is-glob@2.0.1",
+				"path-is-absolute@1.0.1",
+				"readdirp@2.2.1",
+			},
+		},
+		{
+			ID: "chokidar@2.1.5",
+			DependsOn: []string{
+				"anymatch@2.0.0",
+				"async-each@1.0.3",
+				"braces@2.3.2",
+				"glob-parent@3.1.0",
+				"inherits@2.0.3",
+				"is-binary-path@1.0.1",
+				"is-glob@4.0.1",
+				"normalize-path@3.0.0",
+				"path-is-absolute@1.0.1",
+				"readdirp@2.2.1",
+				"upath@1.1.2",
+			},
+		},
+		{
+			ID: "chrome-trace-event@1.0.0",
+			DependsOn: []string{
+				"tslib@1.9.3",
+			},
+		},
+		{
+			ID: "cidr-regex@2.0.10",
+			DependsOn: []string{
+				"ip-regex@2.1.0",
+			},
+		},
+		{
+			ID: "cipher-base@1.0.4",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "class-utils@0.3.6",
+			DependsOn: []string{
+				"arr-union@3.1.0",
+				"define-property@0.2.5",
+				"isobject@3.0.1",
+				"static-extend@0.1.2",
+			},
+		},
+		{
+			ID: "clean-css@4.2.1",
+			DependsOn: []string{
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "clean-webpack-plugin@0.1.19",
+			DependsOn: []string{
+				"rimraf@2.6.3",
+			},
+		},
+		{
+			ID: "cli-columns@3.1.2",
+			DependsOn: []string{
+				"string-width@2.1.1",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "cli-cursor@1.0.2",
+			DependsOn: []string{
+				"restore-cursor@1.0.1",
+			},
+		},
+		{
+			ID: "cli-cursor@2.1.0",
+			DependsOn: []string{
+				"restore-cursor@2.0.0",
+			},
+		},
+		{
+			ID: "cli-table3@0.5.1",
+			DependsOn: []string{
+				"object-assign@4.1.1",
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "cli-truncate@0.2.1",
+			DependsOn: []string{
+				"slice-ansi@0.0.4",
+				"string-width@1.0.2",
+			},
+		},
+		{
+			ID: "cliui@3.2.0",
+			DependsOn: []string{
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+				"wrap-ansi@2.1.0",
+			},
+		},
+		{
+			ID: "cliui@4.1.0",
+			DependsOn: []string{
+				"string-width@2.1.1",
+				"strip-ansi@4.0.0",
+				"wrap-ansi@2.1.0",
+			},
+		},
+		{
+			ID: "clone-deep@0.2.4",
+			DependsOn: []string{
+				"for-own@0.1.5",
+				"is-plain-object@2.0.4",
+				"kind-of@3.2.2",
+				"lazy-cache@1.0.4",
+				"shallow-clone@0.1.2",
+			},
+		},
+		{
+			ID: "cmd-shim@2.0.2",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"mkdirp@0.5.1",
+			},
+		},
+		{
+			ID: "coa@2.0.2",
+			DependsOn: []string{
+				"@types/q@1.5.2",
+				"chalk@2.4.2",
+				"q@1.5.1",
+			},
+		},
+		{
+			ID: "collection-visit@1.0.0",
+			DependsOn: []string{
+				"map-visit@1.0.0",
+				"object-visit@1.0.1",
+			},
+		},
+		{
+			ID: "color-convert@1.9.3",
+			DependsOn: []string{
+				"color-name@1.1.3",
+			},
+		},
+		{
+			ID: "columnify@1.5.4",
+			DependsOn: []string{
+				"strip-ansi@3.0.1",
+				"wcwidth@1.0.1",
+			},
+		},
+		{
+			ID: "combined-stream@1.0.8",
+			DependsOn: []string{
+				"delayed-stream@1.0.0",
+			},
+		},
+		{
+			ID: "compressible@2.0.17",
+			DependsOn: []string{
+				"mime-db@1.40.0",
+			},
+		},
+		{
+			ID: "compression@1.7.4",
+			DependsOn: []string{
+				"accepts@1.3.7",
+				"bytes@3.0.0",
+				"compressible@2.0.17",
+				"debug@2.6.9",
+				"on-headers@1.0.2",
+				"safe-buffer@5.1.2",
+				"vary@1.1.2",
+			},
+		},
+		{
+			ID: "concat-stream@1.6.2",
+			DependsOn: []string{
+				"buffer-from@1.1.1",
+				"inherits@2.0.3",
+				"readable-stream@2.3.6",
+				"typedarray@0.0.6",
+			},
+		},
+		{
+			ID: "config-chain@1.1.12",
+			DependsOn: []string{
+				"ini@1.3.5",
+				"proto-list@1.2.4",
+			},
+		},
+		{
+			ID: "configstore@3.1.2",
+			DependsOn: []string{
+				"dot-prop@4.2.0",
+				"graceful-fs@4.1.15",
+				"make-dir@1.3.0",
+				"unique-string@1.0.0",
+				"write-file-atomic@2.4.2",
+				"xdg-basedir@3.0.0",
+			},
+		},
+		{
+			ID: "console-browserify@1.1.0",
+			DependsOn: []string{
+				"date-now@0.1.4",
+			},
+		},
+		{
+			ID: "convert-source-map@1.6.0",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "copy-concurrently@1.0.5",
+			DependsOn: []string{
+				"aproba@1.2.0",
+				"fs-write-stream-atomic@1.0.10",
+				"iferr@0.1.5",
+				"mkdirp@0.5.1",
+				"rimraf@2.6.3",
+				"run-queue@1.0.3",
+			},
+		},
+		{
+			ID: "copy-to-clipboard@3.2.0",
+			DependsOn: []string{
+				"toggle-selection@1.0.6",
+			},
+		},
+		{
+			ID: "copy-webpack-plugin@4.6.0",
+			DependsOn: []string{
+				"cacache@10.0.4",
+				"find-cache-dir@1.0.0",
+				"globby@7.1.1",
+				"is-glob@4.0.1",
+				"loader-utils@1.2.3",
+				"minimatch@3.0.4",
+				"p-limit@1.3.0",
+				"serialize-javascript@1.7.0",
+			},
+		},
+		{
+			ID: "core-js-compat@3.0.1",
+			DependsOn: []string{
+				"browserslist@4.6.0",
+				"core-js@3.0.1",
+				"core-js-pure@3.0.1",
+				"semver@6.0.0",
+			},
+		},
+		{
+			ID: "cosmiconfig@4.0.0",
+			DependsOn: []string{
+				"is-directory@0.3.1",
+				"js-yaml@3.13.1",
+				"parse-json@4.0.0",
+				"require-from-string@2.0.2",
+			},
+		},
+		{
+			ID: "cosmiconfig@5.2.1",
+			DependsOn: []string{
+				"import-fresh@2.0.0",
+				"is-directory@0.3.1",
+				"js-yaml@3.13.1",
+				"parse-json@4.0.0",
+			},
+		},
+		{
+			ID: "create-ecdh@4.0.3",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"elliptic@6.4.1",
+			},
+		},
+		{
+			ID: "create-error-class@3.0.2",
+			DependsOn: []string{
+				"capture-stack-trace@1.0.1",
+			},
+		},
+		{
+			ID: "create-hash@1.2.0",
+			DependsOn: []string{
+				"cipher-base@1.0.4",
+				"inherits@2.0.3",
+				"md5.js@1.3.5",
+				"ripemd160@2.0.2",
+				"sha.js@2.4.11",
+			},
+		},
+		{
+			ID: "create-hmac@1.1.7",
+			DependsOn: []string{
+				"cipher-base@1.0.4",
+				"create-hash@1.2.0",
+				"inherits@2.0.3",
+				"ripemd160@2.0.2",
+				"safe-buffer@5.1.2",
+				"sha.js@2.4.11",
+			},
+		},
+		{
+			ID: "create-react-class@15.6.3",
+			DependsOn: []string{
+				"fbjs@0.8.17",
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "create-react-context@0.2.2",
+			DependsOn: []string{
+				"fbjs@0.8.17",
+				"gud@1.0.0",
+			},
+		},
+		{
+			ID: "create-react-context@0.2.3",
+			DependsOn: []string{
+				"fbjs@0.8.17",
+				"gud@1.0.0",
+			},
+		},
+		{
+			ID: "cross-spawn@6.0.5",
+			DependsOn: []string{
+				"nice-try@1.0.5",
+				"path-key@2.0.1",
+				"semver@5.7.0",
+				"shebang-command@1.2.0",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "cross-spawn@4.0.2",
+			DependsOn: []string{
+				"lru-cache@4.1.5",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "cross-spawn@5.1.0",
+			DependsOn: []string{
+				"lru-cache@4.1.5",
+				"shebang-command@1.2.0",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "crypto-browserify@3.12.0",
+			DependsOn: []string{
+				"browserify-cipher@1.0.1",
+				"browserify-sign@4.0.4",
+				"create-ecdh@4.0.3",
+				"create-hash@1.2.0",
+				"create-hmac@1.1.7",
+				"diffie-hellman@5.0.3",
+				"inherits@2.0.3",
+				"pbkdf2@3.0.17",
+				"public-encrypt@4.0.3",
+				"randombytes@2.1.0",
+				"randomfill@1.0.4",
+			},
+		},
+		{
+			ID: "css-loader@1.0.1",
+			DependsOn: []string{
+				"babel-code-frame@6.26.0",
+				"css-selector-tokenizer@0.7.1",
+				"icss-utils@2.1.0",
+				"loader-utils@1.2.3",
+				"lodash@4.17.11",
+				"postcss@6.0.23",
+				"postcss-modules-extract-imports@1.2.1",
+				"postcss-modules-local-by-default@1.2.0",
+				"postcss-modules-scope@1.1.0",
+				"postcss-modules-values@1.3.0",
+				"postcss-value-parser@3.3.1",
+				"source-list-map@2.0.1",
+			},
+		},
+		{
+			ID: "css-select@1.2.0",
+			DependsOn: []string{
+				"boolbase@1.0.0",
+				"css-what@2.1.3",
+				"domutils@1.5.1",
+				"nth-check@1.0.2",
+			},
+		},
+		{
+			ID: "css-select@2.0.2",
+			DependsOn: []string{
+				"boolbase@1.0.0",
+				"css-what@2.1.3",
+				"domutils@1.7.0",
+				"nth-check@1.0.2",
+			},
+		},
+		{
+			ID: "css-selector-tokenizer@0.7.1",
+			DependsOn: []string{
+				"cssesc@0.1.0",
+				"fastparse@1.1.2",
+				"regexpu-core@1.0.0",
+			},
+		},
+		{
+			ID: "css-to-react-native@2.3.1",
+			DependsOn: []string{
+				"camelize@1.0.0",
+				"css-color-keywords@1.0.0",
+				"postcss-value-parser@3.3.1",
+			},
+		},
+		{
+			ID: "css-tree@1.0.0-alpha.28",
+			DependsOn: []string{
+				"mdn-data@1.1.4",
+				"source-map@0.5.7",
+			},
+		},
+		{
+			ID: "css-tree@1.0.0-alpha.29",
+			DependsOn: []string{
+				"mdn-data@1.1.4",
+				"source-map@0.5.7",
+			},
+		},
+		{
+			ID: "css-vendor@0.3.8",
+			DependsOn: []string{
+				"is-in-browser@1.1.3",
+			},
+		},
+		{
+			ID: "csso@3.5.1",
+			DependsOn: []string{
+				"css-tree@1.0.0-alpha.29",
+			},
+		},
+		{
+			ID: "cssstyle@1.2.2",
+			DependsOn: []string{
+				"cssom@0.3.6",
+			},
+		},
+		{
+			ID: "dashdash@1.14.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "data-urls@1.1.0",
+			DependsOn: []string{
+				"abab@2.0.0",
+				"whatwg-mimetype@2.3.0",
+				"whatwg-url@7.0.0",
+			},
+		},
+		{
+			ID: "debug@2.6.9",
+			DependsOn: []string{
+				"ms@2.0.0",
+			},
+		},
+		{
+			ID: "debug@3.1.0",
+			DependsOn: []string{
+				"ms@2.0.0",
+			},
+		},
+		{
+			ID: "debug@3.2.6",
+			DependsOn: []string{
+				"ms@2.1.1",
+			},
+		},
+		{
+			ID: "debug@4.1.1",
+			DependsOn: []string{
+				"ms@2.1.1",
+			},
+		},
+		{
+			ID: "decompress-response@3.3.0",
+			DependsOn: []string{
+				"mimic-response@1.0.1",
+			},
+		},
+		{
+			ID: "default-gateway@4.2.0",
+			DependsOn: []string{
+				"execa@1.0.0",
+				"ip-regex@2.1.0",
+			},
+		},
+		{
+			ID: "default-require-extensions@1.0.0",
+			DependsOn: []string{
+				"strip-bom@2.0.0",
+			},
+		},
+		{
+			ID: "defaults@1.0.3",
+			DependsOn: []string{
+				"clone@1.0.4",
+			},
+		},
+		{
+			ID: "define-properties@1.1.3",
+			DependsOn: []string{
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "define-property@0.2.5",
+			DependsOn: []string{
+				"is-descriptor@0.1.6",
+			},
+		},
+		{
+			ID: "define-property@1.0.0",
+			DependsOn: []string{
+				"is-descriptor@1.0.2",
+			},
+		},
+		{
+			ID: "define-property@2.0.2",
+			DependsOn: []string{
+				"is-descriptor@1.0.2",
+				"isobject@3.0.1",
+			},
+		},
+		{
+			ID: "del@3.0.0",
+			DependsOn: []string{
+				"globby@6.1.0",
+				"is-path-cwd@1.0.0",
+				"is-path-in-cwd@1.0.1",
+				"p-map@1.2.0",
+				"pify@3.0.0",
+				"rimraf@2.6.3",
+			},
+		},
+		{
+			ID: "del@4.1.1",
+			DependsOn: []string{
+				"@types/glob@7.1.1",
+				"globby@6.1.0",
+				"is-path-cwd@2.1.0",
+				"is-path-in-cwd@2.1.0",
+				"p-map@2.1.0",
+				"pify@4.0.1",
+				"rimraf@2.6.3",
+			},
+		},
+		{
+			ID: "des.js@1.0.0",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"minimalistic-assert@1.0.1",
+			},
+		},
+		{
+			ID: "detect-indent@4.0.0",
+			DependsOn: []string{
+				"repeating@2.0.1",
+			},
+		},
+		{
+			ID: "detect-port-alt@1.1.6",
+			DependsOn: []string{
+				"address@1.1.0",
+				"debug@2.6.9",
+			},
+		},
+		{
+			ID: "detect-port@1.3.0",
+			DependsOn: []string{
+				"address@1.1.0",
+				"debug@2.6.9",
+			},
+		},
+		{
+			ID: "dezalgo@1.0.3",
+			DependsOn: []string{
+				"asap@2.0.6",
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "diffie-hellman@5.0.3",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"miller-rabin@4.0.1",
+				"randombytes@2.1.0",
+			},
+		},
+		{
+			ID: "dir-glob@2.2.2",
+			DependsOn: []string{
+				"path-type@3.0.0",
+			},
+		},
+		{
+			ID: "dns-packet@1.3.1",
+			DependsOn: []string{
+				"ip@1.1.5",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "dns-txt@2.0.2",
+			DependsOn: []string{
+				"buffer-indexof@1.1.1",
+			},
+		},
+		{
+			ID: "doctrine@1.5.0",
+			DependsOn: []string{
+				"esutils@2.0.2",
+				"isarray@1.0.0",
+			},
+		},
+		{
+			ID: "doctrine@2.1.0",
+			DependsOn: []string{
+				"esutils@2.0.2",
+			},
+		},
+		{
+			ID: "doctrine@3.0.0",
+			DependsOn: []string{
+				"esutils@2.0.2",
+			},
+		},
+		{
+			ID: "dom-converter@0.2.0",
+			DependsOn: []string{
+				"utila@0.4.0",
+			},
+		},
+		{
+			ID: "dom-helpers@3.4.0",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+			},
+		},
+		{
+			ID: "dom-serializer@0.1.1",
+			DependsOn: []string{
+				"domelementtype@1.3.1",
+				"entities@1.1.2",
+			},
+		},
+		{
+			ID: "domexception@1.0.1",
+			DependsOn: []string{
+				"webidl-conversions@4.0.2",
+			},
+		},
+		{
+			ID: "domhandler@2.4.2",
+			DependsOn: []string{
+				"domelementtype@1.3.1",
+			},
+		},
+		{
+			ID: "domutils@1.5.1",
+			DependsOn: []string{
+				"dom-serializer@0.1.1",
+				"domelementtype@1.3.1",
+			},
+		},
+		{
+			ID: "domutils@1.7.0",
+			DependsOn: []string{
+				"dom-serializer@0.1.1",
+				"domelementtype@1.3.1",
+			},
+		},
+		{
+			ID: "dot-prop@4.2.0",
+			DependsOn: []string{
+				"is-obj@1.0.1",
+			},
+		},
+		{
+			ID: "dotenv-defaults@1.0.2",
+			DependsOn: []string{
+				"dotenv@6.2.0",
+			},
+		},
+		{
+			ID: "dotenv-webpack@1.7.0",
+			DependsOn: []string{
+				"dotenv-defaults@1.0.2",
+			},
+		},
+		{
+			ID: "duplexer2@0.1.4",
+			DependsOn: []string{
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "duplexify@3.7.1",
+			DependsOn: []string{
+				"end-of-stream@1.4.1",
+				"inherits@2.0.3",
+				"readable-stream@2.3.6",
+				"stream-shift@1.0.0",
+			},
+		},
+		{
+			ID: "ecc-jsbn@0.1.2",
+			DependsOn: []string{
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "elliptic@6.4.1",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"brorand@1.1.0",
+				"hash.js@1.1.7",
+				"hmac-drbg@1.0.1",
+				"inherits@2.0.3",
+				"minimalistic-assert@1.0.1",
+				"minimalistic-crypto-utils@1.0.1",
+			},
+		},
+		{
+			ID: "encoding@0.1.12",
+			DependsOn: []string{
+				"iconv-lite@0.4.24",
+			},
+		},
+		{
+			ID: "end-of-stream@1.4.1",
+			DependsOn: []string{
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "engine.io-client@3.3.2",
+			DependsOn: []string{
+				"component-emitter@1.2.1",
+				"component-inherit@0.0.3",
+				"debug@3.1.0",
+				"engine.io-parser@2.1.3",
+				"has-cors@1.1.0",
+				"indexof@0.0.1",
+				"parseqs@0.0.5",
+				"parseuri@0.0.5",
+				"ws@6.1.4",
+				"xmlhttprequest-ssl@1.5.5",
+				"yeast@0.1.2",
+			},
+		},
+		{
+			ID: "engine.io-parser@2.1.3",
+			DependsOn: []string{
+				"after@0.8.2",
+				"arraybuffer.slice@0.0.7",
+				"base64-arraybuffer@0.1.5",
+				"blob@0.0.5",
+				"has-binary2@1.0.3",
+			},
+		},
+		{
+			ID: "engine.io@3.3.2",
+			DependsOn: []string{
+				"accepts@1.3.7",
+				"base64id@1.0.0",
+				"cookie@0.3.1",
+				"debug@3.1.0",
+				"engine.io-parser@2.1.3",
+				"ws@6.1.4",
+			},
+		},
+		{
+			ID: "enhanced-resolve@4.1.0",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"memory-fs@0.4.1",
+				"tapable@1.1.3",
+			},
+		},
+		{
+			ID: "enzyme-adapter-react-16@1.13.0",
+			DependsOn: []string{
+				"enzyme-adapter-utils@1.12.0",
+				"object.assign@4.1.0",
+				"object.values@1.1.0",
+				"prop-types@15.7.2",
+				"react-is@16.8.6",
+				"react-test-renderer@16.8.6",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "enzyme-adapter-utils@1.12.0",
+			DependsOn: []string{
+				"airbnb-prop-types@2.13.2",
+				"function.prototype.name@1.1.0",
+				"object.assign@4.1.0",
+				"object.fromentries@2.0.0",
+				"prop-types@15.7.2",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "enzyme@3.9.0",
+			DependsOn: []string{
+				"array.prototype.flat@1.2.1",
+				"cheerio@1.0.0-rc.3",
+				"function.prototype.name@1.1.0",
+				"has@1.0.3",
+				"html-element-map@1.0.1",
+				"is-boolean-object@1.0.0",
+				"is-callable@1.1.4",
+				"is-number-object@1.0.3",
+				"is-regex@1.0.4",
+				"is-string@1.0.4",
+				"is-subset@0.1.1",
+				"lodash.escape@4.0.1",
+				"lodash.isequal@4.5.0",
+				"object-inspect@1.6.0",
+				"object-is@1.0.1",
+				"object.assign@4.1.0",
+				"object.entries@1.1.0",
+				"object.values@1.1.0",
+				"raf@3.4.1",
+				"rst-selector-parser@2.2.3",
+				"string.prototype.trim@1.1.2",
+			},
+		},
+		{
+			ID: "errno@0.1.7",
+			DependsOn: []string{
+				"prr@1.0.1",
+			},
+		},
+		{
+			ID: "error-ex@1.3.2",
+			DependsOn: []string{
+				"is-arrayish@0.2.1",
+			},
+		},
+		{
+			ID: "es-abstract@1.13.0",
+			DependsOn: []string{
+				"es-to-primitive@1.2.0",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+				"is-callable@1.1.4",
+				"is-regex@1.0.4",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "es-to-primitive@1.2.0",
+			DependsOn: []string{
+				"is-callable@1.1.4",
+				"is-date-object@1.0.1",
+				"is-symbol@1.0.2",
+			},
+		},
+		{
+			ID: "es6-promise-promise@1.0.0",
+			DependsOn: []string{
+				"es6-promise@3.3.1",
+			},
+		},
+		{
+			ID: "es6-promisify@5.0.0",
+			DependsOn: []string{
+				"es6-promise@4.2.6",
+			},
+		},
+		{
+			ID: "escodegen@1.11.1",
+			DependsOn: []string{
+				"esprima@3.1.3",
+				"estraverse@4.2.0",
+				"esutils@2.0.2",
+				"optionator@0.8.2",
+			},
+		},
+		{
+			ID: "eslint-config-airbnb-base@13.1.0",
+			DependsOn: []string{
+				"eslint-restricted-globals@0.1.1",
+				"object.assign@4.1.0",
+				"object.entries@1.1.0",
+			},
+		},
+		{
+			ID: "eslint-config-airbnb@17.1.0",
+			DependsOn: []string{
+				"eslint-config-airbnb-base@13.1.0",
+				"object.assign@4.1.0",
+				"object.entries@1.1.0",
+			},
+		},
+		{
+			ID: "eslint-import-resolver-node@0.3.2",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"resolve@1.10.1",
+			},
+		},
+		{
+			ID: "eslint-loader@2.1.2",
+			DependsOn: []string{
+				"loader-fs-cache@1.0.2",
+				"loader-utils@1.2.3",
+				"object-assign@4.1.1",
+				"object-hash@1.3.1",
+				"rimraf@2.6.3",
+			},
+		},
+		{
+			ID: "eslint-module-utils@2.4.0",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"pkg-dir@2.0.0",
+			},
+		},
+		{
+			ID: "eslint-plugin-import@2.17.2",
+			DependsOn: []string{
+				"array-includes@3.0.3",
+				"contains-path@0.1.0",
+				"debug@2.6.9",
+				"doctrine@1.5.0",
+				"eslint-import-resolver-node@0.3.2",
+				"eslint-module-utils@2.4.0",
+				"has@1.0.3",
+				"lodash@4.17.11",
+				"minimatch@3.0.4",
+				"read-pkg-up@2.0.0",
+				"resolve@1.10.1",
+			},
+		},
+		{
+			ID: "eslint-plugin-jsx-a11y@6.2.1",
+			DependsOn: []string{
+				"aria-query@3.0.0",
+				"array-includes@3.0.3",
+				"ast-types-flow@0.0.7",
+				"axobject-query@2.0.2",
+				"damerau-levenshtein@1.0.5",
+				"emoji-regex@7.0.3",
+				"has@1.0.3",
+				"jsx-ast-utils@2.1.0",
+			},
+		},
+		{
+			ID: "eslint-plugin-react@7.13.0",
+			DependsOn: []string{
+				"array-includes@3.0.3",
+				"doctrine@2.1.0",
+				"has@1.0.3",
+				"jsx-ast-utils@2.1.0",
+				"object.fromentries@2.0.0",
+				"prop-types@15.7.2",
+				"resolve@1.10.1",
+			},
+		},
+		{
+			ID: "eslint-scope@3.7.1",
+			DependsOn: []string{
+				"esrecurse@4.2.1",
+				"estraverse@4.2.0",
+			},
+		},
+		{
+			ID: "eslint-scope@4.0.3",
+			DependsOn: []string{
+				"esrecurse@4.2.1",
+				"estraverse@4.2.0",
+			},
+		},
+		{
+			ID: "eslint@5.16.0",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0",
+				"ajv@6.10.0",
+				"chalk@2.4.2",
+				"cross-spawn@6.0.5",
+				"debug@4.1.1",
+				"doctrine@3.0.0",
+				"eslint-scope@4.0.3",
+				"eslint-utils@1.3.1",
+				"eslint-visitor-keys@1.0.0",
+				"espree@5.0.1",
+				"esquery@1.0.1",
+				"esutils@2.0.2",
+				"file-entry-cache@5.0.1",
+				"functional-red-black-tree@1.0.1",
+				"glob@7.1.4",
+				"globals@11.12.0",
+				"ignore@4.0.6",
+				"import-fresh@3.0.0",
+				"imurmurhash@0.1.4",
+				"inquirer@6.3.1",
+				"js-yaml@3.13.1",
+				"json-stable-stringify-without-jsonify@1.0.1",
+				"levn@0.3.0",
+				"lodash@4.17.11",
+				"minimatch@3.0.4",
+				"mkdirp@0.5.1",
+				"natural-compare@1.4.0",
+				"optionator@0.8.2",
+				"path-is-inside@1.0.2",
+				"progress@2.0.3",
+				"regexpp@2.0.1",
+				"semver@5.7.0",
+				"strip-ansi@4.0.0",
+				"strip-json-comments@2.0.1",
+				"table@5.3.3",
+				"text-table@0.2.0",
+			},
+		},
+		{
+			ID: "espree@5.0.1",
+			DependsOn: []string{
+				"acorn@6.1.1",
+				"acorn-jsx@5.0.1",
+				"eslint-visitor-keys@1.0.0",
+			},
+		},
+		{
+			ID: "esquery@1.0.1",
+			DependsOn: []string{
+				"estraverse@4.2.0",
+			},
+		},
+		{
+			ID: "esrecurse@4.2.1",
+			DependsOn: []string{
+				"estraverse@4.2.0",
+			},
+		},
+		{
+			ID: "eventsource@0.1.6",
+			DependsOn: []string{
+				"original@1.0.2",
+			},
+		},
+		{
+			ID: "eventsource@1.0.7",
+			DependsOn: []string{
+				"original@1.0.2",
+			},
+		},
+		{
+			ID: "evp_bytestokey@1.0.3",
+			DependsOn: []string{
+				"md5.js@1.3.5",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "exec-sh@0.2.2",
+			DependsOn: []string{
+				"merge@1.2.1",
+			},
+		},
+		{
+			ID: "execa@0.7.0",
+			DependsOn: []string{
+				"cross-spawn@5.1.0",
+				"get-stream@3.0.0",
+				"is-stream@1.1.0",
+				"npm-run-path@2.0.2",
+				"p-finally@1.0.0",
+				"signal-exit@3.0.2",
+				"strip-eof@1.0.0",
+			},
+		},
+		{
+			ID: "execa@0.9.0",
+			DependsOn: []string{
+				"cross-spawn@5.1.0",
+				"get-stream@3.0.0",
+				"is-stream@1.1.0",
+				"npm-run-path@2.0.2",
+				"p-finally@1.0.0",
+				"signal-exit@3.0.2",
+				"strip-eof@1.0.0",
+			},
+		},
+		{
+			ID: "execa@1.0.0",
+			DependsOn: []string{
+				"cross-spawn@6.0.5",
+				"get-stream@4.1.0",
+				"is-stream@1.1.0",
+				"npm-run-path@2.0.2",
+				"p-finally@1.0.0",
+				"signal-exit@3.0.2",
+				"strip-eof@1.0.0",
+			},
+		},
+		{
+			ID: "expand-brackets@0.1.5",
+			DependsOn: []string{
+				"is-posix-bracket@0.1.1",
+			},
+		},
+		{
+			ID: "expand-brackets@2.1.4",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"define-property@0.2.5",
+				"extend-shallow@2.0.1",
+				"posix-character-classes@0.1.1",
+				"regex-not@1.0.2",
+				"snapdragon@0.8.2",
+				"to-regex@3.0.2",
+			},
+		},
+		{
+			ID: "expand-range@1.8.2",
+			DependsOn: []string{
+				"fill-range@2.2.4",
+			},
+		},
+		{
+			ID: "expand-tilde@2.0.2",
+			DependsOn: []string{
+				"homedir-polyfill@1.0.3",
+			},
+		},
+		{
+			ID: "expect@23.6.0",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"jest-diff@23.6.0",
+				"jest-get-type@22.4.3",
+				"jest-matcher-utils@23.6.0",
+				"jest-message-util@23.4.0",
+				"jest-regex-util@23.3.0",
+			},
+		},
+		{
+			ID: "express@4.16.4",
+			DependsOn: []string{
+				"accepts@1.3.7",
+				"array-flatten@1.1.1",
+				"body-parser@1.18.3",
+				"content-disposition@0.5.2",
+				"content-type@1.0.4",
+				"cookie@0.3.1",
+				"cookie-signature@1.0.6",
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"etag@1.8.1",
+				"finalhandler@1.1.1",
+				"fresh@0.5.2",
+				"merge-descriptors@1.0.1",
+				"methods@1.1.2",
+				"on-finished@2.3.0",
+				"parseurl@1.3.3",
+				"path-to-regexp@0.1.7",
+				"proxy-addr@2.0.5",
+				"qs@6.5.2",
+				"range-parser@1.2.1",
+				"safe-buffer@5.1.2",
+				"send@0.16.2",
+				"serve-static@1.13.2",
+				"setprototypeof@1.1.0",
+				"statuses@1.4.0",
+				"type-is@1.6.18",
+				"utils-merge@1.0.1",
+				"vary@1.1.2",
+			},
+		},
+		{
+			ID: "extend-shallow@2.0.1",
+			DependsOn: []string{
+				"is-extendable@0.1.1",
+			},
+		},
+		{
+			ID: "extend-shallow@3.0.2",
+			DependsOn: []string{
+				"assign-symbols@1.0.0",
+				"is-extendable@1.0.1",
+			},
+		},
+		{
+			ID: "external-editor@3.0.3",
+			DependsOn: []string{
+				"chardet@0.7.0",
+				"iconv-lite@0.4.24",
+				"tmp@0.0.33",
+			},
+		},
+		{
+			ID: "extglob@0.3.2",
+			DependsOn: []string{
+				"is-extglob@1.0.0",
+			},
+		},
+		{
+			ID: "extglob@2.0.4",
+			DependsOn: []string{
+				"array-unique@0.3.2",
+				"define-property@1.0.0",
+				"expand-brackets@2.1.4",
+				"extend-shallow@2.0.1",
+				"fragment-cache@0.2.1",
+				"regex-not@1.0.2",
+				"snapdragon@0.8.2",
+				"to-regex@3.0.2",
+			},
+		},
+		{
+			ID: "extract-text-webpack-plugin@4.0.0-beta.0",
+			DependsOn: []string{
+				"async@2.6.2",
+				"loader-utils@1.2.3",
+				"schema-utils@0.4.7",
+				"webpack-sources@1.3.0",
+			},
+		},
+		{
+			ID: "fast-glob@2.2.6",
+			DependsOn: []string{
+				"@mrmlnc/readdir-enhanced@2.2.1",
+				"@nodelib/fs.stat@1.1.3",
+				"glob-parent@3.1.0",
+				"is-glob@4.0.1",
+				"merge2@1.2.3",
+				"micromatch@3.1.10",
+			},
+		},
+		{
+			ID: "faye-websocket@0.10.0",
+			DependsOn: []string{
+				"websocket-driver@0.7.0",
+			},
+		},
+		{
+			ID: "faye-websocket@0.11.1",
+			DependsOn: []string{
+				"websocket-driver@0.7.0",
+			},
+		},
+		{
+			ID: "fb-watchman@2.0.0",
+			DependsOn: []string{
+				"bser@2.0.0",
+			},
+		},
+		{
+			ID: "fbjs@0.8.17",
+			DependsOn: []string{
+				"core-js@1.2.7",
+				"isomorphic-fetch@2.2.1",
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"promise@7.3.1",
+				"setimmediate@1.0.5",
+				"ua-parser-js@0.7.19",
+			},
+		},
+		{
+			ID: "figures@1.7.0",
+			DependsOn: []string{
+				"escape-string-regexp@1.0.5",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "figures@2.0.0",
+			DependsOn: []string{
+				"escape-string-regexp@1.0.5",
+			},
+		},
+		{
+			ID: "file-entry-cache@5.0.1",
+			DependsOn: []string{
+				"flat-cache@2.0.1",
+			},
+		},
+		{
+			ID: "file-loader@1.1.11",
+			DependsOn: []string{
+				"loader-utils@1.2.3",
+				"schema-utils@0.4.7",
+			},
+		},
+		{
+			ID: "file-loader@2.0.0",
+			DependsOn: []string{
+				"loader-utils@1.2.3",
+				"schema-utils@1.0.0",
+			},
+		},
+		{
+			ID: "file-selector@0.1.11",
+			DependsOn: []string{
+				"tslib@1.9.3",
+			},
+		},
+		{
+			ID: "file-system-cache@1.0.5",
+			DependsOn: []string{
+				"bluebird@3.5.4",
+				"fs-extra@0.30.0",
+				"ramda@0.21.0",
+			},
+		},
+		{
+			ID: "fileset@2.0.3",
+			DependsOn: []string{
+				"glob@7.1.4",
+				"minimatch@3.0.4",
+			},
+		},
+		{
+			ID: "fill-range@2.2.4",
+			DependsOn: []string{
+				"is-number@2.1.0",
+				"isobject@2.1.0",
+				"randomatic@3.1.1",
+				"repeat-element@1.1.3",
+				"repeat-string@1.6.1",
+			},
+		},
+		{
+			ID: "fill-range@4.0.0",
+			DependsOn: []string{
+				"extend-shallow@2.0.1",
+				"is-number@3.0.0",
+				"repeat-string@1.6.1",
+				"to-regex-range@2.1.1",
+			},
+		},
+		{
+			ID: "finalhandler@1.1.1",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"on-finished@2.3.0",
+				"parseurl@1.3.3",
+				"statuses@1.4.0",
+				"unpipe@1.0.0",
+			},
+		},
+		{
+			ID: "find-cache-dir@0.1.1",
+			DependsOn: []string{
+				"commondir@1.0.1",
+				"mkdirp@0.5.1",
+				"pkg-dir@1.0.0",
+			},
+		},
+		{
+			ID: "find-cache-dir@1.0.0",
+			DependsOn: []string{
+				"commondir@1.0.1",
+				"make-dir@1.3.0",
+				"pkg-dir@2.0.0",
+			},
+		},
+		{
+			ID: "find-cache-dir@2.1.0",
+			DependsOn: []string{
+				"commondir@1.0.1",
+				"make-dir@2.1.0",
+				"pkg-dir@3.0.0",
+			},
+		},
+		{
+			ID: "find-up@3.0.0",
+			DependsOn: []string{
+				"locate-path@3.0.0",
+			},
+		},
+		{
+			ID: "find-up@1.1.2",
+			DependsOn: []string{
+				"path-exists@2.1.0",
+				"pinkie-promise@2.0.1",
+			},
+		},
+		{
+			ID: "find-up@2.1.0",
+			DependsOn: []string{
+				"locate-path@2.0.0",
+			},
+		},
+		{
+			ID: "findup-sync@2.0.0",
+			DependsOn: []string{
+				"detect-file@1.0.0",
+				"is-glob@3.1.0",
+				"micromatch@3.1.10",
+				"resolve-dir@1.0.1",
+			},
+		},
+		{
+			ID: "flat-cache@2.0.1",
+			DependsOn: []string{
+				"flatted@2.0.0",
+				"rimraf@2.6.3",
+				"write@1.0.3",
+			},
+		},
+		{
+			ID: "flow-typed@2.5.1",
+			DependsOn: []string{
+				"@octokit/rest@15.18.1",
+				"babel-polyfill@6.26.0",
+				"colors@1.3.3",
+				"fs-extra@5.0.0",
+				"glob@7.1.4",
+				"got@7.1.0",
+				"md5@2.2.1",
+				"mkdirp@0.5.1",
+				"rimraf@2.6.3",
+				"semver@5.7.0",
+				"table@4.0.3",
+				"through@2.3.8",
+				"unzipper@0.8.14",
+				"which@1.3.1",
+				"yargs@4.8.1",
+			},
+		},
+		{
+			ID: "flush-write-stream@1.1.1",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "follow-redirects@1.7.0",
+			DependsOn: []string{
+				"debug@3.2.6",
+			},
+		},
+		{
+			ID: "for-own@0.1.5",
+			DependsOn: []string{
+				"for-in@1.0.2",
+			},
+		},
+		{
+			ID: "form-data@2.3.3",
+			DependsOn: []string{
+				"asynckit@0.4.0",
+				"combined-stream@1.0.8",
+				"mime-types@2.1.24",
+			},
+		},
+		{
+			ID: "formik@1.5.1",
+			DependsOn: []string{
+				"create-react-context@0.2.3",
+				"deepmerge@2.2.1",
+				"hoist-non-react-statics@2.5.5",
+				"lodash@4.17.11",
+				"lodash-es@4.17.11",
+				"prop-types@15.7.2",
+				"react-fast-compare@2.0.4",
+				"tiny-warning@1.0.2",
+				"tslib@1.9.3",
+			},
+		},
+		{
+			ID: "fragment-cache@0.2.1",
+			DependsOn: []string{
+				"map-cache@0.2.2",
+			},
+		},
+		{
+			ID: "from2@1.3.0",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"readable-stream@1.1.14",
+			},
+		},
+		{
+			ID: "from2@2.3.0",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "fs-extra@0.30.0",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"jsonfile@2.4.0",
+				"klaw@1.3.1",
+				"path-is-absolute@1.0.1",
+				"rimraf@2.6.3",
+			},
+		},
+		{
+			ID: "fs-extra@5.0.0",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"jsonfile@4.0.0",
+				"universalify@0.1.2",
+			},
+		},
+		{
+			ID: "fs-extra@7.0.1",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"jsonfile@4.0.0",
+				"universalify@0.1.2",
+			},
+		},
+		{
+			ID: "fs-minipass@1.2.5",
+			DependsOn: []string{
+				"minipass@2.3.5",
+			},
+		},
+		{
+			ID: "fs-vacuum@1.2.10",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"path-is-inside@1.0.2",
+				"rimraf@2.6.3",
+			},
+		},
+		{
+			ID: "fs-write-stream-atomic@1.0.10",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"iferr@0.1.5",
+				"imurmurhash@0.1.4",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "fsevents@1.2.9",
+			DependsOn: []string{
+				"nan@2.13.2",
+				"node-pre-gyp@0.12.0",
+			},
+		},
+		{
+			ID: "fstream@1.0.12",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"inherits@2.0.3",
+				"mkdirp@0.5.1",
+				"rimraf@2.6.3",
+			},
+		},
+		{
+			ID: "function.prototype.name@1.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"function-bind@1.1.1",
+				"is-callable@1.1.4",
+			},
+		},
+		{
+			ID: "gauge@2.7.4",
+			DependsOn: []string{
+				"aproba@1.2.0",
+				"console-control-strings@1.1.0",
+				"has-unicode@2.0.1",
+				"object-assign@4.1.1",
+				"signal-exit@3.0.2",
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+				"wide-align@1.1.3",
+			},
+		},
+		{
+			ID: "gentle-fs@2.0.1",
+			DependsOn: []string{
+				"aproba@1.2.0",
+				"fs-vacuum@1.2.10",
+				"graceful-fs@4.1.15",
+				"iferr@0.1.5",
+				"mkdirp@0.5.1",
+				"path-is-inside@1.0.2",
+				"read-cmd-shim@1.0.1",
+				"slide@1.1.6",
+			},
+		},
+		{
+			ID: "get-stream@4.1.0",
+			DependsOn: []string{
+				"pump@3.0.0",
+			},
+		},
+		{
+			ID: "getpass@0.1.7",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "glob-base@0.3.0",
+			DependsOn: []string{
+				"glob-parent@2.0.0",
+				"is-glob@2.0.1",
+			},
+		},
+		{
+			ID: "glob-parent@2.0.0",
+			DependsOn: []string{
+				"is-glob@2.0.1",
+			},
+		},
+		{
+			ID: "glob-parent@3.1.0",
+			DependsOn: []string{
+				"is-glob@3.1.0",
+				"path-dirname@1.0.2",
+			},
+		},
+		{
+			ID: "glob@7.1.4",
+			DependsOn: []string{
+				"fs.realpath@1.0.0",
+				"inflight@1.0.6",
+				"inherits@2.0.3",
+				"minimatch@3.0.4",
+				"once@1.4.0",
+				"path-is-absolute@1.0.1",
+			},
+		},
+		{
+			ID: "global-dirs@0.1.1",
+			DependsOn: []string{
+				"ini@1.3.5",
+			},
+		},
+		{
+			ID: "global-modules@1.0.0",
+			DependsOn: []string{
+				"global-prefix@1.0.2",
+				"is-windows@1.0.2",
+				"resolve-dir@1.0.1",
+			},
+		},
+		{
+			ID: "global-prefix@1.0.2",
+			DependsOn: []string{
+				"expand-tilde@2.0.2",
+				"homedir-polyfill@1.0.3",
+				"ini@1.3.5",
+				"is-windows@1.0.2",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "global@4.3.2",
+			DependsOn: []string{
+				"min-document@2.19.0",
+				"process@0.5.2",
+			},
+		},
+		{
+			ID: "globalthis@1.0.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"function-bind@1.1.1",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "globby@8.0.1",
+			DependsOn: []string{
+				"array-union@1.0.2",
+				"dir-glob@2.2.2",
+				"fast-glob@2.2.6",
+				"glob@7.1.4",
+				"ignore@3.3.10",
+				"pify@3.0.0",
+				"slash@1.0.0",
+			},
+		},
+		{
+			ID: "globby@6.1.0",
+			DependsOn: []string{
+				"array-union@1.0.2",
+				"glob@7.1.4",
+				"object-assign@4.1.1",
+				"pify@2.3.0",
+				"pinkie-promise@2.0.1",
+			},
+		},
+		{
+			ID: "globby@7.1.1",
+			DependsOn: []string{
+				"array-union@1.0.2",
+				"dir-glob@2.2.2",
+				"glob@7.1.4",
+				"ignore@3.3.10",
+				"pify@3.0.0",
+				"slash@1.0.0",
+			},
+		},
+		{
+			ID: "got@6.7.1",
+			DependsOn: []string{
+				"create-error-class@3.0.2",
+				"duplexer3@0.1.4",
+				"get-stream@3.0.0",
+				"is-redirect@1.0.0",
+				"is-retry-allowed@1.1.0",
+				"is-stream@1.1.0",
+				"lowercase-keys@1.0.1",
+				"safe-buffer@5.1.2",
+				"timed-out@4.0.1",
+				"unzip-response@2.0.1",
+				"url-parse-lax@1.0.0",
+			},
+		},
+		{
+			ID: "got@7.1.0",
+			DependsOn: []string{
+				"decompress-response@3.3.0",
+				"duplexer3@0.1.4",
+				"get-stream@3.0.0",
+				"is-plain-obj@1.1.0",
+				"is-retry-allowed@1.1.0",
+				"is-stream@1.1.0",
+				"isurl@1.0.0",
+				"lowercase-keys@1.0.1",
+				"p-cancelable@0.3.0",
+				"p-timeout@1.2.1",
+				"safe-buffer@5.1.2",
+				"timed-out@4.0.1",
+				"url-parse-lax@1.0.0",
+				"url-to-options@1.0.1",
+			},
+		},
+		{
+			ID: "gzip-size@5.0.0",
+			DependsOn: []string{
+				"duplexer@0.1.1",
+				"pify@3.0.0",
+			},
+		},
+		{
+			ID: "gzip-size@5.1.0",
+			DependsOn: []string{
+				"duplexer@0.1.1",
+				"pify@4.0.1",
+			},
+		},
+		{
+			ID: "handlebars@4.1.2",
+			DependsOn: []string{
+				"neo-async@2.6.1",
+				"optimist@0.6.1",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "har-validator@5.1.3",
+			DependsOn: []string{
+				"ajv@6.10.0",
+				"har-schema@2.0.0",
+			},
+		},
+		{
+			ID: "hard-source-webpack-plugin@0.13.1",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"find-cache-dir@2.1.0",
+				"graceful-fs@4.1.15",
+				"lodash@4.17.11",
+				"mkdirp@0.5.1",
+				"node-object-hash@1.4.2",
+				"parse-json@4.0.0",
+				"pkg-dir@3.0.0",
+				"rimraf@2.6.3",
+				"semver@5.7.0",
+				"tapable@1.1.3",
+				"webpack-sources@1.3.0",
+				"write-json-file@2.3.0",
+			},
+		},
+		{
+			ID: "has-ansi@2.0.0",
+			DependsOn: []string{
+				"ansi-regex@2.1.1",
+			},
+		},
+		{
+			ID: "has-binary2@1.0.3",
+			DependsOn: []string{
+				"isarray@2.0.1",
+			},
+		},
+		{
+			ID: "has-to-string-tag-x@1.4.1",
+			DependsOn: []string{
+				"has-symbol-support-x@1.4.2",
+			},
+		},
+		{
+			ID: "has-value@0.3.1",
+			DependsOn: []string{
+				"get-value@2.0.6",
+				"has-values@0.1.4",
+				"isobject@2.1.0",
+			},
+		},
+		{
+			ID: "has-value@1.0.0",
+			DependsOn: []string{
+				"get-value@2.0.6",
+				"has-values@1.0.0",
+				"isobject@3.0.1",
+			},
+		},
+		{
+			ID: "has-values@1.0.0",
+			DependsOn: []string{
+				"is-number@3.0.0",
+				"kind-of@4.0.0",
+			},
+		},
+		{
+			ID: "has@1.0.3",
+			DependsOn: []string{
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "hash-base@3.0.4",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "hash.js@1.1.7",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"minimalistic-assert@1.0.1",
+			},
+		},
+		{
+			ID: "hast-util-from-parse5@5.0.0",
+			DependsOn: []string{
+				"ccount@1.0.4",
+				"hastscript@5.0.0",
+				"property-information@5.1.0",
+				"web-namespaces@1.1.3",
+				"xtend@4.0.1",
+			},
+		},
+		{
+			ID: "hastscript@5.0.0",
+			DependsOn: []string{
+				"comma-separated-tokens@1.0.7",
+				"hast-util-parse-selector@2.2.1",
+				"property-information@5.1.0",
+				"space-separated-tokens@1.1.4",
+			},
+		},
+		{
+			ID: "history@4.9.0",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"loose-envify@1.4.0",
+				"resolve-pathname@2.2.0",
+				"tiny-invariant@1.0.4",
+				"tiny-warning@1.0.2",
+				"value-equal@0.4.0",
+			},
+		},
+		{
+			ID: "hmac-drbg@1.0.1",
+			DependsOn: []string{
+				"hash.js@1.1.7",
+				"minimalistic-assert@1.0.1",
+				"minimalistic-crypto-utils@1.0.1",
+			},
+		},
+		{
+			ID: "hoist-non-react-statics@3.3.0",
+			DependsOn: []string{
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "home-or-tmp@2.0.0",
+			DependsOn: []string{
+				"os-homedir@1.0.2",
+				"os-tmpdir@1.0.2",
+			},
+		},
+		{
+			ID: "homedir-polyfill@1.0.3",
+			DependsOn: []string{
+				"parse-passwd@1.0.0",
+			},
+		},
+		{
+			ID: "hpack.js@2.1.6",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"obuf@1.1.2",
+				"readable-stream@2.3.6",
+				"wbuf@1.7.3",
+			},
+		},
+		{
+			ID: "html-element-map@1.0.1",
+			DependsOn: []string{
+				"array-filter@1.0.0",
+			},
+		},
+		{
+			ID: "html-encoding-sniffer@1.0.2",
+			DependsOn: []string{
+				"whatwg-encoding@1.0.5",
+			},
+		},
+		{
+			ID: "html-minifier@3.5.21",
+			DependsOn: []string{
+				"camel-case@3.0.0",
+				"clean-css@4.2.1",
+				"commander@2.17.1",
+				"he@1.2.0",
+				"param-case@2.1.1",
+				"relateurl@0.2.7",
+				"uglify-js@3.4.10",
+			},
+		},
+		{
+			ID: "html-webpack-harddisk-plugin@1.0.1",
+			DependsOn: []string{
+				"mkdirp@0.5.1",
+			},
+		},
+		{
+			ID: "html-webpack-plugin@3.2.0",
+			DependsOn: []string{
+				"html-minifier@3.5.21",
+				"loader-utils@0.2.17",
+				"lodash@4.17.11",
+				"pretty-error@2.1.1",
+				"tapable@1.1.3",
+				"toposort@1.0.7",
+				"util.promisify@1.0.0",
+			},
+		},
+		{
+			ID: "html-webpack-plugin@4.0.0-beta.5",
+			DependsOn: []string{
+				"html-minifier@3.5.21",
+				"loader-utils@1.2.3",
+				"lodash@4.17.11",
+				"pretty-error@2.1.1",
+				"tapable@1.1.3",
+				"util.promisify@1.0.0",
+			},
+		},
+		{
+			ID: "htmlparser2@3.10.1",
+			DependsOn: []string{
+				"domelementtype@1.3.1",
+				"domhandler@2.4.2",
+				"domutils@1.7.0",
+				"entities@1.1.2",
+				"inherits@2.0.3",
+				"readable-stream@3.3.0",
+			},
+		},
+		{
+			ID: "http-errors@1.6.3",
+			DependsOn: []string{
+				"depd@1.1.2",
+				"inherits@2.0.3",
+				"setprototypeof@1.1.0",
+				"statuses@1.5.0",
+			},
+		},
+		{
+			ID: "http-proxy-agent@2.1.0",
+			DependsOn: []string{
+				"agent-base@4.2.1",
+				"debug@3.1.0",
+			},
+		},
+		{
+			ID: "http-proxy-middleware@0.19.1",
+			DependsOn: []string{
+				"http-proxy@1.17.0",
+				"is-glob@4.0.1",
+				"lodash@4.17.11",
+				"micromatch@3.1.10",
+			},
+		},
+		{
+			ID: "http-proxy@1.17.0",
+			DependsOn: []string{
+				"eventemitter3@3.1.2",
+				"follow-redirects@1.7.0",
+				"requires-port@1.0.0",
+			},
+		},
+		{
+			ID: "http-signature@1.2.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"jsprim@1.4.1",
+				"sshpk@1.16.1",
+			},
+		},
+		{
+			ID: "https-proxy-agent@2.2.1",
+			DependsOn: []string{
+				"agent-base@4.2.1",
+				"debug@3.2.6",
+			},
+		},
+		{
+			ID: "humanize-ms@1.2.1",
+			DependsOn: []string{
+				"ms@2.1.1",
+			},
+		},
+		{
+			ID: "husky@1.3.1",
+			DependsOn: []string{
+				"cosmiconfig@5.2.1",
+				"execa@1.0.0",
+				"find-up@3.0.0",
+				"get-stdin@6.0.0",
+				"is-ci@2.0.0",
+				"pkg-dir@3.0.0",
+				"please-upgrade-node@3.1.1",
+				"read-pkg@4.0.1",
+				"run-node@1.0.0",
+				"slash@2.0.0",
+			},
+		},
+		{
+			ID: "iconv-lite@0.4.23",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "iconv-lite@0.4.24",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "icss-utils@2.1.0",
+			DependsOn: []string{
+				"postcss@6.0.23",
+			},
+		},
+		{
+			ID: "ignore-walk@3.0.1",
+			DependsOn: []string{
+				"minimatch@3.0.4",
+			},
+		},
+		{
+			ID: "import-cwd@2.1.0",
+			DependsOn: []string{
+				"import-from@2.1.0",
+			},
+		},
+		{
+			ID: "import-fresh@2.0.0",
+			DependsOn: []string{
+				"caller-path@2.0.0",
+				"resolve-from@3.0.0",
+			},
+		},
+		{
+			ID: "import-fresh@3.0.0",
+			DependsOn: []string{
+				"parent-module@1.0.1",
+				"resolve-from@4.0.0",
+			},
+		},
+		{
+			ID: "import-from@2.1.0",
+			DependsOn: []string{
+				"resolve-from@3.0.0",
+			},
+		},
+		{
+			ID: "import-local@1.0.0",
+			DependsOn: []string{
+				"pkg-dir@2.0.0",
+				"resolve-cwd@2.0.0",
+			},
+		},
+		{
+			ID: "import-local@2.0.0",
+			DependsOn: []string{
+				"pkg-dir@3.0.0",
+				"resolve-cwd@2.0.0",
+			},
+		},
+		{
+			ID: "indefinite-observable@1.0.2",
+			DependsOn: []string{
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "inflight@1.0.6",
+			DependsOn: []string{
+				"once@1.4.0",
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "init-package-json@1.10.3",
+			DependsOn: []string{
+				"glob@7.1.4",
+				"npm-package-arg@6.1.0",
+				"promzard@0.3.0",
+				"read@1.0.7",
+				"read-package-json@2.0.13",
+				"semver@5.7.0",
+				"validate-npm-package-license@3.0.4",
+				"validate-npm-package-name@3.0.0",
+			},
+		},
+		{
+			ID: "inquirer@6.2.0",
+			DependsOn: []string{
+				"ansi-escapes@3.2.0",
+				"chalk@2.4.2",
+				"cli-cursor@2.1.0",
+				"cli-width@2.2.0",
+				"external-editor@3.0.3",
+				"figures@2.0.0",
+				"lodash@4.17.11",
+				"mute-stream@0.0.7",
+				"run-async@2.3.0",
+				"rxjs@6.5.2",
+				"string-width@2.1.1",
+				"strip-ansi@4.0.0",
+				"through@2.3.8",
+			},
+		},
+		{
+			ID: "inquirer@0.11.4",
+			DependsOn: []string{
+				"ansi-escapes@1.4.0",
+				"ansi-regex@2.1.1",
+				"chalk@1.1.3",
+				"cli-cursor@1.0.2",
+				"cli-width@1.1.1",
+				"figures@1.7.0",
+				"lodash@3.10.1",
+				"readline2@1.0.1",
+				"run-async@0.1.0",
+				"rx-lite@3.1.2",
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+				"through@2.3.8",
+			},
+		},
+		{
+			ID: "inquirer@6.3.1",
+			DependsOn: []string{
+				"ansi-escapes@3.2.0",
+				"chalk@2.4.2",
+				"cli-cursor@2.1.0",
+				"cli-width@2.2.0",
+				"external-editor@3.0.3",
+				"figures@2.0.0",
+				"lodash@4.17.11",
+				"mute-stream@0.0.7",
+				"run-async@2.3.0",
+				"rxjs@6.5.2",
+				"string-width@2.1.1",
+				"strip-ansi@5.2.0",
+				"through@2.3.8",
+			},
+		},
+		{
+			ID: "internal-ip@4.3.0",
+			DependsOn: []string{
+				"default-gateway@4.2.0",
+				"ipaddr.js@1.9.0",
+			},
+		},
+		{
+			ID: "intl-messageformat@2.2.0",
+			DependsOn: []string{
+				"intl-messageformat-parser@1.4.0",
+			},
+		},
+		{
+			ID: "invariant@2.2.4",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+			},
+		},
+		{
+			ID: "is-accessor-descriptor@0.1.6",
+			DependsOn: []string{
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "is-accessor-descriptor@1.0.0",
+			DependsOn: []string{
+				"kind-of@6.0.2",
+			},
+		},
+		{
+			ID: "is-binary-path@1.0.1",
+			DependsOn: []string{
+				"binary-extensions@1.13.1",
+			},
+		},
+		{
+			ID: "is-ci@1.2.1",
+			DependsOn: []string{
+				"ci-info@1.6.0",
+			},
+		},
+		{
+			ID: "is-ci@2.0.0",
+			DependsOn: []string{
+				"ci-info@2.0.0",
+			},
+		},
+		{
+			ID: "is-cidr@3.0.0",
+			DependsOn: []string{
+				"cidr-regex@2.0.10",
+			},
+		},
+		{
+			ID: "is-data-descriptor@0.1.4",
+			DependsOn: []string{
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "is-data-descriptor@1.0.0",
+			DependsOn: []string{
+				"kind-of@6.0.2",
+			},
+		},
+		{
+			ID: "is-descriptor@0.1.6",
+			DependsOn: []string{
+				"is-accessor-descriptor@0.1.6",
+				"is-data-descriptor@0.1.4",
+				"kind-of@5.1.0",
+			},
+		},
+		{
+			ID: "is-descriptor@1.0.2",
+			DependsOn: []string{
+				"is-accessor-descriptor@1.0.0",
+				"is-data-descriptor@1.0.0",
+				"kind-of@6.0.2",
+			},
+		},
+		{
+			ID: "is-equal-shallow@0.1.3",
+			DependsOn: []string{
+				"is-primitive@2.0.0",
+			},
+		},
+		{
+			ID: "is-extendable@1.0.1",
+			DependsOn: []string{
+				"is-plain-object@2.0.4",
+			},
+		},
+		{
+			ID: "is-finite@1.0.2",
+			DependsOn: []string{
+				"number-is-nan@1.0.1",
+			},
+		},
+		{
+			ID: "is-fullwidth-code-point@1.0.0",
+			DependsOn: []string{
+				"number-is-nan@1.0.1",
+			},
+		},
+		{
+			ID: "is-glob@2.0.1",
+			DependsOn: []string{
+				"is-extglob@1.0.0",
+			},
+		},
+		{
+			ID: "is-glob@3.1.0",
+			DependsOn: []string{
+				"is-extglob@2.1.1",
+			},
+		},
+		{
+			ID: "is-glob@4.0.1",
+			DependsOn: []string{
+				"is-extglob@2.1.1",
+			},
+		},
+		{
+			ID: "is-installed-globally@0.1.0",
+			DependsOn: []string{
+				"global-dirs@0.1.1",
+				"is-path-inside@1.0.1",
+			},
+		},
+		{
+			ID: "is-number@2.1.0",
+			DependsOn: []string{
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "is-number@3.0.0",
+			DependsOn: []string{
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "is-observable@1.1.0",
+			DependsOn: []string{
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "is-path-in-cwd@1.0.1",
+			DependsOn: []string{
+				"is-path-inside@1.0.1",
+			},
+		},
+		{
+			ID: "is-path-in-cwd@2.1.0",
+			DependsOn: []string{
+				"is-path-inside@2.1.0",
+			},
+		},
+		{
+			ID: "is-path-inside@1.0.1",
+			DependsOn: []string{
+				"path-is-inside@1.0.2",
+			},
+		},
+		{
+			ID: "is-path-inside@2.1.0",
+			DependsOn: []string{
+				"path-is-inside@1.0.2",
+			},
+		},
+		{
+			ID: "is-plain-object@2.0.4",
+			DependsOn: []string{
+				"isobject@3.0.1",
+			},
+		},
+		{
+			ID: "is-regex@1.0.4",
+			DependsOn: []string{
+				"has@1.0.3",
+			},
+		},
+		{
+			ID: "is-symbol@1.0.2",
+			DependsOn: []string{
+				"has-symbols@1.0.0",
+			},
+		},
+		{
+			ID: "isobject@2.1.0",
+			DependsOn: []string{
+				"isarray@1.0.0",
+			},
+		},
+		{
+			ID: "isomorphic-fetch@2.2.1",
+			DependsOn: []string{
+				"node-fetch@1.7.3",
+				"whatwg-fetch@3.0.0",
+			},
+		},
+		{
+			ID: "istanbul-api@1.3.7",
+			DependsOn: []string{
+				"async@2.6.2",
+				"fileset@2.0.3",
+				"istanbul-lib-coverage@1.2.1",
+				"istanbul-lib-hook@1.2.2",
+				"istanbul-lib-instrument@1.10.2",
+				"istanbul-lib-report@1.1.5",
+				"istanbul-lib-source-maps@1.2.6",
+				"istanbul-reports@1.5.1",
+				"js-yaml@3.13.1",
+				"mkdirp@0.5.1",
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "istanbul-lib-hook@1.2.2",
+			DependsOn: []string{
+				"append-transform@0.4.0",
+			},
+		},
+		{
+			ID: "istanbul-lib-instrument@1.10.2",
+			DependsOn: []string{
+				"babel-generator@6.26.1",
+				"babel-template@6.26.0",
+				"babel-traverse@6.26.0",
+				"babel-types@6.26.0",
+				"babylon@6.18.0",
+				"istanbul-lib-coverage@1.2.1",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "istanbul-lib-report@1.1.5",
+			DependsOn: []string{
+				"istanbul-lib-coverage@1.2.1",
+				"mkdirp@0.5.1",
+				"path-parse@1.0.6",
+				"supports-color@3.2.3",
+			},
+		},
+		{
+			ID: "istanbul-lib-source-maps@1.2.6",
+			DependsOn: []string{
+				"debug@3.2.6",
+				"istanbul-lib-coverage@1.2.1",
+				"mkdirp@0.5.1",
+				"rimraf@2.6.3",
+				"source-map@0.5.7",
+			},
+		},
+		{
+			ID: "istanbul-reports@1.5.1",
+			DependsOn: []string{
+				"handlebars@4.1.2",
+			},
+		},
+		{
+			ID: "isurl@1.0.0",
+			DependsOn: []string{
+				"has-to-string-tag-x@1.4.1",
+				"is-object@1.0.1",
+			},
+		},
+		{
+			ID: "jest-changed-files@23.4.2",
+			DependsOn: []string{
+				"throat@4.1.0",
+			},
+		},
+		{
+			ID: "jest-cli@23.6.0",
+			DependsOn: []string{
+				"ansi-escapes@3.2.0",
+				"chalk@2.4.2",
+				"exit@0.1.2",
+				"glob@7.1.4",
+				"graceful-fs@4.1.15",
+				"import-local@1.0.0",
+				"is-ci@1.2.1",
+				"istanbul-api@1.3.7",
+				"istanbul-lib-coverage@1.2.1",
+				"istanbul-lib-instrument@1.10.2",
+				"istanbul-lib-source-maps@1.2.6",
+				"jest-changed-files@23.4.2",
+				"jest-config@23.6.0",
+				"jest-environment-jsdom@23.4.0",
+				"jest-get-type@22.4.3",
+				"jest-haste-map@23.6.0",
+				"jest-message-util@23.4.0",
+				"jest-regex-util@23.3.0",
+				"jest-resolve-dependencies@23.6.0",
+				"jest-runner@23.6.0",
+				"jest-runtime@23.6.0",
+				"jest-snapshot@23.6.0",
+				"jest-util@23.4.0",
+				"jest-validate@23.6.0",
+				"jest-watcher@23.4.0",
+				"jest-worker@23.2.0",
+				"micromatch@2.3.11",
+				"node-notifier@5.4.0",
+				"prompts@0.1.14",
+				"realpath-native@1.1.0",
+				"rimraf@2.6.3",
+				"slash@1.0.0",
+				"string-length@2.0.0",
+				"strip-ansi@4.0.0",
+				"which@1.3.1",
+				"yargs@11.1.0",
+			},
+		},
+		{
+			ID: "jest-config@23.6.0",
+			DependsOn: []string{
+				"babel-core@6.26.3",
+				"babel-jest@23.6.0",
+				"chalk@2.4.2",
+				"glob@7.1.4",
+				"jest-environment-jsdom@23.4.0",
+				"jest-environment-node@23.4.0",
+				"jest-get-type@22.4.3",
+				"jest-jasmine2@23.6.0",
+				"jest-regex-util@23.3.0",
+				"jest-resolve@23.6.0",
+				"jest-util@23.4.0",
+				"jest-validate@23.6.0",
+				"micromatch@2.3.11",
+				"pretty-format@23.6.0",
+			},
+		},
+		{
+			ID: "jest-diff@23.6.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"diff@3.5.0",
+				"jest-get-type@22.4.3",
+				"pretty-format@23.6.0",
+			},
+		},
+		{
+			ID: "jest-docblock@23.2.0",
+			DependsOn: []string{
+				"detect-newline@2.1.0",
+			},
+		},
+		{
+			ID: "jest-each@23.6.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"pretty-format@23.6.0",
+			},
+		},
+		{
+			ID: "jest-environment-jsdom@23.4.0",
+			DependsOn: []string{
+				"jest-mock@23.2.0",
+				"jest-util@23.4.0",
+				"jsdom@11.12.0",
+			},
+		},
+		{
+			ID: "jest-environment-node@23.4.0",
+			DependsOn: []string{
+				"jest-mock@23.2.0",
+				"jest-util@23.4.0",
+			},
+		},
+		{
+			ID: "jest-haste-map@23.6.0",
+			DependsOn: []string{
+				"fb-watchman@2.0.0",
+				"graceful-fs@4.1.15",
+				"invariant@2.2.4",
+				"jest-docblock@23.2.0",
+				"jest-serializer@23.0.1",
+				"jest-worker@23.2.0",
+				"micromatch@2.3.11",
+				"sane@2.5.2",
+			},
+		},
+		{
+			ID: "jest-jasmine2@23.6.0",
+			DependsOn: []string{
+				"babel-traverse@6.26.0",
+				"chalk@2.4.2",
+				"co@4.6.0",
+				"expect@23.6.0",
+				"is-generator-fn@1.0.0",
+				"jest-diff@23.6.0",
+				"jest-each@23.6.0",
+				"jest-matcher-utils@23.6.0",
+				"jest-message-util@23.4.0",
+				"jest-snapshot@23.6.0",
+				"jest-util@23.4.0",
+				"pretty-format@23.6.0",
+			},
+		},
+		{
+			ID: "jest-leak-detector@23.6.0",
+			DependsOn: []string{
+				"pretty-format@23.6.0",
+			},
+		},
+		{
+			ID: "jest-matcher-utils@23.6.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"jest-get-type@22.4.3",
+				"pretty-format@23.6.0",
+			},
+		},
+		{
+			ID: "jest-message-util@23.4.0",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0",
+				"chalk@2.4.2",
+				"micromatch@2.3.11",
+				"slash@1.0.0",
+				"stack-utils@1.0.2",
+			},
+		},
+		{
+			ID: "jest-resolve-dependencies@23.6.0",
+			DependsOn: []string{
+				"jest-regex-util@23.3.0",
+				"jest-snapshot@23.6.0",
+			},
+		},
+		{
+			ID: "jest-resolve@23.6.0",
+			DependsOn: []string{
+				"browser-resolve@1.11.3",
+				"chalk@2.4.2",
+				"realpath-native@1.1.0",
+			},
+		},
+		{
+			ID: "jest-runner@23.6.0",
+			DependsOn: []string{
+				"exit@0.1.2",
+				"graceful-fs@4.1.15",
+				"jest-config@23.6.0",
+				"jest-docblock@23.2.0",
+				"jest-haste-map@23.6.0",
+				"jest-jasmine2@23.6.0",
+				"jest-leak-detector@23.6.0",
+				"jest-message-util@23.4.0",
+				"jest-runtime@23.6.0",
+				"jest-util@23.4.0",
+				"jest-worker@23.2.0",
+				"source-map-support@0.5.12",
+				"throat@4.1.0",
+			},
+		},
+		{
+			ID: "jest-runtime@23.6.0",
+			DependsOn: []string{
+				"babel-core@6.26.3",
+				"babel-plugin-istanbul@4.1.6",
+				"chalk@2.4.2",
+				"convert-source-map@1.6.0",
+				"exit@0.1.2",
+				"fast-json-stable-stringify@2.0.0",
+				"graceful-fs@4.1.15",
+				"jest-config@23.6.0",
+				"jest-haste-map@23.6.0",
+				"jest-message-util@23.4.0",
+				"jest-regex-util@23.3.0",
+				"jest-resolve@23.6.0",
+				"jest-snapshot@23.6.0",
+				"jest-util@23.4.0",
+				"jest-validate@23.6.0",
+				"micromatch@2.3.11",
+				"realpath-native@1.1.0",
+				"slash@1.0.0",
+				"strip-bom@3.0.0",
+				"write-file-atomic@2.4.2",
+				"yargs@11.1.0",
+			},
+		},
+		{
+			ID: "jest-snapshot@23.6.0",
+			DependsOn: []string{
+				"babel-types@6.26.0",
+				"chalk@2.4.2",
+				"jest-diff@23.6.0",
+				"jest-matcher-utils@23.6.0",
+				"jest-message-util@23.4.0",
+				"jest-resolve@23.6.0",
+				"mkdirp@0.5.1",
+				"natural-compare@1.4.0",
+				"pretty-format@23.6.0",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "jest-util@23.4.0",
+			DependsOn: []string{
+				"callsites@2.0.0",
+				"chalk@2.4.2",
+				"graceful-fs@4.1.15",
+				"is-ci@1.2.1",
+				"jest-message-util@23.4.0",
+				"mkdirp@0.5.1",
+				"slash@1.0.0",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "jest-validate@23.6.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"jest-get-type@22.4.3",
+				"leven@2.1.0",
+				"pretty-format@23.6.0",
+			},
+		},
+		{
+			ID: "jest-watcher@23.4.0",
+			DependsOn: []string{
+				"ansi-escapes@3.2.0",
+				"chalk@2.4.2",
+				"string-length@2.0.0",
+			},
+		},
+		{
+			ID: "jest-worker@23.2.0",
+			DependsOn: []string{
+				"merge-stream@1.0.1",
+			},
+		},
+		{
+			ID: "jest@23.6.0",
+			DependsOn: []string{
+				"import-local@1.0.0",
+				"jest-cli@23.6.0",
+			},
+		},
+		{
+			ID: "js-yaml@3.13.1",
+			DependsOn: []string{
+				"argparse@1.0.10",
+				"esprima@4.0.1",
+			},
+		},
+		{
+			ID: "jscodeshift@0.5.1",
+			DependsOn: []string{
+				"babel-plugin-transform-flow-strip-types@6.22.0",
+				"babel-preset-es2015@6.24.1",
+				"babel-preset-stage-1@6.24.1",
+				"babel-register@6.26.0",
+				"babylon@7.0.0-beta.47",
+				"colors@1.3.3",
+				"flow-parser@0.98.1",
+				"lodash@4.17.11",
+				"micromatch@2.3.11",
+				"neo-async@2.6.1",
+				"node-dir@0.1.8",
+				"nomnom@1.8.1",
+				"recast@0.15.5",
+				"temp@0.8.3",
+				"write-file-atomic@1.3.4",
+			},
+		},
+		{
+			ID: "jsdom@11.12.0",
+			DependsOn: []string{
+				"abab@2.0.0",
+				"acorn@5.7.3",
+				"acorn-globals@4.3.2",
+				"array-equal@1.0.0",
+				"cssom@0.3.6",
+				"cssstyle@1.2.2",
+				"data-urls@1.1.0",
+				"domexception@1.0.1",
+				"escodegen@1.11.1",
+				"html-encoding-sniffer@1.0.2",
+				"left-pad@1.3.0",
+				"nwsapi@2.1.4",
+				"parse5@4.0.0",
+				"pn@1.1.0",
+				"request@2.88.0",
+				"request-promise-native@1.0.7",
+				"sax@1.2.4",
+				"symbol-tree@3.2.2",
+				"tough-cookie@2.5.0",
+				"w3c-hr-time@1.0.1",
+				"webidl-conversions@4.0.2",
+				"whatwg-encoding@1.0.5",
+				"whatwg-mimetype@2.3.0",
+				"whatwg-url@6.5.0",
+				"ws@5.2.2",
+				"xml-name-validator@3.0.0",
+			},
+		},
+		{
+			ID: "json5@1.0.1",
+			DependsOn: []string{
+				"minimist@1.2.0",
+			},
+		},
+		{
+			ID: "json5@2.1.0",
+			DependsOn: []string{
+				"minimist@1.2.0",
+			},
+		},
+		{
+			ID: "jsprim@1.4.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"extsprintf@1.3.0",
+				"json-schema@0.2.3",
+				"verror@1.10.0",
+			},
+		},
+		{
+			ID: "jss-camel-case@6.1.0",
+			DependsOn: []string{
+				"hyphenate-style-name@1.0.3",
+			},
+		},
+		{
+			ID: "jss-nested@6.0.1",
+			DependsOn: []string{
+				"warning@3.0.0",
+			},
+		},
+		{
+			ID: "jss-vendor-prefixer@7.0.0",
+			DependsOn: []string{
+				"css-vendor@0.3.8",
+			},
+		},
+		{
+			ID: "jss@9.8.7",
+			DependsOn: []string{
+				"is-in-browser@1.1.3",
+				"symbol-observable@1.2.0",
+				"warning@3.0.0",
+			},
+		},
+		{
+			ID: "jsx-ast-utils@2.1.0",
+			DependsOn: []string{
+				"array-includes@3.0.3",
+			},
+		},
+		{
+			ID: "kind-of@2.0.1",
+			DependsOn: []string{
+				"is-buffer@1.1.6",
+			},
+		},
+		{
+			ID: "kind-of@3.2.2",
+			DependsOn: []string{
+				"is-buffer@1.1.6",
+			},
+		},
+		{
+			ID: "kind-of@4.0.0",
+			DependsOn: []string{
+				"is-buffer@1.1.6",
+			},
+		},
+		{
+			ID: "latest-version@3.1.0",
+			DependsOn: []string{
+				"package-json@4.0.1",
+			},
+		},
+		{
+			ID: "lazy-universal-dotenv@2.0.0",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"app-root-dir@1.0.2",
+				"core-js@2.6.5",
+				"dotenv@6.2.0",
+				"dotenv-expand@4.2.0",
+			},
+		},
+		{
+			ID: "lcid@1.0.0",
+			DependsOn: []string{
+				"invert-kv@1.0.0",
+			},
+		},
+		{
+			ID: "lcid@2.0.0",
+			DependsOn: []string{
+				"invert-kv@2.0.0",
+			},
+		},
+		{
+			ID: "levn@0.3.0",
+			DependsOn: []string{
+				"prelude-ls@1.1.2",
+				"type-check@0.3.2",
+			},
+		},
+		{
+			ID: "libcipm@3.0.3",
+			DependsOn: []string{
+				"bin-links@1.1.2",
+				"bluebird@3.5.4",
+				"figgy-pudding@3.5.1",
+				"find-npm-prefix@1.0.2",
+				"graceful-fs@4.1.15",
+				"ini@1.3.5",
+				"lock-verify@2.1.0",
+				"mkdirp@0.5.1",
+				"npm-lifecycle@2.1.1",
+				"npm-logical-tree@1.2.1",
+				"npm-package-arg@6.1.0",
+				"pacote@9.5.0",
+				"read-package-json@2.0.13",
+				"rimraf@2.6.3",
+				"worker-farm@1.7.0",
+			},
+		},
+		{
+			ID: "libnpm@2.0.1",
+			DependsOn: []string{
+				"bin-links@1.1.2",
+				"bluebird@3.5.4",
+				"find-npm-prefix@1.0.2",
+				"libnpmaccess@3.0.1",
+				"libnpmconfig@1.2.1",
+				"libnpmhook@5.0.2",
+				"libnpmorg@1.0.0",
+				"libnpmpublish@1.1.1",
+				"libnpmsearch@2.0.0",
+				"libnpmteam@1.0.1",
+				"lock-verify@2.1.0",
+				"npm-lifecycle@2.1.1",
+				"npm-logical-tree@1.2.1",
+				"npm-package-arg@6.1.0",
+				"npm-profile@4.0.1",
+				"npm-registry-fetch@3.9.0",
+				"npmlog@4.1.2",
+				"pacote@9.5.0",
+				"read-package-json@2.0.13",
+				"stringify-package@1.0.0",
+			},
+		},
+		{
+			ID: "libnpmaccess@3.0.1",
+			DependsOn: []string{
+				"aproba@2.0.0",
+				"get-stream@4.1.0",
+				"npm-package-arg@6.1.0",
+				"npm-registry-fetch@3.9.0",
+			},
+		},
+		{
+			ID: "libnpmconfig@1.2.1",
+			DependsOn: []string{
+				"figgy-pudding@3.5.1",
+				"find-up@3.0.0",
+				"ini@1.3.5",
+			},
+		},
+		{
+			ID: "libnpmhook@5.0.2",
+			DependsOn: []string{
+				"aproba@2.0.0",
+				"figgy-pudding@3.5.1",
+				"get-stream@4.1.0",
+				"npm-registry-fetch@3.9.0",
+			},
+		},
+		{
+			ID: "libnpmorg@1.0.0",
+			DependsOn: []string{
+				"aproba@2.0.0",
+				"figgy-pudding@3.5.1",
+				"get-stream@4.1.0",
+				"npm-registry-fetch@3.9.0",
+			},
+		},
+		{
+			ID: "libnpmpublish@1.1.1",
+			DependsOn: []string{
+				"aproba@2.0.0",
+				"figgy-pudding@3.5.1",
+				"get-stream@4.1.0",
+				"lodash.clonedeep@4.5.0",
+				"normalize-package-data@2.5.0",
+				"npm-package-arg@6.1.0",
+				"npm-registry-fetch@3.9.0",
+				"semver@5.7.0",
+				"ssri@6.0.1",
+			},
+		},
+		{
+			ID: "libnpmsearch@2.0.0",
+			DependsOn: []string{
+				"figgy-pudding@3.5.1",
+				"get-stream@4.1.0",
+				"npm-registry-fetch@3.9.0",
+			},
+		},
+		{
+			ID: "libnpmteam@1.0.1",
+			DependsOn: []string{
+				"aproba@2.0.0",
+				"figgy-pudding@3.5.1",
+				"get-stream@4.1.0",
+				"npm-registry-fetch@3.9.0",
+			},
+		},
+		{
+			ID: "libnpx@10.2.0",
+			DependsOn: []string{
+				"dotenv@5.0.1",
+				"npm-package-arg@6.1.0",
+				"rimraf@2.6.3",
+				"safe-buffer@5.1.2",
+				"update-notifier@2.5.0",
+				"which@1.3.1",
+				"y18n@4.0.0",
+				"yargs@11.1.0",
+			},
+		},
+		{
+			ID: "lint-staged@7.3.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"commander@2.20.0",
+				"cosmiconfig@5.2.1",
+				"debug@3.2.6",
+				"dedent@0.7.0",
+				"execa@0.9.0",
+				"find-parent-dir@0.3.0",
+				"is-glob@4.0.1",
+				"is-windows@1.0.2",
+				"jest-validate@23.6.0",
+				"listr@0.14.3",
+				"lodash@4.17.11",
+				"log-symbols@2.2.0",
+				"micromatch@3.1.10",
+				"npm-which@3.0.1",
+				"p-map@1.2.0",
+				"path-is-inside@1.0.2",
+				"pify@3.0.0",
+				"please-upgrade-node@3.1.1",
+				"staged-git-files@1.1.1",
+				"string-argv@0.0.2",
+				"stringify-object@3.3.0",
+			},
+		},
+		{
+			ID: "listr-update-renderer@0.5.0",
+			DependsOn: []string{
+				"chalk@1.1.3",
+				"cli-truncate@0.2.1",
+				"elegant-spinner@1.0.1",
+				"figures@1.7.0",
+				"indent-string@3.2.0",
+				"log-symbols@1.0.2",
+				"log-update@2.3.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "listr-verbose-renderer@0.5.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"cli-cursor@2.1.0",
+				"date-fns@1.30.1",
+				"figures@2.0.0",
+			},
+		},
+		{
+			ID: "listr@0.14.3",
+			DependsOn: []string{
+				"@samverschueren/stream-to-observable@0.3.0",
+				"is-observable@1.1.0",
+				"is-promise@2.1.0",
+				"is-stream@1.1.0",
+				"listr-silent-renderer@1.1.1",
+				"listr-update-renderer@0.5.0",
+				"listr-verbose-renderer@0.5.0",
+				"p-map@2.1.0",
+				"rxjs@6.5.2",
+			},
+		},
+		{
+			ID: "load-json-file@1.1.0",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"parse-json@2.2.0",
+				"pify@2.3.0",
+				"pinkie-promise@2.0.1",
+				"strip-bom@2.0.0",
+			},
+		},
+		{
+			ID: "load-json-file@2.0.0",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"parse-json@2.2.0",
+				"pify@2.3.0",
+				"strip-bom@3.0.0",
+			},
+		},
+		{
+			ID: "load-json-file@4.0.0",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"parse-json@4.0.0",
+				"pify@3.0.0",
+				"strip-bom@3.0.0",
+			},
+		},
+		{
+			ID: "loader-fs-cache@1.0.2",
+			DependsOn: []string{
+				"find-cache-dir@0.1.1",
+				"mkdirp@0.5.1",
+			},
+		},
+		{
+			ID: "loader-utils@1.1.0",
+			DependsOn: []string{
+				"big.js@3.2.0",
+				"emojis-list@2.1.0",
+				"json5@0.5.1",
+			},
+		},
+		{
+			ID: "loader-utils@0.2.17",
+			DependsOn: []string{
+				"big.js@3.2.0",
+				"emojis-list@2.1.0",
+				"json5@0.5.1",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "loader-utils@1.2.3",
+			DependsOn: []string{
+				"big.js@5.2.2",
+				"emojis-list@2.1.0",
+				"json5@1.0.1",
+			},
+		},
+		{
+			ID: "locate-path@2.0.0",
+			DependsOn: []string{
+				"p-locate@2.0.0",
+				"path-exists@3.0.0",
+			},
+		},
+		{
+			ID: "locate-path@3.0.0",
+			DependsOn: []string{
+				"p-locate@3.0.0",
+				"path-exists@3.0.0",
+			},
+		},
+		{
+			ID: "lock-verify@2.1.0",
+			DependsOn: []string{
+				"npm-package-arg@6.1.0",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "lockfile@1.0.4",
+			DependsOn: []string{
+				"signal-exit@3.0.2",
+			},
+		},
+		{
+			ID: "lodash._baseuniq@4.6.0",
+			DependsOn: []string{
+				"lodash._createset@4.0.3",
+				"lodash._root@3.0.1",
+			},
+		},
+		{
+			ID: "log-symbols@1.0.2",
+			DependsOn: []string{
+				"chalk@1.1.3",
+			},
+		},
+		{
+			ID: "log-symbols@2.2.0",
+			DependsOn: []string{
+				"chalk@2.4.2",
+			},
+		},
+		{
+			ID: "log-update@2.3.0",
+			DependsOn: []string{
+				"ansi-escapes@3.2.0",
+				"cli-cursor@2.1.0",
+				"wrap-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "loose-envify@1.4.0",
+			DependsOn: []string{
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "lru-cache@4.1.5",
+			DependsOn: []string{
+				"pseudomap@1.0.2",
+				"yallist@2.1.2",
+			},
+		},
+		{
+			ID: "lru-cache@5.1.1",
+			DependsOn: []string{
+				"yallist@3.0.3",
+			},
+		},
+		{
+			ID: "make-dir@1.3.0",
+			DependsOn: []string{
+				"pify@3.0.0",
+			},
+		},
+		{
+			ID: "make-dir@2.1.0",
+			DependsOn: []string{
+				"pify@4.0.1",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "make-fetch-happen@4.0.1",
+			DependsOn: []string{
+				"agentkeepalive@3.5.2",
+				"cacache@11.3.2",
+				"http-cache-semantics@3.8.1",
+				"http-proxy-agent@2.1.0",
+				"https-proxy-agent@2.2.1",
+				"lru-cache@4.1.5",
+				"mississippi@3.0.0",
+				"node-fetch-npm@2.0.2",
+				"promise-retry@1.1.1",
+				"socks-proxy-agent@4.0.2",
+				"ssri@6.0.1",
+			},
+		},
+		{
+			ID: "makeerror@1.0.11",
+			DependsOn: []string{
+				"tmpl@1.0.4",
+			},
+		},
+		{
+			ID: "map-age-cleaner@0.1.3",
+			DependsOn: []string{
+				"p-defer@1.0.0",
+			},
+		},
+		{
+			ID: "map-visit@1.0.0",
+			DependsOn: []string{
+				"object-visit@1.0.1",
+			},
+		},
+		{
+			ID: "marksy@6.1.0",
+			DependsOn: []string{
+				"babel-standalone@6.26.0",
+				"he@1.2.0",
+				"marked@0.3.19",
+			},
+		},
+		{
+			ID: "md5.js@1.3.5",
+			DependsOn: []string{
+				"hash-base@3.0.4",
+				"inherits@2.0.3",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "md5@2.2.1",
+			DependsOn: []string{
+				"charenc@0.0.2",
+				"crypt@0.0.2",
+				"is-buffer@1.1.6",
+			},
+		},
+		{
+			ID: "mem@1.1.0",
+			DependsOn: []string{
+				"mimic-fn@1.2.0",
+			},
+		},
+		{
+			ID: "mem@4.3.0",
+			DependsOn: []string{
+				"map-age-cleaner@0.1.3",
+				"mimic-fn@2.1.0",
+				"p-is-promise@2.1.0",
+			},
+		},
+		{
+			ID: "memory-fs@0.4.1",
+			DependsOn: []string{
+				"errno@0.1.7",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "merge-deep@3.0.2",
+			DependsOn: []string{
+				"arr-union@3.1.0",
+				"clone-deep@0.2.4",
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "merge-dirs@0.2.1",
+			DependsOn: []string{
+				"inquirer@0.11.4",
+				"minimist@1.2.0",
+				"node-fs@0.1.7",
+				"path@0.12.7",
+			},
+		},
+		{
+			ID: "merge-stream@1.0.1",
+			DependsOn: []string{
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "micromatch@2.3.11",
+			DependsOn: []string{
+				"arr-diff@2.0.0",
+				"array-unique@0.2.1",
+				"braces@1.8.5",
+				"expand-brackets@0.1.5",
+				"extglob@0.3.2",
+				"filename-regex@2.0.1",
+				"is-extglob@1.0.0",
+				"is-glob@2.0.1",
+				"kind-of@3.2.2",
+				"normalize-path@2.1.1",
+				"object.omit@2.0.1",
+				"parse-glob@3.0.4",
+				"regex-cache@0.4.4",
+			},
+		},
+		{
+			ID: "micromatch@3.1.10",
+			DependsOn: []string{
+				"arr-diff@4.0.0",
+				"array-unique@0.3.2",
+				"braces@2.3.2",
+				"define-property@2.0.2",
+				"extend-shallow@3.0.2",
+				"extglob@2.0.4",
+				"fragment-cache@0.2.1",
+				"kind-of@6.0.2",
+				"nanomatch@1.2.13",
+				"object.pick@1.3.0",
+				"regex-not@1.0.2",
+				"snapdragon@0.8.2",
+				"to-regex@3.0.2",
+			},
+		},
+		{
+			ID: "miller-rabin@4.0.1",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"brorand@1.1.0",
+			},
+		},
+		{
+			ID: "mime-types@2.1.24",
+			DependsOn: []string{
+				"mime-db@1.40.0",
+			},
+		},
+		{
+			ID: "min-document@2.19.0",
+			DependsOn: []string{
+				"dom-walk@0.1.1",
+			},
+		},
+		{
+			ID: "mini-css-extract-plugin@0.4.5",
+			DependsOn: []string{
+				"loader-utils@1.2.3",
+				"schema-utils@1.0.0",
+				"webpack-sources@1.3.0",
+			},
+		},
+		{
+			ID: "minimatch@3.0.4",
+			DependsOn: []string{
+				"brace-expansion@1.1.11",
+			},
+		},
+		{
+			ID: "minipass@2.3.5",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+				"yallist@3.0.3",
+			},
+		},
+		{
+			ID: "minizlib@1.2.1",
+			DependsOn: []string{
+				"minipass@2.3.5",
+			},
+		},
+		{
+			ID: "mississippi@2.0.0",
+			DependsOn: []string{
+				"concat-stream@1.6.2",
+				"duplexify@3.7.1",
+				"end-of-stream@1.4.1",
+				"flush-write-stream@1.1.1",
+				"from2@2.3.0",
+				"parallel-transform@1.1.0",
+				"pump@2.0.1",
+				"pumpify@1.5.1",
+				"stream-each@1.2.3",
+				"through2@2.0.5",
+			},
+		},
+		{
+			ID: "mississippi@3.0.0",
+			DependsOn: []string{
+				"concat-stream@1.6.2",
+				"duplexify@3.7.1",
+				"end-of-stream@1.4.1",
+				"flush-write-stream@1.1.1",
+				"from2@2.3.0",
+				"parallel-transform@1.1.0",
+				"pump@3.0.0",
+				"pumpify@1.5.1",
+				"stream-each@1.2.3",
+				"through2@2.0.5",
+			},
+		},
+		{
+			ID: "mixin-deep@1.3.1",
+			DependsOn: []string{
+				"for-in@1.0.2",
+				"is-extendable@1.0.1",
+			},
+		},
+		{
+			ID: "mixin-object@2.0.1",
+			DependsOn: []string{
+				"for-in@0.1.8",
+				"is-extendable@0.1.1",
+			},
+		},
+		{
+			ID: "mkdirp@0.5.1",
+			DependsOn: []string{
+				"minimist@0.0.8",
+			},
+		},
+		{
+			ID: "moment-timezone@0.5.23",
+			DependsOn: []string{
+				"moment@2.24.0",
+			},
+		},
+		{
+			ID: "move-concurrently@1.0.1",
+			DependsOn: []string{
+				"aproba@1.2.0",
+				"copy-concurrently@1.0.5",
+				"fs-write-stream-atomic@1.0.10",
+				"mkdirp@0.5.1",
+				"rimraf@2.6.3",
+				"run-queue@1.0.3",
+			},
+		},
+		{
+			ID: "multicast-dns@6.2.3",
+			DependsOn: []string{
+				"dns-packet@1.3.1",
+				"thunky@1.0.3",
+			},
+		},
+		{
+			ID: "nanomatch@1.2.13",
+			DependsOn: []string{
+				"arr-diff@4.0.0",
+				"array-unique@0.3.2",
+				"define-property@2.0.2",
+				"extend-shallow@3.0.2",
+				"fragment-cache@0.2.1",
+				"is-windows@1.0.2",
+				"kind-of@6.0.2",
+				"object.pick@1.3.0",
+				"regex-not@1.0.2",
+				"snapdragon@0.8.2",
+				"to-regex@3.0.2",
+			},
+		},
+		{
+			ID: "nearley@2.16.0",
+			DependsOn: []string{
+				"commander@2.20.0",
+				"moo@0.4.3",
+				"railroad-diagrams@1.0.0",
+				"randexp@0.4.6",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "needle@2.4.0",
+			DependsOn: []string{
+				"debug@3.2.6",
+				"iconv-lite@0.4.24",
+				"sax@1.2.4",
+			},
+		},
+		{
+			ID: "no-case@2.3.2",
+			DependsOn: []string{
+				"lower-case@1.1.4",
+			},
+		},
+		{
+			ID: "node-dir@0.1.17",
+			DependsOn: []string{
+				"minimatch@3.0.4",
+			},
+		},
+		{
+			ID: "node-fetch-npm@2.0.2",
+			DependsOn: []string{
+				"encoding@0.1.12",
+				"json-parse-better-errors@1.0.2",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "node-fetch@1.7.3",
+			DependsOn: []string{
+				"encoding@0.1.12",
+				"is-stream@1.1.0",
+			},
+		},
+		{
+			ID: "node-gyp@3.8.0",
+			DependsOn: []string{
+				"fstream@1.0.12",
+				"glob@7.1.4",
+				"graceful-fs@4.1.15",
+				"mkdirp@0.5.1",
+				"nopt@3.0.6",
+				"npmlog@4.1.2",
+				"osenv@0.1.5",
+				"request@2.88.0",
+				"rimraf@2.6.3",
+				"semver@5.3.0",
+				"tar@2.2.2",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "node-gyp@4.0.0",
+			DependsOn: []string{
+				"glob@7.1.4",
+				"graceful-fs@4.1.15",
+				"mkdirp@0.5.1",
+				"nopt@3.0.6",
+				"npmlog@4.1.2",
+				"osenv@0.1.5",
+				"request@2.88.0",
+				"rimraf@2.6.3",
+				"semver@5.3.0",
+				"tar@4.4.8",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "node-libs-browser@2.2.0",
+			DependsOn: []string{
+				"assert@1.5.0",
+				"browserify-zlib@0.2.0",
+				"buffer@4.9.1",
+				"console-browserify@1.1.0",
+				"constants-browserify@1.0.0",
+				"crypto-browserify@3.12.0",
+				"domain-browser@1.2.0",
+				"events@3.0.0",
+				"https-browserify@1.0.0",
+				"os-browserify@0.3.0",
+				"path-browserify@0.0.0",
+				"process@0.11.10",
+				"punycode@1.4.1",
+				"querystring-es3@0.2.1",
+				"readable-stream@2.3.6",
+				"stream-browserify@2.0.2",
+				"stream-http@2.8.3",
+				"string_decoder@1.2.0",
+				"timers-browserify@2.0.10",
+				"tty-browserify@0.0.0",
+				"url@0.11.0",
+				"util@0.11.1",
+				"vm-browserify@0.0.4",
+			},
+		},
+		{
+			ID: "node-notifier@5.4.0",
+			DependsOn: []string{
+				"growly@1.3.0",
+				"is-wsl@1.1.0",
+				"semver@5.7.0",
+				"shellwords@0.1.1",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "node-pre-gyp@0.12.0",
+			DependsOn: []string{
+				"detect-libc@1.0.3",
+				"mkdirp@0.5.1",
+				"needle@2.4.0",
+				"nopt@4.0.1",
+				"npm-packlist@1.4.1",
+				"npmlog@4.1.2",
+				"rc@1.2.8",
+				"rimraf@2.6.3",
+				"semver@5.7.0",
+				"tar@4.4.8",
+			},
+		},
+		{
+			ID: "node-releases@1.1.19",
+			DependsOn: []string{
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "nomnom@1.8.1",
+			DependsOn: []string{
+				"chalk@0.4.0",
+				"underscore@1.6.0",
+			},
+		},
+		{
+			ID: "nopt@3.0.6",
+			DependsOn: []string{
+				"abbrev@1.1.1",
+			},
+		},
+		{
+			ID: "nopt@4.0.1",
+			DependsOn: []string{
+				"abbrev@1.1.1",
+				"osenv@0.1.5",
+			},
+		},
+		{
+			ID: "normalize-package-data@2.5.0",
+			DependsOn: []string{
+				"hosted-git-info@2.7.1",
+				"resolve@1.10.1",
+				"semver@5.7.0",
+				"validate-npm-package-license@3.0.4",
+			},
+		},
+		{
+			ID: "normalize-path@2.1.1",
+			DependsOn: []string{
+				"remove-trailing-separator@1.1.0",
+			},
+		},
+		{
+			ID: "npm-audit-report@1.3.2",
+			DependsOn: []string{
+				"cli-table3@0.5.1",
+				"console-control-strings@1.1.0",
+			},
+		},
+		{
+			ID: "npm-install-checks@3.0.0",
+			DependsOn: []string{
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "npm-lifecycle@2.1.1",
+			DependsOn: []string{
+				"byline@5.0.0",
+				"graceful-fs@4.1.15",
+				"node-gyp@4.0.0",
+				"resolve-from@4.0.0",
+				"slide@1.1.6",
+				"uid-number@0.0.6",
+				"umask@1.1.0",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "npm-package-arg@6.1.0",
+			DependsOn: []string{
+				"hosted-git-info@2.7.1",
+				"osenv@0.1.5",
+				"semver@5.7.0",
+				"validate-npm-package-name@3.0.0",
+			},
+		},
+		{
+			ID: "npm-packlist@1.4.1",
+			DependsOn: []string{
+				"ignore-walk@3.0.1",
+				"npm-bundled@1.0.6",
+			},
+		},
+		{
+			ID: "npm-path@2.0.4",
+			DependsOn: []string{
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "npm-pick-manifest@2.2.3",
+			DependsOn: []string{
+				"figgy-pudding@3.5.1",
+				"npm-package-arg@6.1.0",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "npm-profile@4.0.1",
+			DependsOn: []string{
+				"aproba@2.0.0",
+				"figgy-pudding@3.5.1",
+				"npm-registry-fetch@3.9.0",
+			},
+		},
+		{
+			ID: "npm-registry-fetch@3.9.0",
+			DependsOn: []string{
+				"JSONStream@1.3.5",
+				"bluebird@3.5.4",
+				"figgy-pudding@3.5.1",
+				"lru-cache@4.1.5",
+				"make-fetch-happen@4.0.1",
+				"npm-package-arg@6.1.0",
+			},
+		},
+		{
+			ID: "npm-run-all@4.1.5",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"chalk@2.4.2",
+				"cross-spawn@6.0.5",
+				"memorystream@0.3.1",
+				"minimatch@3.0.4",
+				"pidtree@0.3.0",
+				"read-pkg@3.0.0",
+				"shell-quote@1.6.1",
+				"string.prototype.padend@3.0.0",
+			},
+		},
+		{
+			ID: "npm-run-path@2.0.2",
+			DependsOn: []string{
+				"path-key@2.0.1",
+			},
+		},
+		{
+			ID: "npm-which@3.0.1",
+			DependsOn: []string{
+				"commander@2.20.0",
+				"npm-path@2.0.4",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "npm@6.9.0",
+			DependsOn: []string{
+				"JSONStream@1.3.5",
+				"abbrev@1.1.1",
+				"ansicolors@0.3.2",
+				"ansistyles@0.1.3",
+				"aproba@2.0.0",
+				"archy@1.0.0",
+				"bin-links@1.1.2",
+				"bluebird@3.5.4",
+				"byte-size@5.0.1",
+				"cacache@11.3.2",
+				"call-limit@1.1.0",
+				"chownr@1.1.1",
+				"ci-info@2.0.0",
+				"cli-columns@3.1.2",
+				"cli-table3@0.5.1",
+				"cmd-shim@2.0.2",
+				"columnify@1.5.4",
+				"config-chain@1.1.12",
+				"detect-indent@5.0.0",
+				"detect-newline@2.1.0",
+				"dezalgo@1.0.3",
+				"editor@1.0.0",
+				"figgy-pudding@3.5.1",
+				"find-npm-prefix@1.0.2",
+				"fs-vacuum@1.2.10",
+				"fs-write-stream-atomic@1.0.10",
+				"gentle-fs@2.0.1",
+				"glob@7.1.4",
+				"graceful-fs@4.1.15",
+				"has-unicode@2.0.1",
+				"hosted-git-info@2.7.1",
+				"iferr@1.0.2",
+				"inflight@1.0.6",
+				"inherits@2.0.3",
+				"ini@1.3.5",
+				"init-package-json@1.10.3",
+				"is-cidr@3.0.0",
+				"json-parse-better-errors@1.0.2",
+				"lazy-property@1.0.0",
+				"libcipm@3.0.3",
+				"libnpm@2.0.1",
+				"libnpmhook@5.0.2",
+				"libnpx@10.2.0",
+				"lock-verify@2.1.0",
+				"lockfile@1.0.4",
+				"lodash._baseuniq@4.6.0",
+				"lodash.clonedeep@4.5.0",
+				"lodash.union@4.6.0",
+				"lodash.uniq@4.5.0",
+				"lodash.without@4.4.0",
+				"lru-cache@4.1.5",
+				"meant@1.0.1",
+				"mississippi@3.0.0",
+				"mkdirp@0.5.1",
+				"move-concurrently@1.0.1",
+				"node-gyp@3.8.0",
+				"nopt@4.0.1",
+				"normalize-package-data@2.5.0",
+				"npm-audit-report@1.3.2",
+				"npm-cache-filename@1.0.2",
+				"npm-install-checks@3.0.0",
+				"npm-lifecycle@2.1.1",
+				"npm-package-arg@6.1.0",
+				"npm-packlist@1.4.1",
+				"npm-pick-manifest@2.2.3",
+				"npm-registry-fetch@3.9.0",
+				"npm-user-validate@1.0.0",
+				"npmlog@4.1.2",
+				"once@1.4.0",
+				"opener@1.5.1",
+				"osenv@0.1.5",
+				"pacote@9.5.0",
+				"path-is-inside@1.0.2",
+				"promise-inflight@1.0.1",
+				"qrcode-terminal@0.12.0",
+				"query-string@6.5.0",
+				"qw@1.0.1",
+				"read@1.0.7",
+				"read-cmd-shim@1.0.1",
+				"read-installed@4.0.3",
+				"read-package-json@2.0.13",
+				"read-package-tree@5.2.2",
+				"readable-stream@3.3.0",
+				"request@2.88.0",
+				"retry@0.12.0",
+				"rimraf@2.6.3",
+				"safe-buffer@5.1.2",
+				"semver@5.7.0",
+				"sha@2.0.1",
+				"slide@1.1.6",
+				"sorted-object@2.0.1",
+				"sorted-union-stream@2.1.3",
+				"ssri@6.0.1",
+				"stringify-package@1.0.0",
+				"tar@4.4.8",
+				"text-table@0.2.0",
+				"tiny-relative-date@1.3.0",
+				"uid-number@0.0.6",
+				"umask@1.1.0",
+				"unique-filename@1.1.1",
+				"unpipe@1.0.0",
+				"update-notifier@2.5.0",
+				"uuid@3.3.2",
+				"validate-npm-package-license@3.0.4",
+				"validate-npm-package-name@3.0.0",
+				"which@1.3.1",
+				"worker-farm@1.7.0",
+				"write-file-atomic@2.4.2",
+			},
+		},
+		{
+			ID: "npmlog@4.1.2",
+			DependsOn: []string{
+				"are-we-there-yet@1.1.5",
+				"console-control-strings@1.1.0",
+				"gauge@2.7.4",
+				"set-blocking@2.0.0",
+			},
+		},
+		{
+			ID: "nth-check@1.0.2",
+			DependsOn: []string{
+				"boolbase@1.0.0",
+			},
+		},
+		{
+			ID: "object-copy@0.1.0",
+			DependsOn: []string{
+				"copy-descriptor@0.1.1",
+				"define-property@0.2.5",
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "object-visit@1.0.1",
+			DependsOn: []string{
+				"isobject@3.0.1",
+			},
+		},
+		{
+			ID: "object.assign@4.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"function-bind@1.1.1",
+				"has-symbols@1.0.0",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "object.entries@1.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+			},
+		},
+		{
+			ID: "object.fromentries@2.0.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+			},
+		},
+		{
+			ID: "object.getownpropertydescriptors@2.0.3",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+			},
+		},
+		{
+			ID: "object.omit@2.0.1",
+			DependsOn: []string{
+				"for-own@0.1.5",
+				"is-extendable@0.1.1",
+			},
+		},
+		{
+			ID: "object.pick@1.3.0",
+			DependsOn: []string{
+				"isobject@3.0.1",
+			},
+		},
+		{
+			ID: "object.values@1.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+			},
+		},
+		{
+			ID: "on-finished@2.3.0",
+			DependsOn: []string{
+				"ee-first@1.1.1",
+			},
+		},
+		{
+			ID: "once@1.4.0",
+			DependsOn: []string{
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "onetime@2.0.1",
+			DependsOn: []string{
+				"mimic-fn@1.2.0",
+			},
+		},
+		{
+			ID: "opn@5.4.0",
+			DependsOn: []string{
+				"is-wsl@1.1.0",
+			},
+		},
+		{
+			ID: "opn@5.5.0",
+			DependsOn: []string{
+				"is-wsl@1.1.0",
+			},
+		},
+		{
+			ID: "optimist@0.6.1",
+			DependsOn: []string{
+				"minimist@0.0.10",
+				"wordwrap@0.0.3",
+			},
+		},
+		{
+			ID: "optionator@0.8.2",
+			DependsOn: []string{
+				"deep-is@0.1.3",
+				"fast-levenshtein@2.0.6",
+				"levn@0.3.0",
+				"prelude-ls@1.1.2",
+				"type-check@0.3.2",
+				"wordwrap@1.0.0",
+			},
+		},
+		{
+			ID: "original@1.0.2",
+			DependsOn: []string{
+				"url-parse@1.4.7",
+			},
+		},
+		{
+			ID: "os-locale@1.4.0",
+			DependsOn: []string{
+				"lcid@1.0.0",
+			},
+		},
+		{
+			ID: "os-locale@2.1.0",
+			DependsOn: []string{
+				"execa@0.7.0",
+				"lcid@1.0.0",
+				"mem@1.1.0",
+			},
+		},
+		{
+			ID: "os-locale@3.1.0",
+			DependsOn: []string{
+				"execa@1.0.0",
+				"lcid@2.0.0",
+				"mem@4.3.0",
+			},
+		},
+		{
+			ID: "os-name@3.1.0",
+			DependsOn: []string{
+				"macos-release@2.2.0",
+				"windows-release@3.2.0",
+			},
+		},
+		{
+			ID: "osenv@0.1.5",
+			DependsOn: []string{
+				"os-homedir@1.0.2",
+				"os-tmpdir@1.0.2",
+			},
+		},
+		{
+			ID: "output-file-sync@1.1.2",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"mkdirp@0.5.1",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "p-limit@1.3.0",
+			DependsOn: []string{
+				"p-try@1.0.0",
+			},
+		},
+		{
+			ID: "p-limit@2.2.0",
+			DependsOn: []string{
+				"p-try@2.2.0",
+			},
+		},
+		{
+			ID: "p-locate@2.0.0",
+			DependsOn: []string{
+				"p-limit@1.3.0",
+			},
+		},
+		{
+			ID: "p-locate@3.0.0",
+			DependsOn: []string{
+				"p-limit@2.2.0",
+			},
+		},
+		{
+			ID: "p-timeout@1.2.1",
+			DependsOn: []string{
+				"p-finally@1.0.0",
+			},
+		},
+		{
+			ID: "package-json@4.0.1",
+			DependsOn: []string{
+				"got@6.7.1",
+				"registry-auth-token@3.4.0",
+				"registry-url@3.1.0",
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "pacote@9.5.0",
+			DependsOn: []string{
+				"bluebird@3.5.4",
+				"cacache@11.3.2",
+				"figgy-pudding@3.5.1",
+				"get-stream@4.1.0",
+				"glob@7.1.4",
+				"lru-cache@5.1.1",
+				"make-fetch-happen@4.0.1",
+				"minimatch@3.0.4",
+				"minipass@2.3.5",
+				"mississippi@3.0.0",
+				"mkdirp@0.5.1",
+				"normalize-package-data@2.5.0",
+				"npm-package-arg@6.1.0",
+				"npm-packlist@1.4.1",
+				"npm-pick-manifest@2.2.3",
+				"npm-registry-fetch@3.9.0",
+				"osenv@0.1.5",
+				"promise-inflight@1.0.1",
+				"promise-retry@1.1.1",
+				"protoduck@5.0.1",
+				"rimraf@2.6.3",
+				"safe-buffer@5.1.2",
+				"semver@5.7.0",
+				"ssri@6.0.1",
+				"tar@4.4.8",
+				"unique-filename@1.1.1",
+				"which@1.3.1",
+			},
+		},
+		{
+			ID: "parallel-transform@1.1.0",
+			DependsOn: []string{
+				"cyclist@0.2.2",
+				"inherits@2.0.3",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "param-case@2.1.1",
+			DependsOn: []string{
+				"no-case@2.3.2",
+			},
+		},
+		{
+			ID: "parent-module@1.0.1",
+			DependsOn: []string{
+				"callsites@3.1.0",
+			},
+		},
+		{
+			ID: "parse-asn1@5.1.4",
+			DependsOn: []string{
+				"asn1.js@4.10.1",
+				"browserify-aes@1.2.0",
+				"create-hash@1.2.0",
+				"evp_bytestokey@1.0.3",
+				"pbkdf2@3.0.17",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "parse-glob@3.0.4",
+			DependsOn: []string{
+				"glob-base@0.3.0",
+				"is-dotfile@1.0.3",
+				"is-extglob@1.0.0",
+				"is-glob@2.0.1",
+			},
+		},
+		{
+			ID: "parse-json@2.2.0",
+			DependsOn: []string{
+				"error-ex@1.3.2",
+			},
+		},
+		{
+			ID: "parse-json@4.0.0",
+			DependsOn: []string{
+				"error-ex@1.3.2",
+				"json-parse-better-errors@1.0.2",
+			},
+		},
+		{
+			ID: "parse5@3.0.3",
+			DependsOn: []string{
+				"@types/node@12.0.2",
+			},
+		},
+		{
+			ID: "parseqs@0.0.5",
+			DependsOn: []string{
+				"better-assert@1.0.2",
+			},
+		},
+		{
+			ID: "parseuri@0.0.5",
+			DependsOn: []string{
+				"better-assert@1.0.2",
+			},
+		},
+		{
+			ID: "path-exists@2.1.0",
+			DependsOn: []string{
+				"pinkie-promise@2.0.1",
+			},
+		},
+		{
+			ID: "path-to-regexp@1.7.0",
+			DependsOn: []string{
+				"isarray@0.0.1",
+			},
+		},
+		{
+			ID: "path-type@1.1.0",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"pify@2.3.0",
+				"pinkie-promise@2.0.1",
+			},
+		},
+		{
+			ID: "path-type@2.0.0",
+			DependsOn: []string{
+				"pify@2.3.0",
+			},
+		},
+		{
+			ID: "path-type@3.0.0",
+			DependsOn: []string{
+				"pify@3.0.0",
+			},
+		},
+		{
+			ID: "path@0.12.7",
+			DependsOn: []string{
+				"process@0.11.10",
+				"util@0.10.4",
+			},
+		},
+		{
+			ID: "pbkdf2@3.0.17",
+			DependsOn: []string{
+				"create-hash@1.2.0",
+				"create-hmac@1.1.7",
+				"ripemd160@2.0.2",
+				"safe-buffer@5.1.2",
+				"sha.js@2.4.11",
+			},
+		},
+		{
+			ID: "pinkie-promise@2.0.1",
+			DependsOn: []string{
+				"pinkie@2.0.4",
+			},
+		},
+		{
+			ID: "pirates@4.0.1",
+			DependsOn: []string{
+				"node-modules-regexp@1.0.0",
+			},
+		},
+		{
+			ID: "pkg-dir@1.0.0",
+			DependsOn: []string{
+				"find-up@1.1.2",
+			},
+		},
+		{
+			ID: "pkg-dir@2.0.0",
+			DependsOn: []string{
+				"find-up@2.1.0",
+			},
+		},
+		{
+			ID: "pkg-dir@3.0.0",
+			DependsOn: []string{
+				"find-up@3.0.0",
+			},
+		},
+		{
+			ID: "pkg-up@2.0.0",
+			DependsOn: []string{
+				"find-up@2.1.0",
+			},
+		},
+		{
+			ID: "please-upgrade-node@3.1.1",
+			DependsOn: []string{
+				"semver-compare@1.0.0",
+			},
+		},
+		{
+			ID: "portfinder@1.0.20",
+			DependsOn: []string{
+				"async@1.5.2",
+				"debug@2.6.9",
+				"mkdirp@0.5.1",
+			},
+		},
+		{
+			ID: "postcss-flexbugs-fixes@4.1.0",
+			DependsOn: []string{
+				"postcss@7.0.16",
+			},
+		},
+		{
+			ID: "postcss-load-config@2.0.0",
+			DependsOn: []string{
+				"cosmiconfig@4.0.0",
+				"import-cwd@2.1.0",
+			},
+		},
+		{
+			ID: "postcss-loader@3.0.0",
+			DependsOn: []string{
+				"loader-utils@1.2.3",
+				"postcss@7.0.16",
+				"postcss-load-config@2.0.0",
+				"schema-utils@1.0.0",
+			},
+		},
+		{
+			ID: "postcss-modules-extract-imports@1.2.1",
+			DependsOn: []string{
+				"postcss@6.0.23",
+			},
+		},
+		{
+			ID: "postcss-modules-local-by-default@1.2.0",
+			DependsOn: []string{
+				"css-selector-tokenizer@0.7.1",
+				"postcss@6.0.23",
+			},
+		},
+		{
+			ID: "postcss-modules-scope@1.1.0",
+			DependsOn: []string{
+				"css-selector-tokenizer@0.7.1",
+				"postcss@6.0.23",
+			},
+		},
+		{
+			ID: "postcss-modules-values@1.3.0",
+			DependsOn: []string{
+				"icss-replace-symbols@1.1.0",
+				"postcss@6.0.23",
+			},
+		},
+		{
+			ID: "postcss@6.0.23",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"source-map@0.6.1",
+				"supports-color@5.5.0",
+			},
+		},
+		{
+			ID: "postcss@7.0.16",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"source-map@0.6.1",
+				"supports-color@6.1.0",
+			},
+		},
+		{
+			ID: "pretty-error@2.1.1",
+			DependsOn: []string{
+				"renderkid@2.0.3",
+				"utila@0.4.0",
+			},
+		},
+		{
+			ID: "pretty-format@23.6.0",
+			DependsOn: []string{
+				"ansi-regex@3.0.0",
+				"ansi-styles@3.2.1",
+			},
+		},
+		{
+			ID: "promise-retry@1.1.1",
+			DependsOn: []string{
+				"err-code@1.1.2",
+				"retry@0.10.1",
+			},
+		},
+		{
+			ID: "promise.allsettled@1.0.1",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "promise.prototype.finally@3.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "promise@7.3.1",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+		{
+			ID: "prompts@0.1.14",
+			DependsOn: []string{
+				"kleur@2.0.2",
+				"sisteransi@0.1.1",
+			},
+		},
+		{
+			ID: "promzard@0.3.0",
+			DependsOn: []string{
+				"read@1.0.7",
+			},
+		},
+		{
+			ID: "prop-types-exact@1.2.0",
+			DependsOn: []string{
+				"has@1.0.3",
+				"object.assign@4.1.0",
+				"reflect.ownkeys@0.2.0",
+			},
+		},
+		{
+			ID: "prop-types@15.7.2",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "property-information@5.1.0",
+			DependsOn: []string{
+				"xtend@4.0.1",
+			},
+		},
+		{
+			ID: "protoduck@5.0.1",
+			DependsOn: []string{
+				"genfun@5.0.0",
+			},
+		},
+		{
+			ID: "proxy-addr@2.0.5",
+			DependsOn: []string{
+				"forwarded@0.1.2",
+				"ipaddr.js@1.9.0",
+			},
+		},
+		{
+			ID: "public-encrypt@4.0.3",
+			DependsOn: []string{
+				"bn.js@4.11.8",
+				"browserify-rsa@4.0.1",
+				"create-hash@1.2.0",
+				"parse-asn1@5.1.4",
+				"randombytes@2.1.0",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "pump@2.0.1",
+			DependsOn: []string{
+				"end-of-stream@1.4.1",
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "pump@3.0.0",
+			DependsOn: []string{
+				"end-of-stream@1.4.1",
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "pumpify@1.5.1",
+			DependsOn: []string{
+				"duplexify@3.7.1",
+				"inherits@2.0.3",
+				"pump@2.0.1",
+			},
+		},
+		{
+			ID: "query-string@6.5.0",
+			DependsOn: []string{
+				"decode-uri-component@0.2.0",
+				"split-on-first@1.1.0",
+				"strict-uri-encode@2.0.0",
+			},
+		},
+		{
+			ID: "raf@3.4.1",
+			DependsOn: []string{
+				"performance-now@2.1.0",
+			},
+		},
+		{
+			ID: "randexp@0.4.6",
+			DependsOn: []string{
+				"discontinuous-range@1.0.0",
+				"ret@0.1.15",
+			},
+		},
+		{
+			ID: "randomatic@3.1.1",
+			DependsOn: []string{
+				"is-number@4.0.0",
+				"kind-of@6.0.2",
+				"math-random@1.0.4",
+			},
+		},
+		{
+			ID: "randombytes@2.1.0",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "randomfill@1.0.4",
+			DependsOn: []string{
+				"randombytes@2.1.0",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "raw-body@2.3.3",
+			DependsOn: []string{
+				"bytes@3.0.0",
+				"http-errors@1.6.3",
+				"iconv-lite@0.4.23",
+				"unpipe@1.0.0",
+			},
+		},
+		{
+			ID: "rc@1.2.8",
+			DependsOn: []string{
+				"deep-extend@0.6.0",
+				"ini@1.3.5",
+				"minimist@1.2.0",
+				"strip-json-comments@2.0.1",
+			},
+		},
+		{
+			ID: "react-addons-create-fragment@15.6.2",
+			DependsOn: []string{
+				"fbjs@0.8.17",
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "react-color@2.17.3",
+			DependsOn: []string{
+				"@icons/material@0.2.4",
+				"lodash@4.17.11",
+				"material-colors@1.2.6",
+				"prop-types@15.7.2",
+				"reactcss@1.2.3",
+				"tinycolor2@1.4.1",
+			},
+		},
+		{
+			ID: "react-datepicker@2.5.0",
+			DependsOn: []string{
+				"classnames@2.2.6",
+				"date-fns@2.0.0-alpha.27",
+				"prop-types@15.7.2",
+				"react-onclickoutside@6.8.0",
+				"react-popper@1.3.3",
+			},
+		},
+		{
+			ID: "react-dev-utils@6.1.1",
+			DependsOn: []string{
+				"@babel/code-frame@7.0.0",
+				"address@1.0.3",
+				"browserslist@4.1.1",
+				"chalk@2.4.1",
+				"cross-spawn@6.0.5",
+				"detect-port-alt@1.1.6",
+				"escape-string-regexp@1.0.5",
+				"filesize@3.6.1",
+				"find-up@3.0.0",
+				"global-modules@1.0.0",
+				"globby@8.0.1",
+				"gzip-size@5.0.0",
+				"immer@1.7.2",
+				"inquirer@6.2.0",
+				"is-root@2.0.0",
+				"loader-utils@1.1.0",
+				"opn@5.4.0",
+				"pkg-up@2.0.0",
+				"react-error-overlay@5.1.6",
+				"recursive-readdir@2.2.2",
+				"shell-quote@1.6.1",
+				"sockjs-client@1.1.5",
+				"strip-ansi@4.0.0",
+				"text-table@0.2.0",
+			},
+		},
+		{
+			ID: "react-docgen@3.0.0",
+			DependsOn: []string{
+				"@babel/parser@7.4.4",
+				"@babel/runtime@7.4.4",
+				"async@2.6.2",
+				"commander@2.20.0",
+				"doctrine@2.1.0",
+				"node-dir@0.1.17",
+				"recast@0.16.2",
+			},
+		},
+		{
+			ID: "react-dom@16.8.3",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "react-dom@16.8.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "react-dropzone@10.1.4",
+			DependsOn: []string{
+				"attr-accept@1.1.3",
+				"file-selector@0.1.11",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "react-event-listener@0.6.6",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"prop-types@15.7.2",
+				"warning@4.0.3",
+			},
+		},
+		{
+			ID: "react-fuzzy@0.5.2",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"classnames@2.2.6",
+				"fuse.js@3.4.4",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "react-gateway@3.0.0",
+			DependsOn: []string{
+				"prop-types@15.7.2",
+				"react-prop-types@0.4.0",
+			},
+		},
+		{
+			ID: "react-inspector@2.3.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"is-dom@1.0.9",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "react-intl-universal@1.16.2",
+			DependsOn: []string{
+				"console-polyfill@0.3.0",
+				"cookie@0.3.1",
+				"escape-html@1.0.3",
+				"intl@1.2.5",
+				"intl-messageformat@2.2.0",
+				"invariant@2.2.4",
+				"is-electron@2.2.0",
+				"load-script@1.0.0",
+				"lodash.merge@4.6.1",
+				"object-keys@1.1.1",
+				"querystring@0.2.0",
+			},
+		},
+		{
+			ID: "react-modal@3.8.1",
+			DependsOn: []string{
+				"exenv@1.2.2",
+				"prop-types@15.7.2",
+				"react-lifecycles-compat@3.0.4",
+				"warning@3.0.0",
+			},
+		},
+		{
+			ID: "react-popper@1.3.3",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"create-react-context@0.2.2",
+				"popper.js@1.15.0",
+				"prop-types@15.7.2",
+				"typed-styles@0.0.7",
+				"warning@4.0.3",
+			},
+		},
+		{
+			ID: "react-prop-types@0.4.0",
+			DependsOn: []string{
+				"warning@3.0.0",
+			},
+		},
+		{
+			ID: "react-redux@6.0.1",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"hoist-non-react-statics@3.3.0",
+				"invariant@2.2.4",
+				"loose-envify@1.4.0",
+				"prop-types@15.7.2",
+				"react-is@16.8.6",
+			},
+		},
+		{
+			ID: "react-router-dom@4.3.1",
+			DependsOn: []string{
+				"history@4.9.0",
+				"invariant@2.2.4",
+				"loose-envify@1.4.0",
+				"prop-types@15.7.2",
+				"react-router@4.3.1",
+				"warning@4.0.3",
+			},
+		},
+		{
+			ID: "react-router@4.3.1",
+			DependsOn: []string{
+				"history@4.9.0",
+				"hoist-non-react-statics@2.5.5",
+				"invariant@2.2.4",
+				"loose-envify@1.4.0",
+				"path-to-regexp@1.7.0",
+				"prop-types@15.7.2",
+				"warning@4.0.3",
+			},
+		},
+		{
+			ID: "react-split-pane@0.1.87",
+			DependsOn: []string{
+				"prop-types@15.7.2",
+				"react-lifecycles-compat@3.0.4",
+				"react-style-proptype@3.2.2",
+			},
+		},
+		{
+			ID: "react-style-proptype@3.2.2",
+			DependsOn: []string{
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "react-test-renderer@16.8.6",
+			DependsOn: []string{
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"react-is@16.8.6",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "react-textarea-autosize@7.1.0",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "react-transition-group@2.9.0",
+			DependsOn: []string{
+				"dom-helpers@3.4.0",
+				"loose-envify@1.4.0",
+				"prop-types@15.7.2",
+				"react-lifecycles-compat@3.0.4",
+			},
+		},
+		{
+			ID: "react-treebeard@3.1.0",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"@emotion/core@0.13.1",
+				"@emotion/styled@0.10.6",
+				"deep-equal@1.0.1",
+				"prop-types@15.7.2",
+				"shallowequal@1.1.0",
+				"velocity-react@1.4.3",
+			},
+		},
+		{
+			ID: "react-virtualized@9.21.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"clsx@1.0.4",
+				"dom-helpers@3.4.0",
+				"linear-layout-vector@0.0.1",
+				"loose-envify@1.4.0",
+				"prop-types@15.7.2",
+				"react-lifecycles-compat@3.0.4",
+			},
+		},
+		{
+			ID: "react@16.8.3",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "react@16.8.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+			},
+		},
+		{
+			ID: "reactcss@1.2.3",
+			DependsOn: []string{
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "read-cmd-shim@1.0.1",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+			},
+		},
+		{
+			ID: "read-installed@4.0.3",
+			DependsOn: []string{
+				"debuglog@1.0.1",
+				"read-package-json@2.0.13",
+				"readdir-scoped-modules@1.0.2",
+				"semver@5.7.0",
+				"slide@1.1.6",
+				"util-extend@1.0.3",
+			},
+		},
+		{
+			ID: "read-package-json@2.0.13",
+			DependsOn: []string{
+				"glob@7.1.4",
+				"json-parse-better-errors@1.0.2",
+				"normalize-package-data@2.5.0",
+				"slash@1.0.0",
+			},
+		},
+		{
+			ID: "read-package-tree@5.2.2",
+			DependsOn: []string{
+				"debuglog@1.0.1",
+				"dezalgo@1.0.3",
+				"once@1.4.0",
+				"read-package-json@2.0.13",
+				"readdir-scoped-modules@1.0.2",
+			},
+		},
+		{
+			ID: "read-pkg-up@1.0.1",
+			DependsOn: []string{
+				"find-up@1.1.2",
+				"read-pkg@1.1.0",
+			},
+		},
+		{
+			ID: "read-pkg-up@2.0.0",
+			DependsOn: []string{
+				"find-up@2.1.0",
+				"read-pkg@2.0.0",
+			},
+		},
+		{
+			ID: "read-pkg@1.1.0",
+			DependsOn: []string{
+				"load-json-file@1.1.0",
+				"normalize-package-data@2.5.0",
+				"path-type@1.1.0",
+			},
+		},
+		{
+			ID: "read-pkg@2.0.0",
+			DependsOn: []string{
+				"load-json-file@2.0.0",
+				"normalize-package-data@2.5.0",
+				"path-type@2.0.0",
+			},
+		},
+		{
+			ID: "read-pkg@3.0.0",
+			DependsOn: []string{
+				"load-json-file@4.0.0",
+				"normalize-package-data@2.5.0",
+				"path-type@3.0.0",
+			},
+		},
+		{
+			ID: "read-pkg@4.0.1",
+			DependsOn: []string{
+				"normalize-package-data@2.5.0",
+				"parse-json@4.0.0",
+				"pify@3.0.0",
+			},
+		},
+		{
+			ID: "read@1.0.7",
+			DependsOn: []string{
+				"mute-stream@0.0.8",
+			},
+		},
+		{
+			ID: "readable-stream@2.3.6",
+			DependsOn: []string{
+				"core-util-is@1.0.2",
+				"inherits@2.0.3",
+				"isarray@1.0.0",
+				"process-nextick-args@2.0.0",
+				"safe-buffer@5.1.2",
+				"string_decoder@1.1.1",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "readable-stream@3.3.0",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"string_decoder@1.2.0",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "readable-stream@1.1.14",
+			DependsOn: []string{
+				"core-util-is@1.0.2",
+				"inherits@2.0.3",
+				"isarray@0.0.1",
+				"string_decoder@0.10.31",
+			},
+		},
+		{
+			ID: "readable-stream@2.1.5",
+			DependsOn: []string{
+				"buffer-shims@1.0.0",
+				"core-util-is@1.0.2",
+				"inherits@2.0.3",
+				"isarray@1.0.0",
+				"process-nextick-args@1.0.7",
+				"string_decoder@0.10.31",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "readdir-scoped-modules@1.0.2",
+			DependsOn: []string{
+				"debuglog@1.0.1",
+				"dezalgo@1.0.3",
+				"graceful-fs@4.1.15",
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "readdirp@2.2.1",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"micromatch@3.1.10",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "readline2@1.0.1",
+			DependsOn: []string{
+				"code-point-at@1.1.0",
+				"is-fullwidth-code-point@1.0.0",
+				"mute-stream@0.0.5",
+			},
+		},
+		{
+			ID: "realpath-native@1.1.0",
+			DependsOn: []string{
+				"util.promisify@1.0.0",
+			},
+		},
+		{
+			ID: "recast@0.14.7",
+			DependsOn: []string{
+				"ast-types@0.11.3",
+				"esprima@4.0.1",
+				"private@0.1.8",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "recast@0.15.5",
+			DependsOn: []string{
+				"ast-types@0.11.5",
+				"esprima@4.0.1",
+				"private@0.1.8",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "recast@0.16.2",
+			DependsOn: []string{
+				"ast-types@0.11.7",
+				"esprima@4.0.1",
+				"private@0.1.8",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "rechoir@0.6.2",
+			DependsOn: []string{
+				"resolve@1.10.1",
+			},
+		},
+		{
+			ID: "recompose@0.30.0",
+			DependsOn: []string{
+				"@babel/runtime@7.4.4",
+				"change-emitter@0.1.6",
+				"fbjs@0.8.17",
+				"hoist-non-react-statics@2.5.5",
+				"react-lifecycles-compat@3.0.4",
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "recursive-readdir@2.2.2",
+			DependsOn: []string{
+				"minimatch@3.0.4",
+			},
+		},
+		{
+			ID: "redux@4.0.1",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "regenerate-unicode-properties@8.1.0",
+			DependsOn: []string{
+				"regenerate@1.4.0",
+			},
+		},
+		{
+			ID: "regenerator-transform@0.10.1",
+			DependsOn: []string{
+				"babel-runtime@6.26.0",
+				"babel-types@6.26.0",
+				"private@0.1.8",
+			},
+		},
+		{
+			ID: "regenerator-transform@0.13.4",
+			DependsOn: []string{
+				"private@0.1.8",
+			},
+		},
+		{
+			ID: "regex-cache@0.4.4",
+			DependsOn: []string{
+				"is-equal-shallow@0.1.3",
+			},
+		},
+		{
+			ID: "regex-not@1.0.2",
+			DependsOn: []string{
+				"extend-shallow@3.0.2",
+				"safe-regex@1.1.0",
+			},
+		},
+		{
+			ID: "regexp.prototype.flags@1.2.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+			},
+		},
+		{
+			ID: "regexpu-core@1.0.0",
+			DependsOn: []string{
+				"regenerate@1.4.0",
+				"regjsgen@0.2.0",
+				"regjsparser@0.1.5",
+			},
+		},
+		{
+			ID: "regexpu-core@2.0.0",
+			DependsOn: []string{
+				"regenerate@1.4.0",
+				"regjsgen@0.2.0",
+				"regjsparser@0.1.5",
+			},
+		},
+		{
+			ID: "regexpu-core@4.5.4",
+			DependsOn: []string{
+				"regenerate@1.4.0",
+				"regenerate-unicode-properties@8.1.0",
+				"regjsgen@0.5.0",
+				"regjsparser@0.6.0",
+				"unicode-match-property-ecmascript@1.0.4",
+				"unicode-match-property-value-ecmascript@1.1.0",
+			},
+		},
+		{
+			ID: "registry-auth-token@3.4.0",
+			DependsOn: []string{
+				"rc@1.2.8",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "registry-url@3.1.0",
+			DependsOn: []string{
+				"rc@1.2.8",
+			},
+		},
+		{
+			ID: "regjsparser@0.1.5",
+			DependsOn: []string{
+				"jsesc@0.5.0",
+			},
+		},
+		{
+			ID: "regjsparser@0.6.0",
+			DependsOn: []string{
+				"jsesc@0.5.0",
+			},
+		},
+		{
+			ID: "rehype-parse@6.0.0",
+			DependsOn: []string{
+				"hast-util-from-parse5@5.0.0",
+				"parse5@5.1.0",
+				"xtend@4.0.1",
+			},
+		},
+		{
+			ID: "renderkid@2.0.3",
+			DependsOn: []string{
+				"css-select@1.2.0",
+				"dom-converter@0.2.0",
+				"htmlparser2@3.10.1",
+				"strip-ansi@3.0.1",
+				"utila@0.4.0",
+			},
+		},
+		{
+			ID: "repeating@2.0.1",
+			DependsOn: []string{
+				"is-finite@1.0.2",
+			},
+		},
+		{
+			ID: "request-promise-core@1.1.2",
+			DependsOn: []string{
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "request-promise-native@1.0.7",
+			DependsOn: []string{
+				"request-promise-core@1.1.2",
+				"stealthy-require@1.1.1",
+				"tough-cookie@2.5.0",
+			},
+		},
+		{
+			ID: "request@2.88.0",
+			DependsOn: []string{
+				"aws-sign2@0.7.0",
+				"aws4@1.8.0",
+				"caseless@0.12.0",
+				"combined-stream@1.0.8",
+				"extend@3.0.2",
+				"forever-agent@0.6.1",
+				"form-data@2.3.3",
+				"har-validator@5.1.3",
+				"http-signature@1.2.0",
+				"is-typedarray@1.0.0",
+				"isstream@0.1.2",
+				"json-stringify-safe@5.0.1",
+				"mime-types@2.1.24",
+				"oauth-sign@0.9.0",
+				"performance-now@2.1.0",
+				"qs@6.5.2",
+				"safe-buffer@5.1.2",
+				"tough-cookie@2.4.3",
+				"tunnel-agent@0.6.0",
+				"uuid@3.3.2",
+			},
+		},
+		{
+			ID: "resolve-cwd@2.0.0",
+			DependsOn: []string{
+				"resolve-from@3.0.0",
+			},
+		},
+		{
+			ID: "resolve-dir@1.0.1",
+			DependsOn: []string{
+				"expand-tilde@2.0.2",
+				"global-modules@1.0.0",
+			},
+		},
+		{
+			ID: "resolve@1.10.1",
+			DependsOn: []string{
+				"path-parse@1.0.6",
+			},
+		},
+		{
+			ID: "restore-cursor@1.0.1",
+			DependsOn: []string{
+				"exit-hook@1.1.1",
+				"onetime@1.1.0",
+			},
+		},
+		{
+			ID: "restore-cursor@2.0.0",
+			DependsOn: []string{
+				"onetime@2.0.1",
+				"signal-exit@3.0.2",
+			},
+		},
+		{
+			ID: "rimraf@2.6.3",
+			DependsOn: []string{
+				"glob@7.1.4",
+			},
+		},
+		{
+			ID: "ripemd160@2.0.2",
+			DependsOn: []string{
+				"hash-base@3.0.4",
+				"inherits@2.0.3",
+			},
+		},
+		{
+			ID: "rst-selector-parser@2.2.3",
+			DependsOn: []string{
+				"lodash.flattendeep@4.4.0",
+				"nearley@2.16.0",
+			},
+		},
+		{
+			ID: "run-async@0.1.0",
+			DependsOn: []string{
+				"once@1.4.0",
+			},
+		},
+		{
+			ID: "run-async@2.3.0",
+			DependsOn: []string{
+				"is-promise@2.1.0",
+			},
+		},
+		{
+			ID: "run-queue@1.0.3",
+			DependsOn: []string{
+				"aproba@1.2.0",
+			},
+		},
+		{
+			ID: "rxjs@6.5.2",
+			DependsOn: []string{
+				"tslib@1.9.3",
+			},
+		},
+		{
+			ID: "safe-regex@1.1.0",
+			DependsOn: []string{
+				"ret@0.1.15",
+			},
+		},
+		{
+			ID: "sane@2.5.2",
+			DependsOn: []string{
+				"anymatch@2.0.0",
+				"capture-exit@1.2.0",
+				"exec-sh@0.2.2",
+				"fb-watchman@2.0.0",
+				"micromatch@3.1.10",
+				"minimist@1.2.0",
+				"walker@1.0.7",
+				"watch@0.18.0",
+			},
+		},
+		{
+			ID: "scheduler@0.13.6",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+			},
+		},
+		{
+			ID: "schema-utils@0.4.7",
+			DependsOn: []string{
+				"ajv@6.10.0",
+				"ajv-keywords@3.4.0",
+			},
+		},
+		{
+			ID: "schema-utils@1.0.0",
+			DependsOn: []string{
+				"ajv@6.10.0",
+				"ajv-errors@1.0.1",
+				"ajv-keywords@3.4.0",
+			},
+		},
+		{
+			ID: "selfsigned@1.10.4",
+			DependsOn: []string{
+				"node-forge@0.7.5",
+			},
+		},
+		{
+			ID: "semver-diff@2.1.0",
+			DependsOn: []string{
+				"semver@5.7.0",
+			},
+		},
+		{
+			ID: "send@0.16.2",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"destroy@1.0.4",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"etag@1.8.1",
+				"fresh@0.5.2",
+				"http-errors@1.6.3",
+				"mime@1.4.1",
+				"ms@2.0.0",
+				"on-finished@2.3.0",
+				"range-parser@1.2.1",
+				"statuses@1.4.0",
+			},
+		},
+		{
+			ID: "serve-favicon@2.5.0",
+			DependsOn: []string{
+				"etag@1.8.1",
+				"fresh@0.5.2",
+				"ms@2.1.1",
+				"parseurl@1.3.3",
+				"safe-buffer@5.1.1",
+			},
+		},
+		{
+			ID: "serve-index@1.9.1",
+			DependsOn: []string{
+				"accepts@1.3.7",
+				"batch@0.6.1",
+				"debug@2.6.9",
+				"escape-html@1.0.3",
+				"http-errors@1.6.3",
+				"mime-types@2.1.24",
+				"parseurl@1.3.3",
+			},
+		},
+		{
+			ID: "serve-static@1.13.2",
+			DependsOn: []string{
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"parseurl@1.3.3",
+				"send@0.16.2",
+			},
+		},
+		{
+			ID: "set-value@0.4.3",
+			DependsOn: []string{
+				"extend-shallow@2.0.1",
+				"is-extendable@0.1.1",
+				"is-plain-object@2.0.4",
+				"to-object-path@0.3.0",
+			},
+		},
+		{
+			ID: "set-value@2.0.0",
+			DependsOn: []string{
+				"extend-shallow@2.0.1",
+				"is-extendable@0.1.1",
+				"is-plain-object@2.0.4",
+				"split-string@3.1.0",
+			},
+		},
+		{
+			ID: "sha.js@2.4.11",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "sha@2.0.1",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "shallow-clone@0.1.2",
+			DependsOn: []string{
+				"is-extendable@0.1.1",
+				"kind-of@2.0.1",
+				"lazy-cache@0.2.7",
+				"mixin-object@2.0.1",
+			},
+		},
+		{
+			ID: "shebang-command@1.2.0",
+			DependsOn: []string{
+				"shebang-regex@1.0.0",
+			},
+		},
+		{
+			ID: "shell-quote@1.6.1",
+			DependsOn: []string{
+				"array-filter@0.0.1",
+				"array-map@0.0.0",
+				"array-reduce@0.0.0",
+				"jsonify@0.0.0",
+			},
+		},
+		{
+			ID: "shelljs@0.8.3",
+			DependsOn: []string{
+				"glob@7.1.4",
+				"interpret@1.2.0",
+				"rechoir@0.6.2",
+			},
+		},
+		{
+			ID: "slice-ansi@1.0.0",
+			DependsOn: []string{
+				"is-fullwidth-code-point@2.0.0",
+			},
+		},
+		{
+			ID: "slice-ansi@2.1.0",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"astral-regex@1.0.0",
+				"is-fullwidth-code-point@2.0.0",
+			},
+		},
+		{
+			ID: "snapdragon-node@2.1.1",
+			DependsOn: []string{
+				"define-property@1.0.0",
+				"isobject@3.0.1",
+				"snapdragon-util@3.0.1",
+			},
+		},
+		{
+			ID: "snapdragon-util@3.0.1",
+			DependsOn: []string{
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "snapdragon@0.8.2",
+			DependsOn: []string{
+				"base@0.11.2",
+				"debug@2.6.9",
+				"define-property@0.2.5",
+				"extend-shallow@2.0.1",
+				"map-cache@0.2.2",
+				"source-map@0.5.7",
+				"source-map-resolve@0.5.2",
+				"use@3.1.1",
+			},
+		},
+		{
+			ID: "socket.io-client@2.2.0",
+			DependsOn: []string{
+				"backo2@1.0.2",
+				"base64-arraybuffer@0.1.5",
+				"component-bind@1.0.0",
+				"component-emitter@1.2.1",
+				"debug@3.1.0",
+				"engine.io-client@3.3.2",
+				"has-binary2@1.0.3",
+				"has-cors@1.1.0",
+				"indexof@0.0.1",
+				"object-component@0.0.3",
+				"parseqs@0.0.5",
+				"parseuri@0.0.5",
+				"socket.io-parser@3.3.0",
+				"to-array@0.1.4",
+			},
+		},
+		{
+			ID: "socket.io-parser@3.3.0",
+			DependsOn: []string{
+				"component-emitter@1.2.1",
+				"debug@3.1.0",
+				"isarray@2.0.1",
+			},
+		},
+		{
+			ID: "socket.io@2.2.0",
+			DependsOn: []string{
+				"debug@4.1.1",
+				"engine.io@3.3.2",
+				"has-binary2@1.0.3",
+				"socket.io-adapter@1.1.1",
+				"socket.io-client@2.2.0",
+				"socket.io-parser@3.3.0",
+			},
+		},
+		{
+			ID: "sockjs-client@1.1.5",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"eventsource@0.1.6",
+				"faye-websocket@0.11.1",
+				"inherits@2.0.3",
+				"json3@3.3.2",
+				"url-parse@1.4.7",
+			},
+		},
+		{
+			ID: "sockjs-client@1.3.0",
+			DependsOn: []string{
+				"debug@3.2.6",
+				"eventsource@1.0.7",
+				"faye-websocket@0.11.1",
+				"inherits@2.0.3",
+				"json3@3.3.2",
+				"url-parse@1.4.7",
+			},
+		},
+		{
+			ID: "sockjs@0.3.19",
+			DependsOn: []string{
+				"faye-websocket@0.10.0",
+				"uuid@3.3.2",
+			},
+		},
+		{
+			ID: "socks-proxy-agent@4.0.2",
+			DependsOn: []string{
+				"agent-base@4.2.1",
+				"socks@2.3.2",
+			},
+		},
+		{
+			ID: "socks@2.3.2",
+			DependsOn: []string{
+				"ip@1.1.5",
+				"smart-buffer@4.0.2",
+			},
+		},
+		{
+			ID: "sort-keys@2.0.0",
+			DependsOn: []string{
+				"is-plain-obj@1.1.0",
+			},
+		},
+		{
+			ID: "sorted-union-stream@2.1.3",
+			DependsOn: []string{
+				"from2@1.3.0",
+				"stream-iterate@1.2.0",
+			},
+		},
+		{
+			ID: "source-map-resolve@0.5.2",
+			DependsOn: []string{
+				"atob@2.1.2",
+				"decode-uri-component@0.2.0",
+				"resolve-url@0.2.1",
+				"source-map-url@0.4.0",
+				"urix@0.1.0",
+			},
+		},
+		{
+			ID: "source-map-support@0.4.18",
+			DependsOn: []string{
+				"source-map@0.5.7",
+			},
+		},
+		{
+			ID: "source-map-support@0.5.12",
+			DependsOn: []string{
+				"buffer-from@1.1.1",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "spawn-promise@0.1.8",
+			DependsOn: []string{
+				"co@4.6.0",
+			},
+		},
+		{
+			ID: "spdx-correct@3.1.0",
+			DependsOn: []string{
+				"spdx-expression-parse@3.0.0",
+				"spdx-license-ids@3.0.4",
+			},
+		},
+		{
+			ID: "spdx-expression-parse@3.0.0",
+			DependsOn: []string{
+				"spdx-exceptions@2.2.0",
+				"spdx-license-ids@3.0.4",
+			},
+		},
+		{
+			ID: "spdy-transport@3.0.0",
+			DependsOn: []string{
+				"debug@4.1.1",
+				"detect-node@2.0.4",
+				"hpack.js@2.1.6",
+				"obuf@1.1.2",
+				"readable-stream@3.3.0",
+				"wbuf@1.7.3",
+			},
+		},
+		{
+			ID: "spdy@4.0.0",
+			DependsOn: []string{
+				"debug@4.1.1",
+				"handle-thing@2.0.0",
+				"http-deceiver@1.2.7",
+				"select-hose@2.0.0",
+				"spdy-transport@3.0.0",
+			},
+		},
+		{
+			ID: "split-string@3.1.0",
+			DependsOn: []string{
+				"extend-shallow@3.0.2",
+			},
+		},
+		{
+			ID: "sshpk@1.16.1",
+			DependsOn: []string{
+				"asn1@0.2.4",
+				"assert-plus@1.0.0",
+				"bcrypt-pbkdf@1.0.2",
+				"dashdash@1.14.1",
+				"ecc-jsbn@0.1.2",
+				"getpass@0.1.7",
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "ssri@5.3.0",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "ssri@6.0.1",
+			DependsOn: []string{
+				"figgy-pudding@3.5.1",
+			},
+		},
+		{
+			ID: "static-extend@0.1.2",
+			DependsOn: []string{
+				"define-property@0.2.5",
+				"object-copy@0.1.0",
+			},
+		},
+		{
+			ID: "stream-browserify@2.0.2",
+			DependsOn: []string{
+				"inherits@2.0.3",
+				"readable-stream@2.3.6",
+			},
+		},
+		{
+			ID: "stream-each@1.2.3",
+			DependsOn: []string{
+				"end-of-stream@1.4.1",
+				"stream-shift@1.0.0",
+			},
+		},
+		{
+			ID: "stream-http@2.8.3",
+			DependsOn: []string{
+				"builtin-status-codes@3.0.0",
+				"inherits@2.0.3",
+				"readable-stream@2.3.6",
+				"to-arraybuffer@1.0.1",
+				"xtend@4.0.1",
+			},
+		},
+		{
+			ID: "stream-iterate@1.2.0",
+			DependsOn: []string{
+				"readable-stream@2.3.6",
+				"stream-shift@1.0.0",
+			},
+		},
+		{
+			ID: "string-length@2.0.0",
+			DependsOn: []string{
+				"astral-regex@1.0.0",
+				"strip-ansi@4.0.0",
+			},
+		},
+		{
+			ID: "string-width@1.0.2",
+			DependsOn: []string{
+				"code-point-at@1.1.0",
+				"is-fullwidth-code-point@1.0.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "string-width@2.1.1",
+			DependsOn: []string{
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@4.0.0",
+			},
+		},
+		{
+			ID: "string-width@3.1.0",
+			DependsOn: []string{
+				"emoji-regex@7.0.3",
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@5.2.0",
+			},
+		},
+		{
+			ID: "string.prototype.matchall@3.0.1",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+				"has-symbols@1.0.0",
+				"regexp.prototype.flags@1.2.0",
+			},
+		},
+		{
+			ID: "string.prototype.padend@3.0.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "string.prototype.padstart@3.0.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "string.prototype.trim@1.1.2",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.13.0",
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "string_decoder@1.2.0",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "string_decoder@1.1.1",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "stringify-object@3.3.0",
+			DependsOn: []string{
+				"get-own-enumerable-property-symbols@3.0.0",
+				"is-obj@1.0.1",
+				"is-regexp@1.0.0",
+			},
+		},
+		{
+			ID: "strip-ansi@4.0.0",
+			DependsOn: []string{
+				"ansi-regex@3.0.0",
+			},
+		},
+		{
+			ID: "strip-ansi@3.0.1",
+			DependsOn: []string{
+				"ansi-regex@2.1.1",
+			},
+		},
+		{
+			ID: "strip-ansi@5.2.0",
+			DependsOn: []string{
+				"ansi-regex@4.1.0",
+			},
+		},
+		{
+			ID: "strip-bom@2.0.0",
+			DependsOn: []string{
+				"is-utf8@0.2.1",
+			},
+		},
+		{
+			ID: "style-loader@0.23.1",
+			DependsOn: []string{
+				"loader-utils@1.2.3",
+				"schema-utils@1.0.0",
+			},
+		},
+		{
+			ID: "styled-components@4.1.3",
+			DependsOn: []string{
+				"@babel/helper-module-imports@7.0.0",
+				"@emotion/is-prop-valid@0.7.3",
+				"@emotion/unitless@0.7.3",
+				"babel-plugin-styled-components@1.10.0",
+				"css-to-react-native@2.3.1",
+				"memoize-one@4.1.0",
+				"prop-types@15.7.2",
+				"react-is@16.8.6",
+				"stylis@3.5.4",
+				"stylis-rule-sheet@0.0.10",
+				"supports-color@5.5.0",
+			},
+		},
+		{
+			ID: "supports-color@3.2.3",
+			DependsOn: []string{
+				"has-flag@1.0.0",
+			},
+		},
+		{
+			ID: "supports-color@5.5.0",
+			DependsOn: []string{
+				"has-flag@3.0.0",
+			},
+		},
+		{
+			ID: "supports-color@6.1.0",
+			DependsOn: []string{
+				"has-flag@3.0.0",
+			},
+		},
+		{
+			ID: "svg-url-loader@2.3.2",
+			DependsOn: []string{
+				"file-loader@1.1.11",
+				"loader-utils@1.1.0",
+			},
+		},
+		{
+			ID: "svgo@1.2.2",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"coa@2.0.2",
+				"css-select@2.0.2",
+				"css-select-base-adapter@0.1.1",
+				"css-tree@1.0.0-alpha.28",
+				"css-url-regex@1.1.0",
+				"csso@3.5.1",
+				"js-yaml@3.13.1",
+				"mkdirp@0.5.1",
+				"object.values@1.1.0",
+				"sax@1.2.4",
+				"stable@0.1.8",
+				"unquote@1.1.1",
+				"util.promisify@1.0.0",
+			},
+		},
+		{
+			ID: "symbol.prototype.description@1.0.0",
+			DependsOn: []string{
+				"has-symbols@1.0.0",
+			},
+		},
+		{
+			ID: "table@4.0.3",
+			DependsOn: []string{
+				"ajv@6.10.0",
+				"ajv-keywords@3.4.0",
+				"chalk@2.4.2",
+				"lodash@4.17.11",
+				"slice-ansi@1.0.0",
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "table@5.3.3",
+			DependsOn: []string{
+				"ajv@6.10.0",
+				"lodash@4.17.11",
+				"slice-ansi@2.1.0",
+				"string-width@3.1.0",
+			},
+		},
+		{
+			ID: "tar@2.2.2",
+			DependsOn: []string{
+				"block-stream@0.0.9",
+				"fstream@1.0.12",
+				"inherits@2.0.3",
+			},
+		},
+		{
+			ID: "tar@4.4.8",
+			DependsOn: []string{
+				"chownr@1.1.1",
+				"fs-minipass@1.2.5",
+				"minipass@2.3.5",
+				"minizlib@1.2.1",
+				"mkdirp@0.5.1",
+				"safe-buffer@5.1.2",
+				"yallist@3.0.3",
+			},
+		},
+		{
+			ID: "temp@0.8.3",
+			DependsOn: []string{
+				"os-tmpdir@1.0.2",
+				"rimraf@2.2.8",
+			},
+		},
+		{
+			ID: "term-size@1.2.0",
+			DependsOn: []string{
+				"execa@0.7.0",
+			},
+		},
+		{
+			ID: "terser-webpack-plugin@1.2.4",
+			DependsOn: []string{
+				"cacache@11.3.2",
+				"find-cache-dir@2.1.0",
+				"is-wsl@1.1.0",
+				"schema-utils@1.0.0",
+				"serialize-javascript@1.7.0",
+				"source-map@0.6.1",
+				"terser@3.17.0",
+				"webpack-sources@1.3.0",
+				"worker-farm@1.7.0",
+			},
+		},
+		{
+			ID: "terser@3.17.0",
+			DependsOn: []string{
+				"commander@2.20.0",
+				"source-map@0.6.1",
+				"source-map-support@0.5.12",
+			},
+		},
+		{
+			ID: "test-exclude@4.2.3",
+			DependsOn: []string{
+				"arrify@1.0.1",
+				"micromatch@2.3.11",
+				"object-assign@4.1.1",
+				"read-pkg-up@1.0.1",
+				"require-main-filename@1.0.1",
+			},
+		},
+		{
+			ID: "through2@2.0.5",
+			DependsOn: []string{
+				"readable-stream@2.3.6",
+				"xtend@4.0.1",
+			},
+		},
+		{
+			ID: "timers-browserify@2.0.10",
+			DependsOn: []string{
+				"setimmediate@1.0.5",
+			},
+		},
+		{
+			ID: "tmp@0.0.33",
+			DependsOn: []string{
+				"os-tmpdir@1.0.2",
+			},
+		},
+		{
+			ID: "to-object-path@0.3.0",
+			DependsOn: []string{
+				"kind-of@3.2.2",
+			},
+		},
+		{
+			ID: "to-regex-range@2.1.1",
+			DependsOn: []string{
+				"is-number@3.0.0",
+				"repeat-string@1.6.1",
+			},
+		},
+		{
+			ID: "to-regex@3.0.2",
+			DependsOn: []string{
+				"define-property@2.0.2",
+				"extend-shallow@3.0.2",
+				"regex-not@1.0.2",
+				"safe-regex@1.1.0",
+			},
+		},
+		{
+			ID: "tough-cookie@2.5.0",
+			DependsOn: []string{
+				"psl@1.1.31",
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "tough-cookie@2.4.3",
+			DependsOn: []string{
+				"psl@1.1.31",
+				"punycode@1.4.1",
+			},
+		},
+		{
+			ID: "tr46@1.0.1",
+			DependsOn: []string{
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "tunnel-agent@0.6.0",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "type-check@0.3.2",
+			DependsOn: []string{
+				"prelude-ls@1.1.2",
+			},
+		},
+		{
+			ID: "type-is@1.6.18",
+			DependsOn: []string{
+				"media-typer@0.3.0",
+				"mime-types@2.1.24",
+			},
+		},
+		{
+			ID: "uglify-js@3.4.10",
+			DependsOn: []string{
+				"commander@2.19.0",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "uglify-js@3.5.12",
+			DependsOn: []string{
+				"commander@2.20.0",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "unicode-match-property-ecmascript@1.0.4",
+			DependsOn: []string{
+				"unicode-canonical-property-names-ecmascript@1.0.4",
+				"unicode-property-aliases-ecmascript@1.0.5",
+			},
+		},
+		{
+			ID: "unified@7.1.0",
+			DependsOn: []string{
+				"@types/unist@2.0.3",
+				"@types/vfile@3.0.2",
+				"bail@1.0.4",
+				"extend@3.0.2",
+				"is-plain-obj@1.1.0",
+				"trough@1.0.4",
+				"vfile@3.0.1",
+				"x-is-string@0.1.0",
+			},
+		},
+		{
+			ID: "union-value@1.0.0",
+			DependsOn: []string{
+				"arr-union@3.1.0",
+				"get-value@2.0.6",
+				"is-extendable@0.1.1",
+				"set-value@0.4.3",
+			},
+		},
+		{
+			ID: "unique-filename@1.1.1",
+			DependsOn: []string{
+				"unique-slug@2.0.1",
+			},
+		},
+		{
+			ID: "unique-slug@2.0.1",
+			DependsOn: []string{
+				"imurmurhash@0.1.4",
+			},
+		},
+		{
+			ID: "unique-string@1.0.0",
+			DependsOn: []string{
+				"crypto-random-string@1.0.0",
+			},
+		},
+		{
+			ID: "unist-util-stringify-position@2.0.0",
+			DependsOn: []string{
+				"@types/unist@2.0.3",
+			},
+		},
+		{
+			ID: "universal-user-agent@2.1.0",
+			DependsOn: []string{
+				"os-name@3.1.0",
+			},
+		},
+		{
+			ID: "unset-value@1.0.0",
+			DependsOn: []string{
+				"has-value@0.3.1",
+				"isobject@3.0.1",
+			},
+		},
+		{
+			ID: "unzipper@0.8.14",
+			DependsOn: []string{
+				"big-integer@1.6.43",
+				"binary@0.3.0",
+				"bluebird@3.4.7",
+				"buffer-indexof-polyfill@1.0.1",
+				"duplexer2@0.1.4",
+				"fstream@1.0.12",
+				"listenercount@1.0.1",
+				"readable-stream@2.1.5",
+				"setimmediate@1.0.5",
+			},
+		},
+		{
+			ID: "update-notifier@2.5.0",
+			DependsOn: []string{
+				"boxen@1.3.0",
+				"chalk@2.4.2",
+				"configstore@3.1.2",
+				"import-lazy@2.1.0",
+				"is-ci@1.2.1",
+				"is-installed-globally@0.1.0",
+				"is-npm@1.0.0",
+				"latest-version@3.1.0",
+				"semver-diff@2.1.0",
+				"xdg-basedir@3.0.0",
+			},
+		},
+		{
+			ID: "uri-js@4.2.2",
+			DependsOn: []string{
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "url-loader@1.1.2",
+			DependsOn: []string{
+				"loader-utils@1.2.3",
+				"mime@2.4.2",
+				"schema-utils@1.0.0",
+			},
+		},
+		{
+			ID: "url-parse-lax@1.0.0",
+			DependsOn: []string{
+				"prepend-http@1.0.4",
+			},
+		},
+		{
+			ID: "url-parse@1.4.7",
+			DependsOn: []string{
+				"querystringify@2.1.1",
+				"requires-port@1.0.0",
+			},
+		},
+		{
+			ID: "url@0.11.0",
+			DependsOn: []string{
+				"punycode@1.3.2",
+				"querystring@0.2.0",
+			},
+		},
+		{
+			ID: "util.promisify@1.0.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"object.getownpropertydescriptors@2.0.3",
+			},
+		},
+		{
+			ID: "util@0.10.3",
+			DependsOn: []string{
+				"inherits@2.0.1",
+			},
+		},
+		{
+			ID: "util@0.10.4",
+			DependsOn: []string{
+				"inherits@2.0.3",
+			},
+		},
+		{
+			ID: "util@0.11.1",
+			DependsOn: []string{
+				"inherits@2.0.3",
+			},
+		},
+		{
+			ID: "v8flags@2.1.1",
+			DependsOn: []string{
+				"user-home@1.1.1",
+			},
+		},
+		{
+			ID: "validate-npm-package-license@3.0.4",
+			DependsOn: []string{
+				"spdx-correct@3.1.0",
+				"spdx-expression-parse@3.0.0",
+			},
+		},
+		{
+			ID: "validate-npm-package-name@3.0.0",
+			DependsOn: []string{
+				"builtins@1.0.3",
+			},
+		},
+		{
+			ID: "velocity-react@1.4.3",
+			DependsOn: []string{
+				"lodash@4.17.11",
+				"prop-types@15.7.2",
+				"react-transition-group@2.9.0",
+				"velocity-animate@1.5.2",
+			},
+		},
+		{
+			ID: "verror@1.10.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"core-util-is@1.0.2",
+				"extsprintf@1.4.0",
+			},
+		},
+		{
+			ID: "vfile-message@1.1.1",
+			DependsOn: []string{
+				"unist-util-stringify-position@1.1.2",
+			},
+		},
+		{
+			ID: "vfile-message@2.0.0",
+			DependsOn: []string{
+				"@types/unist@2.0.3",
+				"unist-util-stringify-position@1.1.2",
+			},
+		},
+		{
+			ID: "vfile@3.0.1",
+			DependsOn: []string{
+				"is-buffer@2.0.3",
+				"replace-ext@1.0.0",
+				"unist-util-stringify-position@1.1.2",
+				"vfile-message@1.1.1",
+			},
+		},
+		{
+			ID: "vfile@4.0.0",
+			DependsOn: []string{
+				"@types/unist@2.0.3",
+				"is-buffer@2.0.3",
+				"replace-ext@1.0.0",
+				"unist-util-stringify-position@2.0.0",
+				"vfile-message@2.0.0",
+			},
+		},
+		{
+			ID: "vm-browserify@0.0.4",
+			DependsOn: []string{
+				"indexof@0.0.1",
+			},
+		},
+		{
+			ID: "w3c-hr-time@1.0.1",
+			DependsOn: []string{
+				"browser-process-hrtime@0.1.3",
+			},
+		},
+		{
+			ID: "walker@1.0.7",
+			DependsOn: []string{
+				"makeerror@1.0.11",
+			},
+		},
+		{
+			ID: "warning@3.0.0",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+			},
+		},
+		{
+			ID: "warning@4.0.3",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+			},
+		},
+		{
+			ID: "watch@0.18.0",
+			DependsOn: []string{
+				"exec-sh@0.2.2",
+				"minimist@1.2.0",
+			},
+		},
+		{
+			ID: "watchpack@1.6.0",
+			DependsOn: []string{
+				"chokidar@2.1.5",
+				"graceful-fs@4.1.15",
+				"neo-async@2.6.1",
+			},
+		},
+		{
+			ID: "wbuf@1.7.3",
+			DependsOn: []string{
+				"minimalistic-assert@1.0.1",
+			},
+		},
+		{
+			ID: "wcwidth@1.0.1",
+			DependsOn: []string{
+				"defaults@1.0.3",
+			},
+		},
+		{
+			ID: "webpack-bundle-analyzer@3.3.2",
+			DependsOn: []string{
+				"acorn@6.1.1",
+				"acorn-walk@6.1.1",
+				"bfj@6.1.1",
+				"chalk@2.4.2",
+				"commander@2.20.0",
+				"ejs@2.6.1",
+				"express@4.16.4",
+				"filesize@3.6.1",
+				"gzip-size@5.1.0",
+				"lodash@4.17.11",
+				"mkdirp@0.5.1",
+				"opener@1.5.1",
+				"ws@6.2.1",
+			},
+		},
+		{
+			ID: "webpack-cli@3.3.2",
+			DependsOn: []string{
+				"chalk@2.4.2",
+				"cross-spawn@6.0.5",
+				"enhanced-resolve@4.1.0",
+				"findup-sync@2.0.0",
+				"global-modules@1.0.0",
+				"import-local@2.0.0",
+				"interpret@1.2.0",
+				"loader-utils@1.2.3",
+				"supports-color@5.5.0",
+				"v8-compile-cache@2.0.3",
+				"yargs@12.0.5",
+			},
+		},
+		{
+			ID: "webpack-dev-middleware@3.7.0",
+			DependsOn: []string{
+				"memory-fs@0.4.1",
+				"mime@2.4.2",
+				"range-parser@1.2.1",
+				"webpack-log@2.0.0",
+			},
+		},
+		{
+			ID: "webpack-dev-server@3.3.1",
+			DependsOn: []string{
+				"ansi-html@0.0.7",
+				"bonjour@3.5.0",
+				"chokidar@2.1.5",
+				"compression@1.7.4",
+				"connect-history-api-fallback@1.6.0",
+				"debug@4.1.1",
+				"del@4.1.1",
+				"express@4.16.4",
+				"html-entities@1.2.1",
+				"http-proxy-middleware@0.19.1",
+				"import-local@2.0.0",
+				"internal-ip@4.3.0",
+				"ip@1.1.5",
+				"killable@1.0.1",
+				"loglevel@1.6.1",
+				"opn@5.5.0",
+				"portfinder@1.0.20",
+				"schema-utils@1.0.0",
+				"selfsigned@1.10.4",
+				"semver@6.0.0",
+				"serve-index@1.9.1",
+				"sockjs@0.3.19",
+				"sockjs-client@1.3.0",
+				"spdy@4.0.0",
+				"strip-ansi@3.0.1",
+				"supports-color@6.1.0",
+				"url@0.11.0",
+				"webpack-dev-middleware@3.7.0",
+				"webpack-log@2.0.0",
+				"yargs@12.0.5",
+			},
+		},
+		{
+			ID: "webpack-hot-middleware@2.25.0",
+			DependsOn: []string{
+				"ansi-html@0.0.7",
+				"html-entities@1.2.1",
+				"querystring@0.2.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "webpack-log@2.0.0",
+			DependsOn: []string{
+				"ansi-colors@3.2.4",
+				"uuid@3.3.2",
+			},
+		},
+		{
+			ID: "webpack-merge@4.2.1",
+			DependsOn: []string{
+				"lodash@4.17.11",
+			},
+		},
+		{
+			ID: "webpack-sources@1.3.0",
+			DependsOn: []string{
+				"source-list-map@2.0.1",
+				"source-map@0.6.1",
+			},
+		},
+		{
+			ID: "webpack@4.31.0",
+			DependsOn: []string{
+				"@webassemblyjs/ast@1.8.5",
+				"@webassemblyjs/helper-module-context@1.8.5",
+				"@webassemblyjs/wasm-edit@1.8.5",
+				"@webassemblyjs/wasm-parser@1.8.5",
+				"acorn@6.1.1",
+				"acorn-dynamic-import@4.0.0",
+				"ajv@6.10.0",
+				"ajv-keywords@3.4.0",
+				"chrome-trace-event@1.0.0",
+				"enhanced-resolve@4.1.0",
+				"eslint-scope@4.0.3",
+				"json-parse-better-errors@1.0.2",
+				"loader-runner@2.4.0",
+				"loader-utils@1.2.3",
+				"memory-fs@0.4.1",
+				"micromatch@3.1.10",
+				"mkdirp@0.5.1",
+				"neo-async@2.6.1",
+				"node-libs-browser@2.2.0",
+				"schema-utils@1.0.0",
+				"tapable@1.1.3",
+				"terser-webpack-plugin@1.2.4",
+				"watchpack@1.6.0",
+				"webpack-sources@1.3.0",
+			},
+		},
+		{
+			ID: "websocket-driver@0.7.0",
+			DependsOn: []string{
+				"http-parser-js@0.5.0",
+				"websocket-extensions@0.1.3",
+			},
+		},
+		{
+			ID: "whatwg-encoding@1.0.5",
+			DependsOn: []string{
+				"iconv-lite@0.4.24",
+			},
+		},
+		{
+			ID: "whatwg-url@6.5.0",
+			DependsOn: []string{
+				"lodash.sortby@4.7.0",
+				"tr46@1.0.1",
+				"webidl-conversions@4.0.2",
+			},
+		},
+		{
+			ID: "whatwg-url@7.0.0",
+			DependsOn: []string{
+				"lodash.sortby@4.7.0",
+				"tr46@1.0.1",
+				"webidl-conversions@4.0.2",
+			},
+		},
+		{
+			ID: "which@1.3.1",
+			DependsOn: []string{
+				"isexe@2.0.0",
+			},
+		},
+		{
+			ID: "wide-align@1.1.3",
+			DependsOn: []string{
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "widest-line@2.0.1",
+			DependsOn: []string{
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "windows-release@3.2.0",
+			DependsOn: []string{
+				"execa@1.0.0",
+			},
+		},
+		{
+			ID: "worker-farm@1.7.0",
+			DependsOn: []string{
+				"errno@0.1.7",
+			},
+		},
+		{
+			ID: "wrap-ansi@2.1.0",
+			DependsOn: []string{
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "wrap-ansi@3.0.1",
+			DependsOn: []string{
+				"string-width@2.1.1",
+				"strip-ansi@4.0.0",
+			},
+		},
+		{
+			ID: "write-file-atomic@1.3.4",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"imurmurhash@0.1.4",
+				"slide@1.1.6",
+			},
+		},
+		{
+			ID: "write-file-atomic@2.4.2",
+			DependsOn: []string{
+				"graceful-fs@4.1.15",
+				"imurmurhash@0.1.4",
+				"signal-exit@3.0.2",
+			},
+		},
+		{
+			ID: "write-json-file@2.3.0",
+			DependsOn: []string{
+				"detect-indent@5.0.0",
+				"graceful-fs@4.1.15",
+				"make-dir@1.3.0",
+				"pify@3.0.0",
+				"sort-keys@2.0.0",
+				"write-file-atomic@2.4.2",
+			},
+		},
+		{
+			ID: "write@1.0.3",
+			DependsOn: []string{
+				"mkdirp@0.5.1",
+			},
+		},
+		{
+			ID: "ws@5.2.2",
+			DependsOn: []string{
+				"async-limiter@1.0.0",
+			},
+		},
+		{
+			ID: "ws@6.2.1",
+			DependsOn: []string{
+				"async-limiter@1.0.0",
+			},
+		},
+		{
+			ID: "ws@6.1.4",
+			DependsOn: []string{
+				"async-limiter@1.0.0",
+			},
+		},
+		{
+			ID: "yargs-parser@11.1.1",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-parser@2.4.1",
+			DependsOn: []string{
+				"camelcase@3.0.0",
+				"lodash.assign@4.2.0",
+			},
+		},
+		{
+			ID: "yargs-parser@9.0.2",
+			DependsOn: []string{
+				"camelcase@4.1.0",
+			},
+		},
+		{
+			ID: "yargs@12.0.5",
+			DependsOn: []string{
+				"cliui@4.1.0",
+				"decamelize@1.2.0",
+				"find-up@3.0.0",
+				"get-caller-file@1.0.3",
+				"os-locale@3.1.0",
+				"require-directory@2.1.1",
+				"require-main-filename@1.0.1",
+				"set-blocking@2.0.0",
+				"string-width@2.1.1",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@11.1.1",
+			},
+		},
+		{
+			ID: "yargs@11.1.0",
+			DependsOn: []string{
+				"cliui@4.1.0",
+				"decamelize@1.2.0",
+				"find-up@2.1.0",
+				"get-caller-file@1.0.3",
+				"os-locale@2.1.0",
+				"require-directory@2.1.1",
+				"require-main-filename@1.0.1",
+				"set-blocking@2.0.0",
+				"string-width@2.1.1",
+				"which-module@2.0.0",
+				"y18n@3.2.1",
+				"yargs-parser@9.0.2",
+			},
+		},
+		{
+			ID: "yargs@4.8.1",
+			DependsOn: []string{
+				"cliui@3.2.0",
+				"decamelize@1.2.0",
+				"get-caller-file@1.0.3",
+				"lodash.assign@4.2.0",
+				"os-locale@1.4.0",
+				"read-pkg-up@1.0.1",
+				"require-directory@2.1.1",
+				"require-main-filename@1.0.1",
+				"set-blocking@2.0.0",
+				"string-width@1.0.2",
+				"which-module@1.0.0",
+				"window-size@0.2.0",
+				"y18n@3.2.1",
+				"yargs-parser@2.4.1",
+			},
+		},
+	}
+
 	// docker run --name yarn2 --rm -it -w /code node:12-alpine sh
 	// yarn set version berry
 	// apk add git
@@ -2326,6 +13477,15 @@ var (
 		{Name: "asap", Version: "2.0.6"},
 		{Name: "jquery", Version: "3.5.1"},
 		{Name: "promise", Version: "8.1.0"},
+	}
+
+	yarnV2NormalDeps = []types.Dependency{
+		{
+			ID: "promise@8.1.0",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
 	}
 
 	// ... and
@@ -2343,6 +13503,44 @@ var (
 		{Name: "react", Version: "16.13.1"},
 		{Name: "redux", Version: "4.0.5"},
 		{Name: "symbol-observable", Version: "1.2.0"},
+	}
+
+	yarnV2ReactDeps = []types.Dependency{
+		{
+			ID: "promise@8.1.0",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+		{
+			ID: "loose-envify@1.4.0",
+			DependsOn: []string{
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "react@16.13.1",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "prop-types@15.7.2",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"react-is@16.13.1",
+			},
+		},
+		{
+			ID: "redux@4.0.5",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"symbol-observable@1.2.0",
+			},
+		},
 	}
 
 	// ... and
@@ -2564,6 +13762,811 @@ var (
 		{Name: "yargs-unparser", Version: "1.6.1"},
 		{Name: "yargs", Version: "13.3.2"},
 		{Name: "yargs", Version: "14.2.3"},
+	}
+
+	yarnV2WithDevDeps = []types.Dependency{
+		{
+			ID: "promise@8.1.0",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+		{
+			ID: "loose-envify@1.4.0",
+			DependsOn: []string{
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "react@16.13.1",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "prop-types@15.7.2",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"react-is@16.13.1",
+			},
+		},
+		{
+			ID: "redux@4.0.5",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "mocha@8.1.3",
+			DependsOn: []string{
+				"ansi-colors@4.1.1",
+				"browser-stdout@1.3.1",
+				"chokidar@3.4.2",
+				"debug@4.1.1",
+				"diff@4.0.2",
+				"escape-string-regexp@4.0.0",
+				"find-up@5.0.0",
+				"glob@7.1.6",
+				"growl@1.10.5",
+				"he@1.2.0",
+				"js-yaml@3.14.0",
+				"log-symbols@4.0.0",
+				"minimatch@3.0.4",
+				"ms@2.1.2",
+				"object.assign@4.1.0",
+				"promise.allsettled@1.0.2",
+				"serialize-javascript@4.0.0",
+				"strip-json-comments@3.0.1",
+				"supports-color@7.1.0",
+				"which@2.0.2",
+				"wide-align@1.1.3",
+				"workerpool@6.0.0",
+				"yargs@13.3.2",
+				"yargs-parser@13.1.2",
+				"yargs-unparser@1.6.1",
+			},
+		},
+		{
+			ID: "anymatch@3.1.1",
+			DependsOn: []string{
+				"normalize-path@3.0.0",
+				"picomatch@2.2.2",
+			},
+		},
+		{
+			ID: "chokidar@3.4.2",
+			DependsOn: []string{
+				"anymatch@3.1.1",
+				"braces@3.0.2",
+				"fsevents@2.1.3",
+				"glob-parent@5.1.1",
+				"is-binary-path@2.1.0",
+				"is-glob@4.0.1",
+				"normalize-path@3.0.0",
+				"readdirp@3.4.0",
+			},
+		},
+		{
+			ID: "to-regex-range@5.0.1",
+			DependsOn: []string{
+				"is-number@7.0.0",
+			},
+		},
+		{
+			ID: "fill-range@7.0.1",
+			DependsOn: []string{
+				"to-regex-range@5.0.1",
+			},
+		},
+		{
+			ID: "braces@3.0.2",
+			DependsOn: []string{
+				"fill-range@7.0.1",
+			},
+		},
+		{
+			ID: "node-gyp@7.1.0",
+			DependsOn: []string{
+				"env-paths@2.2.0",
+				"glob@7.1.6",
+				"graceful-fs@4.2.4",
+				"nopt@4.0.3",
+				"npmlog@4.1.2",
+				"request@2.88.2",
+				"rimraf@2.7.1",
+				"semver@7.3.2",
+				"tar@6.0.5",
+				"which@2.0.2",
+			},
+		},
+		{
+			ID: "glob@7.1.6",
+			DependsOn: []string{
+				"fs.realpath@1.0.0",
+				"inflight@1.0.6",
+				"inherits@2.0.4",
+				"minimatch@3.0.4",
+				"once@1.4.0",
+				"path-is-absolute@1.0.1",
+			},
+		},
+		{
+			ID: "once@1.4.0",
+			DependsOn: []string{
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "inflight@1.0.6",
+			DependsOn: []string{
+				"once@1.4.0",
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "brace-expansion@1.1.11",
+			DependsOn: []string{
+				"balanced-match@1.0.0",
+				"concat-map@0.0.1",
+			},
+		},
+		{
+			ID: "minimatch@3.0.4",
+			DependsOn: []string{
+				"brace-expansion@1.1.11",
+			},
+		},
+		{
+			ID: "nopt@4.0.3",
+			DependsOn: []string{
+				"abbrev@1.1.1",
+				"osenv@0.1.5",
+			},
+		},
+		{
+			ID: "osenv@0.1.5",
+			DependsOn: []string{
+				"os-homedir@1.0.2",
+				"os-tmpdir@1.0.2",
+			},
+		},
+		{
+			ID: "are-we-there-yet@1.1.5",
+			DependsOn: []string{
+				"delegates@1.0.0",
+				"readable-stream@2.3.7",
+			},
+		},
+		{
+			ID: "readable-stream@2.3.7",
+			DependsOn: []string{
+				"core-util-is@1.0.2",
+				"inherits@2.0.4",
+				"isarray@1.0.0",
+				"process-nextick-args@2.0.1",
+				"safe-buffer@5.1.2",
+				"string_decoder@1.1.1",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "string_decoder@1.1.1",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "npmlog@4.1.2",
+			DependsOn: []string{
+				"are-we-there-yet@1.1.5",
+				"console-control-strings@1.1.0",
+				"gauge@2.7.4",
+				"set-blocking@2.0.0",
+			},
+		},
+		{
+			ID: "gauge@2.7.4",
+			DependsOn: []string{
+				"aproba@1.2.0",
+				"console-control-strings@1.1.0",
+				"has-unicode@2.0.1",
+				"object-assign@4.1.1",
+				"signal-exit@3.0.3",
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+				"wide-align@1.1.3",
+			},
+		},
+		{
+			ID: "string-width@1.0.2",
+			DependsOn: []string{
+				"code-point-at@1.1.0",
+				"is-fullwidth-code-point@1.0.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "is-fullwidth-code-point@1.0.0",
+			DependsOn: []string{
+				"number-is-nan@1.0.1",
+			},
+		},
+		{
+			ID: "strip-ansi@3.0.1",
+			DependsOn: []string{
+				"ansi-regex@2.1.1",
+			},
+		},
+		{
+			ID: "string-width@2.1.1",
+			DependsOn: []string{
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@4.0.0",
+			},
+		},
+		{
+			ID: "strip-ansi@4.0.0",
+			DependsOn: []string{
+				"ansi-regex@3.0.0",
+			},
+		},
+		{
+			ID: "wide-align@1.1.3",
+			DependsOn: []string{
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "request@2.88.2",
+			DependsOn: []string{
+				"aws-sign2@0.7.0",
+				"aws4@1.10.1",
+				"caseless@0.12.0",
+				"combined-stream@1.0.8",
+				"extend@3.0.2",
+				"forever-agent@0.6.1",
+				"form-data@2.3.3",
+				"har-validator@5.1.5",
+				"http-signature@1.2.0",
+				"is-typedarray@1.0.0",
+				"isstream@0.1.2",
+				"json-stringify-safe@5.0.1",
+				"mime-types@2.1.27",
+				"oauth-sign@0.9.0",
+				"performance-now@2.1.0",
+				"qs@6.5.2",
+				"safe-buffer@5.2.1",
+				"tough-cookie@2.5.0",
+				"tunnel-agent@0.6.0",
+				"uuid@3.4.0",
+			},
+		},
+		{
+			ID: "combined-stream@1.0.8",
+			DependsOn: []string{
+				"delayed-stream@1.0.0",
+			},
+		},
+		{
+			ID: "form-data@2.3.3",
+			DependsOn: []string{
+				"asynckit@0.4.0",
+				"combined-stream@1.0.8",
+				"mime-types@2.1.27",
+			},
+		},
+		{
+			ID: "mime-types@2.1.27",
+			DependsOn: []string{
+				"mime-db@1.44.0",
+			},
+		},
+		{
+			ID: "ajv@6.12.4",
+			DependsOn: []string{
+				"fast-deep-equal@3.1.3",
+				"fast-json-stable-stringify@2.1.0",
+				"json-schema-traverse@0.4.1",
+				"uri-js@4.4.0",
+			},
+		},
+		{
+			ID: "uri-js@4.4.0",
+			DependsOn: []string{
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "har-validator@5.1.5",
+			DependsOn: []string{
+				"ajv@6.12.4",
+				"har-schema@2.0.0",
+			},
+		},
+		{
+			ID: "http-signature@1.2.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"jsprim@1.4.1",
+				"sshpk@1.16.1",
+			},
+		},
+		{
+			ID: "jsprim@1.4.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"extsprintf@1.3.0",
+				"json-schema@0.2.3",
+				"verror@1.10.0",
+			},
+		},
+		{
+			ID: "verror@1.10.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"core-util-is@1.0.2",
+				"extsprintf@1.3.0",
+			},
+		},
+		{
+			ID: "asn1@0.2.4",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "sshpk@1.16.1",
+			DependsOn: []string{
+				"asn1@0.2.4",
+				"assert-plus@1.0.0",
+				"bcrypt-pbkdf@1.0.2",
+				"dashdash@1.14.1",
+				"ecc-jsbn@0.1.2",
+				"getpass@0.1.7",
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "bcrypt-pbkdf@1.0.2",
+			DependsOn: []string{
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "dashdash@1.14.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "ecc-jsbn@0.1.2",
+			DependsOn: []string{
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "getpass@0.1.7",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "tough-cookie@2.5.0",
+			DependsOn: []string{
+				"psl@1.8.0",
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "tunnel-agent@0.6.0",
+			DependsOn: []string{
+				"safe-buffer@5.2.1",
+			},
+		},
+		{
+			ID: "rimraf@2.7.1",
+			DependsOn: []string{
+				"glob@7.1.6",
+			},
+		},
+		{
+			ID: "tar@6.0.5",
+			DependsOn: []string{
+				"chownr@2.0.0",
+				"fs-minipass@2.1.0",
+				"minipass@3.1.3",
+				"minizlib@2.1.2",
+				"mkdirp@1.0.4",
+				"yallist@4.0.0",
+			},
+		},
+		{
+			ID: "minipass@3.1.3",
+			DependsOn: []string{
+				"yallist@4.0.0",
+			},
+		},
+		{
+			ID: "fs-minipass@2.1.0",
+			DependsOn: []string{
+				"minipass@3.1.3",
+			},
+		},
+		{
+			ID: "minizlib@2.1.2",
+			DependsOn: []string{
+				"minipass@3.1.3",
+				"yallist@4.0.0",
+			},
+		},
+		{
+			ID: "which@2.0.2",
+			DependsOn: []string{
+				"isexe@2.0.0",
+			},
+		},
+		{
+			ID: "fsevents@2.1.3",
+			DependsOn: []string{
+				"node-gyp@7.1.0",
+			},
+		},
+		{
+			ID: "is-glob@4.0.1",
+			DependsOn: []string{
+				"is-extglob@2.1.1",
+			},
+		},
+		{
+			ID: "glob-parent@5.1.1",
+			DependsOn: []string{
+				"is-glob@4.0.1",
+			},
+		},
+		{
+			ID: "is-binary-path@2.1.0",
+			DependsOn: []string{
+				"binary-extensions@2.1.0",
+			},
+		},
+		{
+			ID: "readdirp@3.4.0",
+			DependsOn: []string{
+				"picomatch@2.2.2",
+			},
+		},
+		{
+			ID: "debug@4.1.1",
+			DependsOn: []string{
+				"ms@2.1.2",
+			},
+		},
+		{
+			ID: "p-limit@3.0.2",
+			DependsOn: []string{
+				"p-try@2.2.0",
+			},
+		},
+		{
+			ID: "p-locate@5.0.0",
+			DependsOn: []string{
+				"p-limit@3.0.2",
+			},
+		},
+		{
+			ID: "locate-path@6.0.0",
+			DependsOn: []string{
+				"p-locate@5.0.0",
+			},
+		},
+		{
+			ID: "find-up@5.0.0",
+			DependsOn: []string{
+				"locate-path@6.0.0",
+				"path-exists@4.0.0",
+			},
+		},
+		{
+			ID: "argparse@1.0.10",
+			DependsOn: []string{
+				"sprintf-js@1.0.3",
+			},
+		},
+		{
+			ID: "js-yaml@3.14.0",
+			DependsOn: []string{
+				"argparse@1.0.10",
+				"esprima@4.0.1",
+			},
+		},
+		{
+			ID: "ansi-styles@4.2.1",
+			DependsOn: []string{
+				"@types/color-name@1.1.1",
+				"color-convert@2.0.1",
+			},
+		},
+		{
+			ID: "color-convert@2.0.1",
+			DependsOn: []string{
+				"color-name@1.1.4",
+			},
+		},
+		{
+			ID: "chalk@4.1.0",
+			DependsOn: []string{
+				"ansi-styles@4.2.1",
+				"supports-color@7.1.0",
+			},
+		},
+		{
+			ID: "supports-color@7.1.0",
+			DependsOn: []string{
+				"has-flag@4.0.0",
+			},
+		},
+		{
+			ID: "log-symbols@4.0.0",
+			DependsOn: []string{
+				"chalk@4.1.0",
+			},
+		},
+		{
+			ID: "define-properties@1.1.3",
+			DependsOn: []string{
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "object.assign@4.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"function-bind@1.1.1",
+				"has-symbols@1.0.1",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "array.prototype.map@1.0.2",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.17.6",
+				"es-array-method-boxes-properly@1.0.0",
+				"is-string@1.0.5",
+			},
+		},
+		{
+			ID: "es-to-primitive@1.2.1",
+			DependsOn: []string{
+				"is-callable@1.2.0",
+				"is-date-object@1.0.2",
+				"is-symbol@1.0.3",
+			},
+		},
+		{
+			ID: "is-symbol@1.0.3",
+			DependsOn: []string{
+				"has-symbols@1.0.1",
+			},
+		},
+		{
+			ID: "es-abstract@1.17.6",
+			DependsOn: []string{
+				"es-to-primitive@1.2.1",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+				"has-symbols@1.0.1",
+				"is-callable@1.2.0",
+				"is-regex@1.1.1",
+				"object-inspect@1.8.0",
+				"object-keys@1.1.1",
+				"object.assign@4.1.0",
+				"string.prototype.trimend@1.0.1",
+				"string.prototype.trimstart@1.0.1",
+			},
+		},
+		{
+			ID: "has@1.0.3",
+			DependsOn: []string{
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "is-regex@1.1.1",
+			DependsOn: []string{
+				"has-symbols@1.0.1",
+			},
+		},
+		{
+			ID: "string.prototype.trimend@1.0.1",
+			DependsOn: []string{
+				"es-abstract@1.17.6",
+				"define-properties@1.1.3",
+			},
+		},
+		{
+			ID: "string.prototype.trimstart@1.0.1",
+			DependsOn: []string{
+				"es-abstract@1.17.6",
+				"define-properties@1.1.3",
+			},
+		},
+		{
+			ID: "promise.allsettled@1.0.2",
+			DependsOn: []string{
+				"array.prototype.map@1.0.2",
+				"define-properties@1.1.3",
+				"es-abstract@1.17.6",
+				"function-bind@1.1.1",
+				"iterate-value@1.0.2",
+			},
+		},
+		{
+			ID: "es-get-iterator@1.1.0",
+			DependsOn: []string{
+				"es-abstract@1.17.6",
+				"has-symbols@1.0.1",
+				"is-arguments@1.0.4",
+				"is-map@2.0.1",
+				"is-set@2.0.1",
+				"is-string@1.0.5",
+				"isarray@2.0.5",
+			},
+		},
+		{
+			ID: "iterate-value@1.0.2",
+			DependsOn: []string{
+				"es-get-iterator@1.1.0",
+				"iterate-iterator@1.0.1",
+			},
+		},
+		{
+			ID: "randombytes@2.1.0",
+			DependsOn: []string{
+				"safe-buffer@5.2.1",
+			},
+		},
+		{
+			ID: "serialize-javascript@4.0.0",
+			DependsOn: []string{
+				"randombytes@2.1.0",
+			},
+		},
+		{
+			ID: "string-width@3.1.0",
+			DependsOn: []string{
+				"emoji-regex@7.0.3",
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@5.2.0",
+			},
+		},
+		{
+			ID: "strip-ansi@5.2.0",
+			DependsOn: []string{
+				"ansi-regex@4.1.0",
+			},
+		},
+		{
+			ID: "cliui@5.0.0",
+			DependsOn: []string{
+				"string-width@3.1.0",
+				"strip-ansi@5.2.0",
+				"wrap-ansi@5.1.0",
+			},
+		},
+		{
+			ID: "color-convert@1.9.3",
+			DependsOn: []string{
+				"color-name@1.1.3",
+			},
+		},
+		{
+			ID: "ansi-styles@3.2.1",
+			DependsOn: []string{
+				"color-convert@1.9.3",
+			},
+		},
+		{
+			ID: "wrap-ansi@5.1.0",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"string-width@3.1.0",
+				"strip-ansi@5.2.0",
+			},
+		},
+		{
+			ID: "yargs@13.3.2",
+			DependsOn: []string{
+				"cliui@5.0.0",
+				"find-up@3.0.0",
+				"get-caller-file@2.0.5",
+				"require-directory@2.1.1",
+				"require-main-filename@2.0.0",
+				"set-blocking@2.0.0",
+				"string-width@3.1.0",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@13.1.2",
+			},
+		},
+		{
+			ID: "p-limit@2.3.0",
+			DependsOn: []string{
+				"p-try@2.2.0",
+			},
+		},
+		{
+			ID: "p-locate@3.0.0",
+			DependsOn: []string{
+				"p-limit@2.3.0",
+			},
+		},
+		{
+			ID: "locate-path@3.0.0",
+			DependsOn: []string{
+				"p-locate@3.0.0",
+				"path-exists@3.0.0",
+			},
+		},
+		{
+			ID: "find-up@3.0.0",
+			DependsOn: []string{
+				"locate-path@3.0.0",
+			},
+		},
+		{
+			ID: "yargs-parser@13.1.2",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-unparser@1.6.1",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+				"flat@4.1.0",
+				"is-plain-obj@1.1.0",
+				"yargs@14.2.3",
+			},
+		},
+		{
+			ID: "flat@4.1.0",
+			DependsOn: []string{
+				"is-buffer@2.0.4",
+			},
+		},
+		{
+			ID: "yargs@14.2.3",
+			DependsOn: []string{
+				"cliui@5.0.0",
+				"decamelize@1.2.0",
+				"find-up@3.0.0",
+				"get-caller-file@2.0.5",
+				"require-directory@2.1.1",
+				"require-main-filename@2.0.0",
+				"set-blocking@2.0.0",
+				"string-width@3.1.0",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@15.0.1",
+			},
+		},
+		{
+			ID: "yargs-parser@15.0.1",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
 	}
 
 	// ... and
@@ -2838,6 +14841,980 @@ var (
 		{Name: "yargs-unparser", Version: "1.6.1"},
 		{Name: "yargs", Version: "13.3.2"},
 		{Name: "yargs", Version: "14.2.3"},
+	}
+
+	yarnV2ManyDeps = []types.Dependency{
+		{
+			ID: "promise@8.1.0",
+			DependsOn: []string{
+				"asap@2.0.6",
+			},
+		},
+		{
+			ID: "loose-envify@1.4.0",
+			DependsOn: []string{
+				"js-tokens@4.0.0",
+			},
+		},
+		{
+			ID: "react@16.13.1",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID: "prop-types@15.7.2",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"object-assign@4.1.1",
+				"react-is@16.13.1",
+			},
+		},
+		{
+			ID: "redux@4.0.5",
+			DependsOn: []string{
+				"loose-envify@1.4.0",
+				"symbol-observable@1.2.0",
+			},
+		},
+		{
+			ID: "mocha@8.1.3",
+			DependsOn: []string{
+				"ansi-colors@4.1.1",
+				"browser-stdout@1.3.1",
+				"chokidar@3.4.2",
+				"debug@4.1.1",
+				"diff@4.0.2",
+				"escape-string-regexp@4.0.0",
+				"find-up@5.0.0",
+				"glob@7.1.6",
+				"growl@1.10.5",
+				"he@1.2.0",
+				"js-yaml@3.14.0",
+				"log-symbols@4.0.0",
+				"minimatch@3.0.4",
+				"ms@2.1.2",
+				"object.assign@4.1.0",
+				"promise.allsettled@1.0.2",
+				"serialize-javascript@4.0.0",
+				"strip-json-comments@3.0.1",
+				"supports-color@7.1.0",
+				"which@2.0.2",
+				"wide-align@1.1.3",
+				"workerpool@6.0.0",
+				"yargs@13.3.2",
+				"yargs-parser@13.1.2",
+				"yargs-unparser@1.6.1",
+			},
+		},
+		{
+			ID: "anymatch@3.1.1",
+			DependsOn: []string{
+				"normalize-path@3.0.0",
+				"picomatch@2.2.2",
+			},
+		},
+		{
+			ID: "chokidar@3.4.2",
+			DependsOn: []string{
+				"anymatch@3.1.1",
+				"braces@3.0.2",
+				"fsevents@2.1.3",
+				"glob-parent@5.1.1",
+				"is-binary-path@2.1.0",
+				"is-glob@4.0.1",
+				"normalize-path@3.0.0",
+				"readdirp@3.4.0",
+			},
+		},
+		{
+			ID: "to-regex-range@5.0.1",
+			DependsOn: []string{
+				"is-number@7.0.0",
+			},
+		},
+		{
+			ID: "fill-range@7.0.1",
+			DependsOn: []string{
+				"to-regex-range@5.0.1",
+			},
+		},
+		{
+			ID: "braces@3.0.2",
+			DependsOn: []string{
+				"fill-range@7.0.1",
+			},
+		},
+		{
+			ID: "node-gyp@7.1.0",
+			DependsOn: []string{
+				"env-paths@2.2.0",
+				"glob@7.1.6",
+				"graceful-fs@4.2.4",
+				"nopt@4.0.3",
+				"npmlog@4.1.2",
+				"request@2.88.2",
+				"rimraf@2.7.1",
+				"semver@7.3.2",
+				"tar@6.0.5",
+				"which@2.0.2",
+			},
+		},
+		{
+			ID: "glob@7.1.6",
+			DependsOn: []string{
+				"fs.realpath@1.0.0",
+				"inflight@1.0.6",
+				"inherits@2.0.4",
+				"minimatch@3.0.4",
+				"once@1.4.0",
+				"path-is-absolute@1.0.1",
+			},
+		},
+		{
+			ID: "once@1.4.0",
+			DependsOn: []string{
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "inflight@1.0.6",
+			DependsOn: []string{
+				"once@1.4.0",
+				"wrappy@1.0.2",
+			},
+		},
+		{
+			ID: "brace-expansion@1.1.11",
+			DependsOn: []string{
+				"balanced-match@1.0.0",
+				"concat-map@0.0.1",
+			},
+		},
+		{
+			ID: "minimatch@3.0.4",
+			DependsOn: []string{
+				"brace-expansion@1.1.11",
+			},
+		},
+		{
+			ID: "nopt@4.0.3",
+			DependsOn: []string{
+				"abbrev@1.1.1",
+				"osenv@0.1.5",
+			},
+		},
+		{
+			ID: "osenv@0.1.5",
+			DependsOn: []string{
+				"os-homedir@1.0.2",
+				"os-tmpdir@1.0.2",
+			},
+		},
+		{
+			ID: "are-we-there-yet@1.1.5",
+			DependsOn: []string{
+				"delegates@1.0.0",
+				"readable-stream@2.3.7",
+			},
+		},
+		{
+			ID: "readable-stream@2.3.7",
+			DependsOn: []string{
+				"core-util-is@1.0.2",
+				"inherits@2.0.4",
+				"isarray@1.0.0",
+				"process-nextick-args@2.0.1",
+				"safe-buffer@5.1.2",
+				"string_decoder@1.1.1",
+				"util-deprecate@1.0.2",
+			},
+		},
+		{
+			ID: "string_decoder@1.1.1",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "npmlog@4.1.2",
+			DependsOn: []string{
+				"are-we-there-yet@1.1.5",
+				"console-control-strings@1.1.0",
+				"gauge@2.7.4",
+				"set-blocking@2.0.0",
+			},
+		},
+		{
+			ID: "gauge@2.7.4",
+			DependsOn: []string{
+				"aproba@1.2.0",
+				"console-control-strings@1.1.0",
+				"has-unicode@2.0.1",
+				"object-assign@4.1.1",
+				"signal-exit@3.0.3",
+				"string-width@1.0.2",
+				"strip-ansi@3.0.1",
+				"wide-align@1.1.3",
+			},
+		},
+		{
+			ID: "string-width@1.0.2",
+			DependsOn: []string{
+				"code-point-at@1.1.0",
+				"is-fullwidth-code-point@1.0.0",
+				"strip-ansi@3.0.1",
+			},
+		},
+		{
+			ID: "is-fullwidth-code-point@1.0.0",
+			DependsOn: []string{
+				"number-is-nan@1.0.1",
+			},
+		},
+		{
+			ID: "strip-ansi@3.0.1",
+			DependsOn: []string{
+				"ansi-regex@2.1.1",
+			},
+		},
+		{
+			ID: "string-width@2.1.1",
+			DependsOn: []string{
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@4.0.0",
+			},
+		},
+		{
+			ID: "strip-ansi@4.0.0",
+			DependsOn: []string{
+				"ansi-regex@3.0.0",
+			},
+		},
+		{
+			ID: "wide-align@1.1.3",
+			DependsOn: []string{
+				"string-width@2.1.1",
+			},
+		},
+		{
+			ID: "request@2.88.2",
+			DependsOn: []string{
+				"aws-sign2@0.7.0",
+				"aws4@1.10.1",
+				"caseless@0.12.0",
+				"combined-stream@1.0.8",
+				"extend@3.0.2",
+				"forever-agent@0.6.1",
+				"form-data@2.3.3",
+				"har-validator@5.1.5",
+				"http-signature@1.2.0",
+				"is-typedarray@1.0.0",
+				"isstream@0.1.2",
+				"json-stringify-safe@5.0.1",
+				"mime-types@2.1.27",
+				"oauth-sign@0.9.0",
+				"performance-now@2.1.0",
+				"qs@6.5.2",
+				"safe-buffer@5.2.1",
+				"tough-cookie@2.5.0",
+				"tunnel-agent@0.6.0",
+				"uuid@3.4.0",
+			},
+		},
+		{
+			ID: "combined-stream@1.0.8",
+			DependsOn: []string{
+				"delayed-stream@1.0.0",
+			},
+		},
+		{
+			ID: "form-data@2.3.3",
+			DependsOn: []string{
+				"asynckit@0.4.0",
+				"combined-stream@1.0.8",
+				"mime-types@2.1.27",
+			},
+		},
+		{
+			ID: "mime-types@2.1.27",
+			DependsOn: []string{
+				"mime-db@1.44.0",
+			},
+		},
+		{
+			ID: "ajv@6.12.4",
+			DependsOn: []string{
+				"fast-deep-equal@3.1.3",
+				"fast-json-stable-stringify@2.1.0",
+				"json-schema-traverse@0.4.1",
+				"uri-js@4.4.0",
+			},
+		},
+		{
+			ID: "uri-js@4.4.0",
+			DependsOn: []string{
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "har-validator@5.1.5",
+			DependsOn: []string{
+				"ajv@6.12.4",
+				"har-schema@2.0.0",
+			},
+		},
+		{
+			ID: "http-signature@1.2.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"jsprim@1.4.1",
+				"sshpk@1.16.1",
+			},
+		},
+		{
+			ID: "jsprim@1.4.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"extsprintf@1.3.0",
+				"json-schema@0.2.3",
+				"verror@1.10.0",
+			},
+		},
+		{
+			ID: "verror@1.10.0",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+				"core-util-is@1.0.2",
+				"extsprintf@1.3.0",
+			},
+		},
+		{
+			ID: "asn1@0.2.4",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "sshpk@1.16.1",
+			DependsOn: []string{
+				"asn1@0.2.4",
+				"assert-plus@1.0.0",
+				"bcrypt-pbkdf@1.0.2",
+				"dashdash@1.14.1",
+				"ecc-jsbn@0.1.2",
+				"getpass@0.1.7",
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "bcrypt-pbkdf@1.0.2",
+			DependsOn: []string{
+				"tweetnacl@0.14.5",
+			},
+		},
+		{
+			ID: "dashdash@1.14.1",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "ecc-jsbn@0.1.2",
+			DependsOn: []string{
+				"jsbn@0.1.1",
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "getpass@0.1.7",
+			DependsOn: []string{
+				"assert-plus@1.0.0",
+			},
+		},
+		{
+			ID: "tough-cookie@2.5.0",
+			DependsOn: []string{
+				"psl@1.8.0",
+				"punycode@2.1.1",
+			},
+		},
+		{
+			ID: "tunnel-agent@0.6.0",
+			DependsOn: []string{
+				"safe-buffer@5.2.1",
+			},
+		},
+		{
+			ID: "rimraf@2.7.1",
+			DependsOn: []string{
+				"glob@7.1.6",
+			},
+		},
+		{
+			ID: "tar@6.0.5",
+			DependsOn: []string{
+				"chownr@2.0.0",
+				"fs-minipass@2.1.0",
+				"minipass@3.1.3",
+				"minizlib@2.1.2",
+				"mkdirp@1.0.4",
+				"yallist@4.0.0",
+			},
+		},
+		{
+			ID: "minipass@3.1.3",
+			DependsOn: []string{
+				"yallist@4.0.0",
+			},
+		},
+		{
+			ID: "fs-minipass@2.1.0",
+			DependsOn: []string{
+				"minipass@3.1.3",
+			},
+		},
+		{
+			ID: "minizlib@2.1.2",
+			DependsOn: []string{
+				"minipass@3.1.3",
+				"yallist@4.0.0",
+			},
+		},
+		{
+			ID: "which@2.0.2",
+			DependsOn: []string{
+				"isexe@2.0.0",
+			},
+		},
+		{
+			ID: "fsevents@2.1.3",
+			DependsOn: []string{
+				"node-gyp@7.1.0",
+			},
+		},
+		{
+			ID: "is-glob@4.0.1",
+			DependsOn: []string{
+				"is-extglob@2.1.1",
+			},
+		},
+		{
+			ID: "glob-parent@5.1.1",
+			DependsOn: []string{
+				"is-glob@4.0.1",
+			},
+		},
+		{
+			ID: "is-binary-path@2.1.0",
+			DependsOn: []string{
+				"binary-extensions@2.1.0",
+			},
+		},
+		{
+			ID: "readdirp@3.4.0",
+			DependsOn: []string{
+				"picomatch@2.2.2",
+			},
+		},
+		{
+			ID: "debug@4.1.1",
+			DependsOn: []string{
+				"ms@2.1.2",
+			},
+		},
+		{
+			ID: "p-limit@3.0.2",
+			DependsOn: []string{
+				"p-try@2.2.0",
+			},
+		},
+		{
+			ID: "p-locate@5.0.0",
+			DependsOn: []string{
+				"p-limit@3.0.2",
+			},
+		},
+		{
+			ID: "locate-path@6.0.0",
+			DependsOn: []string{
+				"p-locate@5.0.0",
+			},
+		},
+		{
+			ID: "find-up@5.0.0",
+			DependsOn: []string{
+				"locate-path@6.0.0",
+				"path-exists@4.0.0",
+			},
+		},
+		{
+			ID: "argparse@1.0.10",
+			DependsOn: []string{
+				"sprintf-js@1.0.3",
+			},
+		},
+		{
+			ID: "js-yaml@3.14.0",
+			DependsOn: []string{
+				"argparse@1.0.10",
+				"esprima@4.0.1",
+			},
+		},
+		{
+			ID: "ansi-styles@4.2.1",
+			DependsOn: []string{
+				"@types/color-name@1.1.1",
+				"color-convert@2.0.1",
+			},
+		},
+		{
+			ID: "color-convert@2.0.1",
+			DependsOn: []string{
+				"color-name@1.1.4",
+			},
+		},
+		{
+			ID: "chalk@4.1.0",
+			DependsOn: []string{
+				"ansi-styles@4.2.1",
+				"supports-color@7.1.0",
+			},
+		},
+		{
+			ID: "supports-color@7.1.0",
+			DependsOn: []string{
+				"has-flag@4.0.0",
+			},
+		},
+		{
+			ID: "log-symbols@4.0.0",
+			DependsOn: []string{
+				"chalk@4.1.0",
+			},
+		},
+		{
+			ID: "define-properties@1.1.3",
+			DependsOn: []string{
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "object.assign@4.1.0",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"function-bind@1.1.1",
+				"has-symbols@1.0.1",
+				"object-keys@1.1.1",
+			},
+		},
+		{
+			ID: "array.prototype.map@1.0.2",
+			DependsOn: []string{
+				"define-properties@1.1.3",
+				"es-abstract@1.17.6",
+				"es-array-method-boxes-properly@1.0.0",
+				"is-string@1.0.5",
+			},
+		},
+		{
+			ID: "es-to-primitive@1.2.1",
+			DependsOn: []string{
+				"is-callable@1.2.0",
+				"is-date-object@1.0.2",
+				"is-symbol@1.0.3",
+			},
+		},
+		{
+			ID: "is-symbol@1.0.3",
+			DependsOn: []string{
+				"has-symbols@1.0.1",
+			},
+		},
+		{
+			ID: "es-abstract@1.17.6",
+			DependsOn: []string{
+				"es-to-primitive@1.2.1",
+				"function-bind@1.1.1",
+				"has@1.0.3",
+				"has-symbols@1.0.1",
+				"is-callable@1.2.0",
+				"is-regex@1.1.1",
+				"object-inspect@1.8.0",
+				"object-keys@1.1.1",
+				"object.assign@4.1.0",
+				"string.prototype.trimend@1.0.1",
+				"string.prototype.trimstart@1.0.1",
+			},
+		},
+		{
+			ID: "has@1.0.3",
+			DependsOn: []string{
+				"function-bind@1.1.1",
+			},
+		},
+		{
+			ID: "is-regex@1.1.1",
+			DependsOn: []string{
+				"has-symbols@1.0.1",
+			},
+		},
+		{
+			ID: "string.prototype.trimend@1.0.1",
+			DependsOn: []string{
+				"es-abstract@1.17.6",
+				"define-properties@1.1.3",
+			},
+		},
+		{
+			ID: "string.prototype.trimstart@1.0.1",
+			DependsOn: []string{
+				"es-abstract@1.17.6",
+				"define-properties@1.1.3",
+			},
+		},
+		{
+			ID: "promise.allsettled@1.0.2",
+			DependsOn: []string{
+				"array.prototype.map@1.0.2",
+				"define-properties@1.1.3",
+				"es-abstract@1.17.6",
+				"function-bind@1.1.1",
+				"iterate-value@1.0.2",
+			},
+		},
+		{
+			ID: "es-get-iterator@1.1.0",
+			DependsOn: []string{
+				"es-abstract@1.17.6",
+				"has-symbols@1.0.1",
+				"is-arguments@1.0.4",
+				"is-map@2.0.1",
+				"is-set@2.0.1",
+				"is-string@1.0.5",
+				"isarray@2.0.5",
+			},
+		},
+		{
+			ID: "iterate-value@1.0.2",
+			DependsOn: []string{
+				"es-get-iterator@1.1.0",
+				"iterate-iterator@1.0.1",
+			},
+		},
+		{
+			ID: "randombytes@2.1.0",
+			DependsOn: []string{
+				"safe-buffer@5.2.1",
+			},
+		},
+		{
+			ID: "serialize-javascript@4.0.0",
+			DependsOn: []string{
+				"randombytes@2.1.0",
+			},
+		},
+		{
+			ID: "string-width@3.1.0",
+			DependsOn: []string{
+				"emoji-regex@7.0.3",
+				"is-fullwidth-code-point@2.0.0",
+				"strip-ansi@5.2.0",
+			},
+		},
+		{
+			ID: "strip-ansi@5.2.0",
+			DependsOn: []string{
+				"ansi-regex@4.1.0",
+			},
+		},
+		{
+			ID: "cliui@5.0.0",
+			DependsOn: []string{
+				"string-width@3.1.0",
+				"strip-ansi@5.2.0",
+				"wrap-ansi@5.1.0",
+			},
+		},
+		{
+			ID: "color-convert@1.9.3",
+			DependsOn: []string{
+				"color-name@1.1.3",
+			},
+		},
+		{
+			ID: "ansi-styles@3.2.1",
+			DependsOn: []string{
+				"color-convert@1.9.3",
+			},
+		},
+		{
+			ID: "wrap-ansi@5.1.0",
+			DependsOn: []string{
+				"ansi-styles@3.2.1",
+				"string-width@3.1.0",
+				"strip-ansi@5.2.0",
+			},
+		},
+		{
+			ID: "yargs@13.3.2",
+			DependsOn: []string{
+				"cliui@5.0.0",
+				"find-up@3.0.0",
+				"get-caller-file@2.0.5",
+				"require-directory@2.1.1",
+				"require-main-filename@2.0.0",
+				"set-blocking@2.0.0",
+				"string-width@3.1.0",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@13.1.2",
+			},
+		},
+		{
+			ID: "p-limit@2.3.0",
+			DependsOn: []string{
+				"p-try@2.2.0",
+			},
+		},
+		{
+			ID: "p-locate@3.0.0",
+			DependsOn: []string{
+				"p-limit@2.3.0",
+			},
+		},
+		{
+			ID: "locate-path@3.0.0",
+			DependsOn: []string{
+				"p-locate@3.0.0",
+				"path-exists@3.0.0",
+			},
+		},
+		{
+			ID: "find-up@3.0.0",
+			DependsOn: []string{
+				"locate-path@3.0.0",
+			},
+		},
+		{
+			ID: "yargs-parser@13.1.2",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "yargs-unparser@1.6.1",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+				"flat@4.1.0",
+				"is-plain-obj@1.1.0",
+				"yargs@14.2.3",
+			},
+		},
+		{
+			ID: "flat@4.1.0",
+			DependsOn: []string{
+				"is-buffer@2.0.4",
+			},
+		},
+		{
+			ID: "yargs@14.2.3",
+			DependsOn: []string{
+				"cliui@5.0.0",
+				"decamelize@1.2.0",
+				"find-up@3.0.0",
+				"get-caller-file@2.0.5",
+				"require-directory@2.1.1",
+				"require-main-filename@2.0.0",
+				"set-blocking@2.0.0",
+				"string-width@3.1.0",
+				"which-module@2.0.0",
+				"y18n@4.0.0",
+				"yargs-parser@15.0.1",
+			},
+		},
+		{
+			ID: "yargs-parser@15.0.1",
+			DependsOn: []string{
+				"camelcase@5.3.1",
+				"decamelize@1.2.0",
+			},
+		},
+		{
+			ID: "accepts@1.3.7",
+			DependsOn: []string{
+				"mime-types@2.1.27",
+				"negotiator@0.6.2",
+			},
+		},
+		{
+			ID: "express@4.17.1",
+			DependsOn: []string{
+				"accepts@1.3.7",
+				"array-flatten@1.1.1",
+				"body-parser@1.19.0",
+				"content-disposition@0.5.3",
+				"content-type@1.0.4",
+				"cookie@0.4.0",
+				"cookie-signature@1.0.6",
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"etag@1.8.1",
+				"finalhandler@1.1.2",
+				"fresh@0.5.2",
+				"merge-descriptors@1.0.1",
+				"methods@1.1.2",
+				"on-finished@2.3.0",
+				"parseurl@1.3.3",
+				"path-to-regexp@0.1.7",
+				"proxy-addr@2.0.6",
+				"qs@6.7.0",
+				"range-parser@1.2.1",
+				"safe-buffer@5.1.2",
+				"send@0.17.1",
+				"serve-static@1.14.1",
+				"setprototypeof@1.1.1",
+				"statuses@1.5.0",
+				"type-is@1.6.18",
+				"utils-merge@1.0.1",
+				"vary@1.1.2",
+			},
+		},
+		{
+			ID: "body-parser@1.19.0",
+			DependsOn: []string{
+				"bytes@3.1.0",
+				"content-type@1.0.4",
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"http-errors@1.7.2",
+				"iconv-lite@0.4.24",
+				"on-finished@2.3.0",
+				"qs@6.7.0",
+				"raw-body@2.4.0",
+				"type-is@1.6.18",
+			},
+		},
+		{
+			ID: "debug@2.6.9",
+			DependsOn: []string{
+				"ms@2.0.0",
+			},
+		},
+		{
+			ID: "http-errors@1.7.2",
+			DependsOn: []string{
+				"depd@1.1.2",
+				"inherits@2.0.3",
+				"setprototypeof@1.1.1",
+				"statuses@1.5.0",
+				"toidentifier@1.0.0",
+			},
+		},
+		{
+			ID: "iconv-lite@0.4.24",
+			DependsOn: []string{
+				"safer-buffer@2.1.2",
+			},
+		},
+		{
+			ID: "on-finished@2.3.0",
+			DependsOn: []string{
+				"ee-first@1.1.1",
+			},
+		},
+		{
+			ID: "raw-body@2.4.0",
+			DependsOn: []string{
+				"bytes@3.1.0",
+				"http-errors@1.7.2",
+				"iconv-lite@0.4.24",
+				"unpipe@1.0.0",
+			},
+		},
+		{
+			ID: "type-is@1.6.18",
+			DependsOn: []string{
+				"media-typer@0.3.0",
+				"mime-types@2.1.27",
+			},
+		},
+		{
+			ID: "content-disposition@0.5.3",
+			DependsOn: []string{
+				"safe-buffer@5.1.2",
+			},
+		},
+		{
+			ID: "finalhandler@1.1.2",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"on-finished@2.3.0",
+				"parseurl@1.3.3",
+				"statuses@1.5.0",
+				"unpipe@1.0.0",
+			},
+		},
+		{
+			ID: "proxy-addr@2.0.6",
+			DependsOn: []string{
+				"forwarded@0.1.2",
+				"ipaddr.js@1.9.1",
+			},
+		},
+		{
+			ID: "send@0.17.1",
+			DependsOn: []string{
+				"debug@2.6.9",
+				"depd@1.1.2",
+				"destroy@1.0.4",
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"etag@1.8.1",
+				"fresh@0.5.2",
+				"http-errors@1.7.3",
+				"mime@1.6.0",
+				"ms@2.1.1",
+				"on-finished@2.3.0",
+				"range-parser@1.2.1",
+				"statuses@1.5.0",
+			},
+		},
+		{
+			ID: "http-errors@1.7.3",
+			DependsOn: []string{
+				"depd@1.1.2",
+				"inherits@2.0.4",
+				"setprototypeof@1.1.1",
+				"statuses@1.5.0",
+				"toidentifier@1.0.0",
+			},
+		},
+		{
+			ID: "serve-static@1.14.1",
+			DependsOn: []string{
+				"encodeurl@1.0.2",
+				"escape-html@1.0.3",
+				"parseurl@1.3.3",
+				"send@0.17.1",
+			},
+		},
+		{
+			ID: "axios@0.20.0",
+			DependsOn: []string{
+				"follow-redirects@1.13.0",
+			},
+		},
 	}
 
 	// docker run --name node --rm -it node:16-alpine sh
