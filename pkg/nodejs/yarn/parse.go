@@ -94,8 +94,15 @@ func validProtocol(protocol string) (valid bool) {
 }
 
 func parseResults(yarnLibs map[string]Library, dependsOn map[string][]Dependency) (libs []types.Library, deps []types.Dependency) {
+	// find dependencies by locators
 	for libLoc, lib := range yarnLibs {
+		libs = append(libs, types.Library{
+			Name:    lib.Name,
+			Version: lib.Version,
+		})
+
 		if libDeps, ok := dependsOn[libLoc]; ok {
+			// find resolved version of each dependency
 			libDepIds := lo.FilterMap(libDeps, func(dep Dependency, _ int) (string, bool) {
 				if depLib, ok := yarnLibs[dep.Locator]; ok {
 					return utils.PackageID(depLib.Name, depLib.Version), true
@@ -107,10 +114,6 @@ func parseResults(yarnLibs map[string]Library, dependsOn map[string][]Dependency
 				DependsOn: libDepIds,
 			})
 		}
-		libs = append(libs, types.Library{
-			Name:    lib.Name,
-			Version: lib.Version,
-		})
 	}
 
 	libs = lo.UniqBy(libs, func(lib types.Library) string {

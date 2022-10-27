@@ -12,27 +12,70 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-func TestGetPackageName(t *testing.T) {
+func TestParseLocator(t *testing.T) {
 	vectors := []struct {
-		target   string // Test input file
-		expect   string
-		occurErr bool
+		name           string
+		target         string
+		expectName     string
+		expectProtocol string
+		expactVersion  string
+		occurErr       bool
 	}{
 		{
-			target: `"@babel/code-frame@^7.0.0"`,
-			expect: "@babel/code-frame",
+			name:          "normal",
+			target:        `asn1@~0.2.3:`,
+			expectName:    "asn1",
+			expactVersion: "~0.2.3",
 		},
 		{
-			target: `grunt-contrib-cssmin@3.0.*:`,
-			expect: "grunt-contrib-cssmin",
+			name:           "normal with protocol",
+			target:         `asn1@npm:~0.2.3:`,
+			expectName:     "asn1",
+			expectProtocol: "npm",
+			expactVersion:  "~0.2.3",
 		},
 		{
-			target: "grunt-contrib-uglify-es@gruntjs/grunt-contrib-uglify#harmony:",
-			expect: "grunt-contrib-uglify-es",
+			name:          "scope",
+			target:        `@babel/code-frame@^7.0.0:`,
+			expectName:    "@babel/code-frame",
+			expactVersion: "^7.0.0",
 		},
 		{
-			target: `"jquery@git+https://xxxx:x-oauth-basic@github.com/tomoyamachi/jquery":`,
-			expect: "jquery",
+			name:           "scope with protocol",
+			target:         `@babel/code-frame@npm:^7.0.0:`,
+			expectName:     "@babel/code-frame",
+			expectProtocol: "npm",
+			expactVersion:  "^7.0.0",
+		},
+		{
+			name:           "scope with protocol and quotes",
+			target:         `"@babel/code-frame@npm:^7.0.0":`,
+			expectName:     "@babel/code-frame",
+			expectProtocol: "npm",
+			expactVersion:  "^7.0.0",
+		},
+		{
+			name:          "unusual version",
+			target:        `grunt-contrib-cssmin@3.0.*:`,
+			expectName:    "grunt-contrib-cssmin",
+			expactVersion: "3.0.*",
+		},
+		{
+			name:          "conditional version",
+			target:        `"js-tokens@^3.0.0 || ^4.0.0":`,
+			expectName:    "js-tokens",
+			expactVersion: "^3.0.0 || ^4.0.0",
+		},
+		{
+			target:        "grunt-contrib-uglify-es@gruntjs/grunt-contrib-uglify#harmony:",
+			expectName:    "grunt-contrib-uglify-es",
+			expactVersion: "gruntjs/grunt-contrib-uglify#harmony",
+		},
+		{
+			target:         `"jquery@git+https://xxxx:x-oauth-basic@github.com/tomoyamachi/jquery":`,
+			expectName:     "jquery",
+			expectProtocol: "git+https",
+			expactVersion:  "//xxxx:x-oauth-basic@github.com/tomoyamachi/jquery",
 		},
 		{
 			target:   `normal line`,
@@ -41,15 +84,165 @@ func TestGetPackageName(t *testing.T) {
 	}
 
 	for _, v := range vectors {
-		actual, _, _, err := parsePackageLocators(v.target)
+		gotName, gotProtocol, gotVersion, err := parseLocator(v.target)
 
 		if v.occurErr != (err != nil) {
 			t.Errorf("expect error %t but err is %s", v.occurErr, err)
 			continue
 		}
 
-		if actual != v.expect {
-			t.Errorf("got %s, want %s, target :%s", actual, v.expect, v.target)
+		if gotName != v.expectName {
+			t.Errorf("name mismatch: got %s, want %s, target :%s", gotName, v.expectName, v.target)
+		}
+
+		if gotProtocol != v.expectProtocol {
+			t.Errorf("protocol mismatch: got %s, want %s, target :%s", gotProtocol, v.expectProtocol, v.target)
+		}
+
+		if gotVersion != v.expactVersion {
+			t.Errorf("version mismatch: got %s, want %s, target :%s", gotVersion, v.expactVersion, v.target)
+		}
+	}
+}
+
+func TestParsePackageLocators(t *testing.T) {
+	vectors := []struct {
+		name           string
+		target         string
+		expectName     string
+		expectProtocol string
+		expactLocators []string
+		occurErr       bool
+	}{
+		{
+			name:       "normal",
+			target:     `asn1@~0.2.3:`,
+			expectName: "asn1",
+			expactLocators: []string{
+				"asn1@~0.2.3",
+			},
+		},
+		{
+			name:       "normal with quotes",
+			target:     `"asn1@~0.2.3":`,
+			expectName: "asn1",
+			expactLocators: []string{
+				"asn1@~0.2.3",
+			},
+		},
+		{
+			name:           "normal with protocol",
+			target:         `asn1@npm:~0.2.3:`,
+			expectName:     "asn1",
+			expectProtocol: "npm",
+			expactLocators: []string{
+				"asn1@npm:~0.2.3",
+				"asn1@~0.2.3",
+			},
+		},
+		{
+			name:       "multiple locators",
+			target:     `loose-envify@^1.1.0, loose-envify@^1.4.0:`,
+			expectName: "loose-envify",
+			expactLocators: []string{
+				"loose-envify@^1.1.0",
+				"loose-envify@^1.4.0",
+			},
+		},
+		{
+			name:           "multiple locators v2",
+			target:         `"loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":`,
+			expectName:     "loose-envify",
+			expectProtocol: "npm",
+			expactLocators: []string{
+				"loose-envify@^1.1.0",
+				"loose-envify@npm:^1.1.0",
+				"loose-envify@^1.4.0",
+				"loose-envify@npm:^1.4.0",
+			},
+		},
+		{
+			target:   `normal line`,
+			occurErr: true,
+		},
+	}
+
+	for _, v := range vectors {
+		gotName, gotProtocol, gotLocs, err := parsePackageLocators(v.target)
+
+		if v.occurErr != (err != nil) {
+			t.Errorf("expect error %t but err is %s", v.occurErr, err)
+			continue
+		}
+
+		if gotName != v.expectName {
+			t.Errorf("name mismatch: got %s, want %s, target: %s", gotName, v.expectName, v.target)
+		}
+
+		if gotProtocol != v.expectProtocol {
+			t.Errorf("protocol mismatch: got %s, want %s, target: %s", gotProtocol, v.expectProtocol, v.target)
+		}
+
+		sort.Strings(gotLocs)
+		sort.Strings(v.expactLocators)
+
+		assert.Equal(t, v.expactLocators, gotLocs)
+	}
+}
+
+func TestGetDependency(t *testing.T) {
+	vectors := []struct {
+		name          string
+		target        string
+		expectName    string
+		expactVersion string
+		occurErr      bool
+	}{
+		{
+			name:          "normal",
+			target:        `    chalk "^2.0.1"`,
+			expectName:    "chalk",
+			expactVersion: "^2.0.1",
+		},
+		{
+			name:          "range",
+			target:        `    js-tokens "^3.0.0 || ^4.0.0"`,
+			expectName:    "js-tokens",
+			expactVersion: "^3.0.0 || ^4.0.0",
+		},
+		{
+			name:          "normal v2",
+			target:        `    depd: ~1.1.2`,
+			expectName:    "depd",
+			expactVersion: "~1.1.2",
+		},
+		{
+			name:          "range version v2",
+			target:        `    statuses: ">= 1.5.0 < 2"`,
+			expectName:    "statuses",
+			expactVersion: ">= 1.5.0 < 2",
+		},
+		{
+			name:     "not dependency line",
+			target:   `  languageName: unknown`,
+			occurErr: true,
+		},
+	}
+
+	for _, v := range vectors {
+		gotName, gotVersion, err := getDependency(v.target)
+
+		if v.occurErr != (err != nil) {
+			t.Errorf("expect error %t but err is %s", v.occurErr, err)
+			continue
+		}
+
+		if gotName != v.expectName {
+			t.Errorf("name mismatch: got %s, want %s, target: %s", gotName, v.expectName, v.target)
+		}
+
+		if gotVersion != v.expactVersion {
+			t.Errorf("version mismatch: got %s, want %s, target: %s", gotVersion, v.expactVersion, v.target)
 		}
 	}
 }
