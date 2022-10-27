@@ -27,6 +27,7 @@ type Library struct {
 	Locators []string
 	Name     string
 	Version  string
+	Location types.Location
 }
 type Dependency struct {
 	Locator string
@@ -99,6 +100,9 @@ func parseResults(yarnLibs map[string]Library, dependsOn map[string][]Dependency
 		libs = append(libs, types.Library{
 			Name:    lib.Name,
 			Version: lib.Version,
+			Locations: []types.Location{
+				lib.Location,
+			},
 		})
 
 		if libDeps, ok := dependsOn[libLoc]; ok {
@@ -142,7 +146,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 	var skipPackage bool
 	var isInPackage bool
 	var inDependenciesBlock bool
+	var lineNumber int // It is used to save dependency location
 	for scanner.Scan() {
+		lineNumber++
 		line := scanner.Text()
 		if len(line) < 1 {
 			// save previous package
@@ -155,6 +161,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 					lib = Library{}
 					continue
 				}
+
+				lib.Location.EndLine = lineNumber - 1
 
 				for _, loc := range lib.Locators {
 					yarnLibs[loc] = lib
@@ -217,6 +225,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 			}
 			lib.Name = name
 			lib.Locators = locs
+			// use line number of dependency name for location
+			lib.Location = types.Location{
+				StartLine: lineNumber,
+			}
 			isInPackage = true
 		}
 
@@ -228,6 +240,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 	}
 	// scanner doesn't iterate last line
 	for _, loc := range lib.Locators {
+		lib.Location.EndLine = lineNumber
 		yarnLibs[loc] = lib
 	}
 
