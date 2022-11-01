@@ -1,4 +1,4 @@
-To recreate these files, run:
+To recreate test files, run:
 ```bash
 conda create --yes -n test-dep-parser python=3.8.8
 cp ~/miniconda3/envs/test-dep-parser/conda-meta/*
