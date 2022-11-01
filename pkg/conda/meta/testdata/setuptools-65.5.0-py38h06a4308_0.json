@@ -1,0 +1,59 @@
+{
+  "build": "py38h06a4308_0",
+  "build_number": 0,
+  "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
+  "constrains": [],
+  "depends": [
+    "certifi >=2016.9.26",
+    "python >=3.8,<3.9.0a0"
+  ],
+  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0",
+  "features": "",
+  "files": [
+    "lib/python3.8/site-packages/_distutils_hack/__init__.py",
+    "<SNIP>",
+    "lib/python3.8/site-packages/setuptools/windows_support.py"
+  ],
+  "fn": "setuptools-65.5.0-py38h06a4308_0.conda",
+  "legacy_bz2_md5": "c8a92b43998cc14c24d67f42f6a8faa0",
+  "legacy_bz2_size": 1436496,
+  "license": "MIT",
+  "license_family": "MIT",
+  "link": {
+    "source": "/home/mmaitre/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0",
+    "type": 1
+  },
+  "md5": "39a83921f08b25897e9e4d07f4d41179",
+  "name": "setuptools",
+  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0.conda",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "lib/python3.8/site-packages/_distutils_hack/__init__.py",
+        "path_type": "hardlink",
+        "sha256": "4d27a48545b57dd137ae35376fcf326d2064271084a487960686f8704b94de4a",
+        "sha256_in_prefix": "4d27a48545b57dd137ae35376fcf326d2064271084a487960686f8704b94de4a",
+        "size_in_bytes": 6128
+      },
+      {
+        "_path": "<SNIP>"
+      },
+      {
+        "_path": "lib/python3.8/site-packages/setuptools/windows_support.py",
+        "path_type": "hardlink",
+        "sha256": "297ac55abb5e5e3848a2ed201b095f072d2db40b331cfe76113abeda973499eb",
+        "sha256_in_prefix": "297ac55abb5e5e3848a2ed201b095f072d2db40b331cfe76113abeda973499eb",
+        "size_in_bytes": 718
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "52810ca1e79fbcba8adbfe9a1242bfd5111e0bd0067050e9abc464edbed4792f",
+  "size": 1198888,
+  "subdir": "linux-64",
+  "timestamp": 1667236207481,
+  "track_features": "",
+  "url": "https://repo.anaconda.com/pkgs/main/linux-64/setuptools-65.5.0-py38h06a4308_0.conda",
+  "version": "65.5.0"
+}
