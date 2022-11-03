@@ -6,7 +6,7 @@
   "depends": [
     "libgcc-ng >=11.2.0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/ncurses-6.3-h5eee18b_3",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/ncurses-6.3-h5eee18b_3",
   "features": "",
   "files": [
     "bin/captoinfo",
@@ -18,12 +18,12 @@
   "legacy_bz2_size": 1105342,
   "license": "Free software (MIT-like)",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/ncurses-6.3-h5eee18b_3",
+    "source": "/home/user/miniconda3/pkgs/ncurses-6.3-h5eee18b_3",
     "type": 1
   },
   "md5": "0c616f387885c1bbb57ec0bd1e779ced",
   "name": "ncurses",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/ncurses-6.3-h5eee18b_3.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/ncurses-6.3-h5eee18b_3.conda",
   "paths_data": {
     "paths": [
       {

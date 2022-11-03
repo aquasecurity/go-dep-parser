@@ -9,7 +9,7 @@
     "_libgcc_mutex 0.1 main",
     "libgomp >=7.5.0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/_openmp_mutex-5.1-1_gnu",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/_openmp_mutex-5.1-1_gnu",
   "features": "",
   "files": [
     "lib/libgomp.so.1"
@@ -19,12 +19,12 @@
   "legacy_bz2_size": 20810,
   "license": "BSD-3-Clause",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/_openmp_mutex-5.1-1_gnu",
+    "source": "/home/user/miniconda3/pkgs/_openmp_mutex-5.1-1_gnu",
     "type": 1
   },
   "md5": "71d281e9c2192cb3fa425655a8defb85",
   "name": "_openmp_mutex",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/_openmp_mutex-5.1-1_gnu.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/_openmp_mutex-5.1-1_gnu.conda",
   "paths_data": {
     "paths": [
       {

@@ -4,7 +4,7 @@
   "channel": "https://repo.anaconda.com/pkgs/main/linux-64",
   "constrains": [],
   "depends": [],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/ca-certificates-2022.10.11-h06a4308_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/ca-certificates-2022.10.11-h06a4308_0",
   "features": "",
   "files": [
     "ssl/cacert.pem",
@@ -16,12 +16,12 @@
   "license": "MPL-2.0",
   "license_family": "Other",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/ca-certificates-2022.10.11-h06a4308_0",
+    "source": "/home/user/miniconda3/pkgs/ca-certificates-2022.10.11-h06a4308_0",
     "type": 1
   },
   "md5": "e9b86b388e2cf59585fefca34037b783",
   "name": "ca-certificates",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/ca-certificates-2022.10.11-h06a4308_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/ca-certificates-2022.10.11-h06a4308_0.conda",
   "paths_data": {
     "paths": [
       {

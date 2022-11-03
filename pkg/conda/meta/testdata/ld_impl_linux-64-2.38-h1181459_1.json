@@ -6,7 +6,7 @@
     "binutils_impl_linux-64 2.38"
   ],
   "depends": [],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/ld_impl_linux-64-2.38-h1181459_1",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/ld_impl_linux-64-2.38-h1181459_1",
   "features": "",
   "files": [
     "bin/x86_64-conda-linux-gnu-ld",
@@ -19,12 +19,12 @@
   "legacy_bz2_size": 749072,
   "license": "GPL-3.0-only",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/ld_impl_linux-64-2.38-h1181459_1",
+    "source": "/home/user/miniconda3/pkgs/ld_impl_linux-64-2.38-h1181459_1",
     "type": 1
   },
   "md5": "68eedfd9c06f2b0e6888d8db345b7f5b",
   "name": "ld_impl_linux-64",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/ld_impl_linux-64-2.38-h1181459_1.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/ld_impl_linux-64-2.38-h1181459_1.conda",
   "paths_data": {
     "paths": [
       {

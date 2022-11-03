@@ -7,7 +7,7 @@
     "libgcc-ng >=7.3.0",
     "libstdcxx-ng >=7.3.0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/libffi-3.3-he6710b0_2",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/libffi-3.3-he6710b0_2",
   "features": "",
   "files": [
     "include/ffi.h",
@@ -29,12 +29,12 @@
   "legacy_bz2_size": 55183,
   "license": "Custom",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/libffi-3.3-he6710b0_2",
+    "source": "/home/user/miniconda3/pkgs/libffi-3.3-he6710b0_2",
     "type": 1
   },
   "md5": "88a54b8f50e351c650e16f4ee781440c",
   "name": "libffi",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/libffi-3.3-he6710b0_2.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/libffi-3.3-he6710b0_2.conda",
   "paths_data": {
     "paths": [
       {

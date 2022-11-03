@@ -7,7 +7,7 @@
     "libgcc-ng >=7.5.0",
     "zlib >=1.2.12,<1.3.0a0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/tk-8.6.12-h1ccaba5_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/tk-8.6.12-h1ccaba5_0",
   "features": "",
   "files": [
     "bin/sqlite3_analyzer",
@@ -20,12 +20,12 @@
   "license": "TCL",
   "license_family": "BSD",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/tk-8.6.12-h1ccaba5_0",
+    "source": "/home/user/miniconda3/pkgs/tk-8.6.12-h1ccaba5_0",
     "type": 1
   },
   "md5": "fa10ff4aa631fa4aa090a6234d7770b9",
   "name": "tk",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/tk-8.6.12-h1ccaba5_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/tk-8.6.12-h1ccaba5_0.conda",
   "paths_data": {
     "paths": [
       {

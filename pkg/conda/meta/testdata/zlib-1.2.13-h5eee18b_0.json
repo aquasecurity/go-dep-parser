@@ -6,7 +6,7 @@
   "depends": [
     "libgcc-ng >=11.2.0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/zlib-1.2.13-h5eee18b_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/zlib-1.2.13-h5eee18b_0",
   "features": "",
   "files": [
     "include/zconf.h",
@@ -23,12 +23,12 @@
   "license": "Zlib",
   "license_family": "Other",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/zlib-1.2.13-h5eee18b_0",
+    "source": "/home/user/miniconda3/pkgs/zlib-1.2.13-h5eee18b_0",
     "type": 1
   },
   "md5": "333e31fbfbb5057c92fa845ad6adef93",
   "name": "zlib",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/zlib-1.2.13-h5eee18b_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/zlib-1.2.13-h5eee18b_0.conda",
   "paths_data": {
     "paths": [
       {

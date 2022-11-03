@@ -7,7 +7,7 @@
     "ca-certificates",
     "libgcc-ng >=7.5.0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/openssl-1.1.1q-h7f8727e_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/openssl-1.1.1q-h7f8727e_0",
   "features": "",
   "files": [
     "bin/c_rehash",
@@ -142,12 +142,12 @@
   "license": "OpenSSL",
   "license_family": "Apache",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/openssl-1.1.1q-h7f8727e_0",
+    "source": "/home/user/miniconda3/pkgs/openssl-1.1.1q-h7f8727e_0",
     "type": 1
   },
   "md5": "2ac47797afee2ece8d339c18b095b8d8",
   "name": "openssl",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/openssl-1.1.1q-h7f8727e_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/openssl-1.1.1q-h7f8727e_0.conda",
   "paths_data": {
     "paths": [
       {

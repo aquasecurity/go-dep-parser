@@ -6,7 +6,7 @@
   "depends": [
     "python >=3.8,<3.9.0a0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/certifi-2022.9.24-py38h06a4308_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/certifi-2022.9.24-py38h06a4308_0",
   "features": "",
   "files": [
     "lib/python3.8/site-packages/certifi-2022.9.24.dist-info/INSTALLER",
@@ -32,12 +32,12 @@
   "license": "MPL-2.0",
   "license_family": "Other",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/certifi-2022.9.24-py38h06a4308_0",
+    "source": "/home/user/miniconda3/pkgs/certifi-2022.9.24-py38h06a4308_0",
     "type": 1
   },
   "md5": "2c24987d7c70c1c4c3a8c0f0e744b853",
   "name": "certifi",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/certifi-2022.9.24-py38h06a4308_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/certifi-2022.9.24-py38h06a4308_0.conda",
   "paths_data": {
     "paths": [
       {

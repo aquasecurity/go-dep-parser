@@ -6,7 +6,7 @@
   "depends": [
     "libgcc-ng >=11.2.0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/xz-5.2.6-h5eee18b_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/xz-5.2.6-h5eee18b_0",
   "features": "",
   "files": [
     "bin/lzcat",
@@ -155,12 +155,12 @@
   "license": "LGPL-2.1-or-later and GPL-2.0-or-later",
   "license_family": "GPL2",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/xz-5.2.6-h5eee18b_0",
+    "source": "/home/user/miniconda3/pkgs/xz-5.2.6-h5eee18b_0",
     "type": 1
   },
   "md5": "8abc704d4a473839d5351b43deb793bb",
   "name": "xz",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/xz-5.2.6-h5eee18b_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/xz-5.2.6-h5eee18b_0.conda",
   "paths_data": {
     "paths": [
       {

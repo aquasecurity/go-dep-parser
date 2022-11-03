@@ -7,7 +7,7 @@
     "certifi >=2016.9.26",
     "python >=3.8,<3.9.0a0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0",
   "features": "",
   "files": [
     "lib/python3.8/site-packages/_distutils_hack/__init__.py",
@@ -20,12 +20,12 @@
   "license": "MIT",
   "license_family": "MIT",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0",
+    "source": "/home/user/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0",
     "type": 1
   },
   "md5": "39a83921f08b25897e9e4d07f4d41179",
   "name": "setuptools",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/setuptools-65.5.0-py38h06a4308_0.conda",
   "paths_data": {
     "paths": [
       {

@@ -6,7 +6,7 @@
   "depends": [
     "python"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/wheel-0.37.1-pyhd3eb1b0_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/wheel-0.37.1-pyhd3eb1b0_0",
   "features": "",
   "files": [
     "lib/python3.8/site-packages/wheel-0.37.1-py3.9.egg-info/PKG-INFO",
@@ -56,13 +56,13 @@
   "license": "MIT",
   "license_family": "MIT",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/wheel-0.37.1-pyhd3eb1b0_0",
+    "source": "/home/user/miniconda3/pkgs/wheel-0.37.1-pyhd3eb1b0_0",
     "type": 1
   },
   "md5": "ab85e96e26da8d5797c2458232338b86",
   "name": "wheel",
   "noarch": "python",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/wheel-0.37.1-pyhd3eb1b0_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/wheel-0.37.1-pyhd3eb1b0_0.conda",
   "package_type": "noarch_python",
   "paths_data": {
     "paths": [

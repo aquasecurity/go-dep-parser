@@ -12,7 +12,7 @@
     "_openmp_mutex",
     "_libgcc_mutex * main"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/libgcc-ng-11.2.0-h1234567_1",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/libgcc-ng-11.2.0-h1234567_1",
   "features": "",
   "files": [
     "lib/libasan.so",
@@ -47,12 +47,12 @@
   "legacy_bz2_size": 8895144,
   "license": "GPL-3.0-only WITH GCC-exception-3.1",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/libgcc-ng-11.2.0-h1234567_1",
+    "source": "/home/user/miniconda3/pkgs/libgcc-ng-11.2.0-h1234567_1",
     "type": 1
   },
   "md5": "a87728dabf3151fb9cfa990bd2eb0464",
   "name": "libgcc-ng",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/libgcc-ng-11.2.0-h1234567_1.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/libgcc-ng-11.2.0-h1234567_1.conda",
   "paths_data": {
     "paths": [
       {

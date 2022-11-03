@@ -16,7 +16,7 @@
     "zlib >=1.2.11,<1.3.0a0",
     "pip"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/python-3.8.8-hdb3f193_5",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/python-3.8.8-hdb3f193_5",
   "features": "",
   "files": [
     "bin/2to3",
@@ -28,12 +28,12 @@
   "legacy_bz2_size": 61015482,
   "license": "Python-2.0",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/python-3.8.8-hdb3f193_5",
+    "source": "/home/user/miniconda3/pkgs/python-3.8.8-hdb3f193_5",
     "type": 1
   },
   "md5": "266058a081e3164d6966e89e379177e6",
   "name": "python",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/python-3.8.8-hdb3f193_5.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/python-3.8.8-hdb3f193_5.conda",
   "paths_data": {
     "paths": [
       {

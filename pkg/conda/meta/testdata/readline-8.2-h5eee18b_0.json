@@ -7,7 +7,7 @@
     "libgcc-ng >=11.2.0",
     "ncurses >=6.3,<7.0a0"
   ],
-  "extracted_package_dir": "/home/mmaitre/miniconda3/pkgs/readline-8.2-h5eee18b_0",
+  "extracted_package_dir": "/home/user/miniconda3/pkgs/readline-8.2-h5eee18b_0",
   "features": "",
   "files": [
     "include/readline/chardefs.h",
@@ -43,12 +43,12 @@
   "license": "GPL-3.0-only",
   "license_family": "GPL",
   "link": {
-    "source": "/home/mmaitre/miniconda3/pkgs/readline-8.2-h5eee18b_0",
+    "source": "/home/user/miniconda3/pkgs/readline-8.2-h5eee18b_0",
     "type": 1
   },
   "md5": "be42180685cce6e6b0329201d9f48efb",
   "name": "readline",
-  "package_tarball_full_path": "/home/mmaitre/miniconda3/pkgs/readline-8.2-h5eee18b_0.conda",
+  "package_tarball_full_path": "/home/user/miniconda3/pkgs/readline-8.2-h5eee18b_0.conda",
   "paths_data": {
     "paths": [
       {
