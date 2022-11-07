@@ -15,6 +15,10 @@ var (
 		{Name: "Newtonsoft.Json", Version: "12.0.3"},
 		{Name: "NuGet.Frameworks", Version: "5.7.0"},
 	}
+	nuGetSimpleDeps = []types.Dependency{
+		{ID: "Newtonsoft.Json@12.0.3", DependsOn: []string{}},
+		{ID: "NuGet.Frameworks@5.7.0", DependsOn: []string{}},
+	}
 
 	// docker run --rm -i -t mcr.microsoft.com/dotnet/sdk:latest
 	// apt -y update && apt -y install jq
@@ -34,6 +38,15 @@ var (
 		{Name: "Swashbuckle.AspNetCore.SwaggerGen", Version: "5.5.1"},
 		{Name: "Swashbuckle.AspNetCore.SwaggerUI", Version: "5.5.1"},
 	}
+	nuGetSubDependenciesDeps = []types.Dependency{
+		{ID: "Microsoft.Extensions.ApiDescription.Server@3.0.0", DependsOn: []string{}},
+		{ID: "Microsoft.OpenApi@1.1.4", DependsOn: []string{}},
+		{ID: "Swashbuckle.AspNetCore.Swagger@5.5.1", DependsOn: []string{"Microsoft.OpenApi@1.1.4"}},
+		{ID: "Swashbuckle.AspNetCore.SwaggerGen@5.5.1", DependsOn: []string{"Swashbuckle.AspNetCore.Swagger@5.5.1"}},
+		{ID: "Swashbuckle.AspNetCore.SwaggerUI@5.5.1", DependsOn: []string{}},
+		{ID: "Newtonsoft.Json@12.0.3", DependsOn: []string{}},
+		{ID: "NuGet.Frameworks@5.7.0", DependsOn: []string{}},
+		{ID: "Swashbuckle.AspNetCore@5.5.1", DependsOn: []string{"Microsoft.Extensions.ApiDescription.Server@3.0.0", "Swashbuckle.AspNetCore.Swagger@5.5.1", "Swashbuckle.AspNetCore.SwaggerGen@5.5.1", "Swashbuckle.AspNetCore.SwaggerUI@5.5.1"}}}
 
 	// mcr.microsoft.com/dotnet/sdk:latest
 	// apt -y update && apt -y install jq
@@ -47,6 +60,7 @@ var (
 		{Name: "AWSSDK.Core", Version: "3.5.1.30"},
 		{Name: "Newtonsoft.Json", Version: "12.0.3"},
 	}
+	nuGetLegacyDeps = []types.Dependency{{ID: "Newtonsoft.Json@12.0.3", DependsOn: []string{}}, {ID: "AWSSDK.Core@3.5.1.30", DependsOn: []string{}}}
 
 	// docker run --rm -i -t mcr.microsoft.com/dotnet/sdk:latest
 	// apt -y update && apt -y install jq
@@ -98,5 +112,47 @@ var (
 		{Name: "System.Threading.Tasks.Extensions", Version: "4.5.2"},
 		{Name: "System.Xml.ReaderWriter", Version: "4.3.0"},
 		{Name: "System.Xml.XDocument", Version: "4.3.0"},
+	}
+	nuGetMultiTargetDeps = []types.Dependency{
+		{ID: "AWSSDK.Core@3.5.1.30", DependsOn: []string{"Microsoft.Bcl.AsyncInterfaces@1.1.0"}},
+		{ID: "Microsoft.Bcl.AsyncInterfaces@1.1.0", DependsOn: []string{"System.Threading.Tasks.Extensions@4.5.2"}},
+		{ID: "Microsoft.CSharp@4.3.0", DependsOn: []string{"System.Dynamic.Runtime@4.3.0", "System.Linq.Expressions@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "Microsoft.NETCore.Platforms@1.1.0", DependsOn: []string{}},
+		{ID: "Microsoft.NETCore.Targets@1.1.0", DependsOn: []string{}},
+		{ID: "Microsoft.NETFramework.ReferenceAssemblies.net20@1.0.0", DependsOn: []string{}},
+		{ID: "Microsoft.NETFramework.ReferenceAssemblies.net40@1.0.0", DependsOn: []string{}},
+		{ID: "Microsoft.NETFramework.ReferenceAssemblies@1.0.0", DependsOn: []string{"Microsoft.NETFramework.ReferenceAssemblies.net20@1.0.0", "Microsoft.NETFramework.ReferenceAssemblies.net40@1.0.0"}},
+		{ID: "NETStandard.Library@1.6.1", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "System.Collections@4.3.0", "System.Diagnostics.Debug@4.3.0", "System.Diagnostics.Tools@4.3.0", "System.Globalization@4.3.0", "System.IO@4.3.0", "System.Linq.Expressions@4.3.0", "System.Linq@4.3.0", "System.Net.Primitives@4.3.0", "System.ObjectModel@4.3.0", "System.Reflection.Extensions@4.3.0", "System.Reflection.Primitives@4.3.0", "System.Reflection@4.3.0", "System.Resources.ResourceManager@4.3.0", "System.Runtime.Extensions@4.3.0", "System.Runtime@4.3.0", "System.Text.Encoding.Extensions@4.3.0", "System.Text.Encoding@4.3.0", "System.Text.RegularExpressions@4.3.0", "System.Threading.Tasks@4.3.0", "System.Threading@4.3.0", "System.Xml.ReaderWriter@4.3.0", "System.Xml.XDocument@4.3.0"}},
+		{ID: "NETStandard.Library@2.0.3", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0"}},
+		{ID: "Newtonsoft.Json@12.0.3", DependsOn: []string{"Microsoft.CSharp@4.3.0", "NETStandard.Library@1.6.1", "System.ComponentModel.TypeConverter@4.3.0", "System.Runtime.Serialization.Primitives@4.3.0"}},
+		{ID: "System.Collections@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.ComponentModel.Primitives@4.3.0", DependsOn: []string{"System.ComponentModel@4.3.0", "System.Resources.ResourceManager@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "System.ComponentModel.TypeConverter@4.3.0", DependsOn: []string{"System.Collections@4.3.0", "System.ComponentModel.Primitives@4.3.0", "System.ComponentModel@4.3.0", "System.Globalization@4.3.0", "System.Reflection.Extensions@4.3.0", "System.Reflection.Primitives@4.3.0", "System.Reflection@4.3.0", "System.Resources.ResourceManager@4.3.0", "System.Runtime.Extensions@4.3.0", "System.Runtime@4.3.0", "System.Threading@4.3.0"}},
+		{ID: "System.ComponentModel@4.3.0", DependsOn: []string{"System.Runtime@4.3.0"}},
+		{ID: "System.Diagnostics.Debug@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Diagnostics.Tools@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Dynamic.Runtime@4.3.0", DependsOn: []string{"System.Linq.Expressions@4.3.0", "System.ObjectModel@4.3.0", "System.Reflection@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Globalization@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.IO@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0", "System.Text.Encoding@4.3.0", "System.Threading.Tasks@4.3.0"}},
+		{ID: "System.Linq.Expressions@4.3.0", DependsOn: []string{"System.Reflection@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Linq@4.3.0", DependsOn: []string{"System.Collections@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Net.Primitives@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.ObjectModel@4.3.0", DependsOn: []string{"System.Runtime@4.3.0"}},
+		{ID: "System.Reflection.Extensions@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Reflection@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Reflection.Primitives@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Reflection@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.IO@4.3.0", "System.Reflection.Primitives@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Resources.ResourceManager@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Globalization@4.3.0", "System.Reflection@4.3.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Runtime.CompilerServices.Unsafe@4.5.2", DependsOn: []string{}},
+		{ID: "System.Runtime.Extensions@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Runtime.Serialization.Primitives@4.3.0", DependsOn: []string{"System.Runtime@4.3.0"}},
+		{ID: "System.Runtime@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0"}},
+		{ID: "System.Text.Encoding.Extensions@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0", "System.Text.Encoding@4.3.0"}},
+		{ID: "System.Text.Encoding@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Text.RegularExpressions@4.3.0", DependsOn: []string{"System.Runtime@4.3.0"}},
+		{ID: "System.Threading.Tasks.Extensions@4.5.2", DependsOn: []string{"System.Runtime.CompilerServices.Unsafe@4.5.2"}},
+		{ID: "System.Threading.Tasks@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
+		{ID: "System.Threading@4.3.0", DependsOn: []string{"System.Runtime@4.3.0", "System.Threading.Tasks@4.3.0"}},
+		{ID: "System.Xml.ReaderWriter@4.3.0", DependsOn: []string{"System.IO@4.3.0", "System.Runtime@4.3.0", "System.Text.Encoding@4.3.0", "System.Threading.Tasks@4.3.0"}},
+		{ID: "System.Xml.XDocument@4.3.0", DependsOn: []string{"System.IO@4.3.0", "System.Runtime@4.3.0", "System.Xml.ReaderWriter@4.3.0"}},
 	}
 )

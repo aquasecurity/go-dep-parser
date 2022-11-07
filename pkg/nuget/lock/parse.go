@@ -18,8 +18,9 @@ type LockFile struct {
 type Dependencies map[string]Dependency
 
 type Dependency struct {
-	Type     string
-	Resolved string
+	Type         string
+	Resolved     string
+	Dependencies map[string]string `json:"dependencies,omitempty"`
 }
 
 type Parser struct{}
@@ -37,6 +38,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	libs := make([]types.Library, 0)
+	depsMap := make(map[string][]string)
 	for _, targetContent := range lockFile.Targets {
 		for packageName, packageContent := range targetContent {
 			// If package type is "project", it is the actual project, and we skip it.
@@ -49,7 +51,33 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 				Version: packageContent.Resolved,
 			}
 			libs = append(libs, lib)
+
+			depId := utils.PackageID(packageName, packageContent.Resolved)
+			dependsOn := make([]string, 0)
+
+			for depName := range packageContent.Dependencies {
+				dependsOn = append(dependsOn, utils.PackageID(depName, targetContent[depName].Resolved))
+			}
+
+			if depsMap[depId] != nil {
+				dependsOn = append(dependsOn, depsMap[depId]...)
+				if dependsOn = utils.UniqueStrings(dependsOn); dependsOn == nil {
+					dependsOn = make([]string, 0)
+				}
+			}
+
+			depsMap[depId] = dependsOn
 		}
 	}
-	return utils.UniqueLibraries(libs), nil, nil
+
+	deps := make([]types.Dependency, 0)
+	for depId, dependsOn := range depsMap {
+		dep := types.Dependency{
+			ID:        depId,
+			DependsOn: dependsOn,
+		}
+		deps = append(deps, dep)
+	}
+
+	return utils.UniqueLibraries(libs), deps, nil
 }
