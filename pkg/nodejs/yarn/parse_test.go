@@ -136,7 +136,6 @@ func TestParsePackageLocators(t *testing.T) {
 			expectName:     "asn1",
 			expectProtocol: "npm",
 			expactLocators: []string{
-				"asn1@npm:~0.2.3",
 				"asn1@~0.2.3",
 			},
 		},
@@ -156,9 +155,7 @@ func TestParsePackageLocators(t *testing.T) {
 			expectProtocol: "npm",
 			expactLocators: []string{
 				"loose-envify@^1.1.0",
-				"loose-envify@npm:^1.1.0",
 				"loose-envify@^1.4.0",
-				"loose-envify@npm:^1.4.0",
 			},
 		},
 		{

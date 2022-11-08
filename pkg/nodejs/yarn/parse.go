@@ -13,10 +13,9 @@ import (
 )
 
 var (
-	yarnLocatorRegexp      = regexp.MustCompile(`\\?"?(?P<package>.+?)@(?:(?P<protocol>.+?):)?(?P<version>.+?)\\?"?:?$`)
-	yarnVersionRegexp      = regexp.MustCompile(`\s+"?version:?"?\s+"?(?P<version>[^"]+)"?`)
-	yarnDependenciesRegexp = regexp.MustCompile(`\s+"?dependencies:?"?`)
-	yarnDependencyRegexp   = regexp.MustCompile(`\s{4,}"?(?P<package>.+?)"?:?\s"?(?P<version>[^"]+)"?`)
+	yarnLocatorRegexp    = regexp.MustCompile(`\\?"?(?P<package>.+?)@(?:(?P<protocol>.+?):)?(?P<version>.+?)\\?"?:?$`)
+	yarnVersionRegexp    = regexp.MustCompile(`\s+"?version:?"?\s+"?(?P<version>[^"]+)"?`)
+	yarnDependencyRegexp = regexp.MustCompile(`\s{4,}"?(?P<package>.+?)"?:?\s"?(?P<version>[^"]+)"?`)
 )
 
 type LockFile struct {
@@ -58,13 +57,9 @@ func parsePackageLocators(target string) (packagename, protocol string, locs []s
 	if err != nil {
 		return "", "", nil, err
 	}
-	locs = lo.FlatMap(locsSplit, func(loc string, _ int) []string {
+	locs = lo.Map(locsSplit, func(loc string, _ int) string {
 		_, _, version, _ := parseLocator(loc)
-		ls := []string{utils.PackageID(packagename, version)}
-		if protocol != "" {
-			ls = append(ls, packagename+"@"+protocol+":"+version)
-		}
-		return ls
+		return utils.PackageID(packagename, version)
 	})
 	return
 }
@@ -233,7 +228,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 		}
 
 		// start dependencies block
-		if isInPackage && yarnDependenciesRegexp.MatchString(line) {
+		if isInPackage && strings.TrimSpace(line) == "dependencies:" {
 			inDependenciesBlock = true
 			continue
 		}
