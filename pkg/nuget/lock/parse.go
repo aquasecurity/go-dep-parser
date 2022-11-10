@@ -53,17 +53,14 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			libs = append(libs, lib)
 
 			depId := utils.PackageID(packageName, packageContent.Resolved)
-			dependsOn := make([]string, 0)
+			var dependsOn []string
 
 			for depName := range packageContent.Dependencies {
 				dependsOn = append(dependsOn, utils.PackageID(depName, targetContent[depName].Resolved))
 			}
 
-			if depsMap[depId] != nil {
-				dependsOn = append(dependsOn, depsMap[depId]...)
-				if dependsOn = utils.UniqueStrings(dependsOn); dependsOn == nil {
-					dependsOn = make([]string, 0)
-				}
+			if savedDependsOn, ok := depsMap[depId]; ok {
+				dependsOn = utils.UniqueStrings(append(dependsOn, savedDependsOn...))
 			}
 
 			depsMap[depId] = dependsOn
