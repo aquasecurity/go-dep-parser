@@ -63,7 +63,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 				dependsOn = utils.UniqueStrings(append(dependsOn, savedDependsOn...))
 			}
 
-			depsMap[depId] = dependsOn
+			if len(dependsOn) > 0 {
+				depsMap[depId] = dependsOn
+			}
 		}
 	}
 

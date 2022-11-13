@@ -15,10 +15,7 @@ var (
 		{Name: "Newtonsoft.Json", Version: "12.0.3"},
 		{Name: "NuGet.Frameworks", Version: "5.7.0"},
 	}
-	nuGetSimpleDeps = []types.Dependency{
-		{ID: "Newtonsoft.Json@12.0.3", DependsOn: nil},
-		{ID: "NuGet.Frameworks@5.7.0", DependsOn: nil},
-	}
+	nuGetSimpleDeps = []types.Dependency{}
 
 	// docker run --rm -i -t mcr.microsoft.com/dotnet/sdk:latest
 	// apt -y update && apt -y install jq
@@ -39,13 +36,8 @@ var (
 		{Name: "Swashbuckle.AspNetCore.SwaggerUI", Version: "5.5.1"},
 	}
 	nuGetSubDependenciesDeps = []types.Dependency{
-		{ID: "Microsoft.Extensions.ApiDescription.Server@3.0.0", DependsOn: nil},
-		{ID: "Microsoft.OpenApi@1.1.4", DependsOn: nil},
 		{ID: "Swashbuckle.AspNetCore.Swagger@5.5.1", DependsOn: []string{"Microsoft.OpenApi@1.1.4"}},
 		{ID: "Swashbuckle.AspNetCore.SwaggerGen@5.5.1", DependsOn: []string{"Swashbuckle.AspNetCore.Swagger@5.5.1"}},
-		{ID: "Swashbuckle.AspNetCore.SwaggerUI@5.5.1", DependsOn: nil},
-		{ID: "Newtonsoft.Json@12.0.3", DependsOn: nil},
-		{ID: "NuGet.Frameworks@5.7.0", DependsOn: nil},
 		{ID: "Swashbuckle.AspNetCore@5.5.1", DependsOn: []string{"Microsoft.Extensions.ApiDescription.Server@3.0.0", "Swashbuckle.AspNetCore.Swagger@5.5.1", "Swashbuckle.AspNetCore.SwaggerGen@5.5.1", "Swashbuckle.AspNetCore.SwaggerUI@5.5.1"}}}
 
 	// mcr.microsoft.com/dotnet/sdk:latest
@@ -60,7 +52,7 @@ var (
 		{Name: "AWSSDK.Core", Version: "3.5.1.30"},
 		{Name: "Newtonsoft.Json", Version: "12.0.3"},
 	}
-	nuGetLegacyDeps = []types.Dependency{{ID: "Newtonsoft.Json@12.0.3", DependsOn: nil}, {ID: "AWSSDK.Core@3.5.1.30", DependsOn: nil}}
+	nuGetLegacyDeps = []types.Dependency{}
 
 	// docker run --rm -i -t mcr.microsoft.com/dotnet/sdk:latest
 	// apt -y update && apt -y install jq
@@ -117,10 +109,6 @@ var (
 		{ID: "AWSSDK.Core@3.5.1.30", DependsOn: []string{"Microsoft.Bcl.AsyncInterfaces@1.1.0"}},
 		{ID: "Microsoft.Bcl.AsyncInterfaces@1.1.0", DependsOn: []string{"System.Threading.Tasks.Extensions@4.5.2"}},
 		{ID: "Microsoft.CSharp@4.3.0", DependsOn: []string{"System.Dynamic.Runtime@4.3.0", "System.Linq.Expressions@4.3.0", "System.Runtime@4.3.0"}},
-		{ID: "Microsoft.NETCore.Platforms@1.1.0", DependsOn: nil},
-		{ID: "Microsoft.NETCore.Targets@1.1.0", DependsOn: nil},
-		{ID: "Microsoft.NETFramework.ReferenceAssemblies.net20@1.0.0", DependsOn: nil},
-		{ID: "Microsoft.NETFramework.ReferenceAssemblies.net40@1.0.0", DependsOn: nil},
 		{ID: "Microsoft.NETFramework.ReferenceAssemblies@1.0.0", DependsOn: []string{"Microsoft.NETFramework.ReferenceAssemblies.net20@1.0.0", "Microsoft.NETFramework.ReferenceAssemblies.net40@1.0.0"}},
 		{ID: "NETStandard.Library@1.6.1", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "System.Collections@4.3.0", "System.Diagnostics.Debug@4.3.0", "System.Diagnostics.Tools@4.3.0", "System.Globalization@4.3.0", "System.IO@4.3.0", "System.Linq.Expressions@4.3.0", "System.Linq@4.3.0", "System.Net.Primitives@4.3.0", "System.ObjectModel@4.3.0", "System.Reflection.Extensions@4.3.0", "System.Reflection.Primitives@4.3.0", "System.Reflection@4.3.0", "System.Resources.ResourceManager@4.3.0", "System.Runtime.Extensions@4.3.0", "System.Runtime@4.3.0", "System.Text.Encoding.Extensions@4.3.0", "System.Text.Encoding@4.3.0", "System.Text.RegularExpressions@4.3.0", "System.Threading.Tasks@4.3.0", "System.Threading@4.3.0", "System.Xml.ReaderWriter@4.3.0", "System.Xml.XDocument@4.3.0"}},
 		{ID: "NETStandard.Library@2.0.3", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0"}},
@@ -142,7 +130,6 @@ var (
 		{ID: "System.Reflection.Primitives@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
 		{ID: "System.Reflection@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.IO@4.3.0", "System.Reflection.Primitives@4.3.0", "System.Runtime@4.3.0"}},
 		{ID: "System.Resources.ResourceManager@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Globalization@4.3.0", "System.Reflection@4.3.0", "System.Runtime@4.3.0"}},
-		{ID: "System.Runtime.CompilerServices.Unsafe@4.5.2", DependsOn: nil},
 		{ID: "System.Runtime.Extensions@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0", "System.Runtime@4.3.0"}},
 		{ID: "System.Runtime.Serialization.Primitives@4.3.0", DependsOn: []string{"System.Runtime@4.3.0"}},
 		{ID: "System.Runtime@4.3.0", DependsOn: []string{"Microsoft.NETCore.Platforms@1.1.0", "Microsoft.NETCore.Targets@1.1.0"}},
