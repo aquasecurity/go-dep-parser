@@ -1,7 +1,9 @@
 package lock
 
 import (
-	"encoding/json"
+	"io"
+
+	"github.com/liamg/jfather"
 
 	"golang.org/x/xerrors"
 
@@ -11,15 +13,17 @@ import (
 )
 
 type LockFile struct {
-	Version int
+	Version int                     `json:"version"`
 	Targets map[string]Dependencies `json:"dependencies"`
 }
 
 type Dependencies map[string]Dependency
 
 type Dependency struct {
-	Type         string
-	Resolved     string
+	Type         string `json:"type"`
+	Resolved     string `json:"resolved"`
+	StartLine    int
+	EndLine      int
 	Dependencies map[string]string `json:"dependencies,omitempty"`
 }
 
@@ -31,9 +35,11 @@ func NewParser() types.Parser {
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockFile LockFile
-	decoder := json.NewDecoder(r)
-
-	if err := decoder.Decode(&lockFile); err != nil {
+	input, err := io.ReadAll(r)
+	if err != nil {
+		return nil, nil, xerrors.Errorf("failed to read packages.lock.json: %w", err)
+	}
+	if err := jfather.Unmarshal(input, &lockFile); err != nil {
 		return nil, nil, xerrors.Errorf("failed to decode packages.lock.json: %w", err)
 	}
 
@@ -46,13 +52,21 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 				continue
 			}
 
+			depId := utils.PackageID(packageName, packageContent.Resolved)
+
 			lib := types.Library{
+				ID:      depId,
 				Name:    packageName,
 				Version: packageContent.Resolved,
+				Locations: []types.Location{
+					{
+						StartLine: packageContent.StartLine,
+						EndLine:   packageContent.EndLine,
+					},
+				},
 			}
 			libs = append(libs, lib)
 
-			depId := utils.PackageID(packageName, packageContent.Resolved)
 			var dependsOn []string
 
 			for depName := range packageContent.Dependencies {
@@ -79,4 +93,15 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	return utils.UniqueLibraries(libs), deps, nil
+}
+
+// UnmarshalJSONWithMetadata needed to detect start and end lines of deps
+func (t *Dependency) UnmarshalJSONWithMetadata(node jfather.Node) error {
+	if err := node.Decode(&t); err != nil {
+		return err
+	}
+	// Decode func will overwrite line numbers if we save them first
+	t.StartLine = node.Range().Start.Line
+	t.EndLine = node.Range().End.Line
+	return nil
 }
