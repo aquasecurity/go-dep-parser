@@ -93,6 +93,7 @@ func parseResults(yarnLibs map[string]Library, dependsOn map[string][]Dependency
 	// find dependencies by locators
 	for libLoc, lib := range yarnLibs {
 		libs = append(libs, types.Library{
+			ID:      utils.PackageID(lib.Name, lib.Version),
 			Name:    lib.Name,
 			Version: lib.Version,
 			Locations: []types.Location{
