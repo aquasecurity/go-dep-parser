@@ -29,12 +29,12 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	if data.Name == "" || data.Version == "" {
-		return nil, nil, xerrors.Errorf("unable to parse package.json")
+		return nil, nil, xerrors.Errorf("unable to parse conda package")
 	}
 
 	return []types.Library{{
 		Name:    data.Name,
 		Version: data.Version,
-		License: data.License,
+		License: data.License, // can be empty
 	}}, nil, nil
 }
