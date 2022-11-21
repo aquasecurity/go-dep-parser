@@ -197,32 +197,27 @@ func TestGetDependency(t *testing.T) {
 	}{
 		{
 			name:          "normal",
-			target:        `    chalk "^2.0.1"`,
+			target:        `chalk "^2.0.1"`,
 			expectName:    "chalk",
 			expactVersion: "^2.0.1",
 		},
 		{
 			name:          "range",
-			target:        `    js-tokens "^3.0.0 || ^4.0.0"`,
+			target:        `js-tokens "^3.0.0 || ^4.0.0"`,
 			expectName:    "js-tokens",
 			expactVersion: "^3.0.0 || ^4.0.0",
 		},
 		{
 			name:          "normal v2",
-			target:        `    depd: ~1.1.2`,
+			target:        `depd: ~1.1.2`,
 			expectName:    "depd",
 			expactVersion: "~1.1.2",
 		},
 		{
 			name:          "range version v2",
-			target:        `    statuses: ">= 1.5.0 < 2"`,
+			target:        `statuses: ">= 1.5.0 < 2"`,
 			expectName:    "statuses",
 			expactVersion: ">= 1.5.0 < 2",
-		},
-		{
-			name:     "not dependency line",
-			target:   `  languageName: unknown`,
-			occurErr: true,
 		},
 	}
 
