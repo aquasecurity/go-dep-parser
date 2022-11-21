@@ -34,6 +34,8 @@ type Dependency struct {
 	Name    string
 }
 
+var lineNumber int
+
 func parseLocator(target string) (packagename, protocol, version string, err error) {
 	capture := yarnLocatorRegexp.FindStringSubmatch(target)
 	if len(capture) < 3 {
@@ -173,6 +175,7 @@ func scanProperties(data []byte, atEOF bool) (advance int, token []byte, err err
 
 func parseBlock(block []byte) (lib Library, deps []Dependency, err error) {
 	scanner := bufio.NewScanner(bytes.NewReader(block))
+	lib.Location.StartLine, lib.Location.EndLine = calcBlockLineNumbers(block)
 	scanner.Split(scanProperties)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -219,6 +222,17 @@ func parseBlock(block []byte) (lib Library, deps []Dependency, err error) {
 	return
 }
 
+func calcBlockLineNumbers(block []byte) (start, end int) {
+	// block seperator is 2 line breaks
+	lineNumber += 2
+	leadingLineBreaks := len(block) - len(bytes.TrimLeft(block, "\n"))
+	trailingLineBreaks := len(block) - len(bytes.TrimRight(block, "\n"))
+	start = lineNumber + leadingLineBreaks
+	end = start + bytes.Count(block, []byte("\n")) - leadingLineBreaks - trailingLineBreaks
+	lineNumber = end
+	return
+}
+
 func parseDependencies(depBlock []byte) (deps []Dependency, err error) {
 	scanner := bufio.NewScanner(bytes.NewReader(depBlock))
 	for scanner.Scan() {
@@ -251,6 +265,7 @@ func parseDependency(line string) (dep Dependency, err error) {
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
+	lineNumber = -1
 	scanner := bufio.NewScanner(r)
 	scanner.Split(scanBlocks)
 	unique := map[string]struct{}{}
