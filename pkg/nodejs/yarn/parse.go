@@ -10,6 +10,7 @@ import (
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
+	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"golang.org/x/xerrors"
 )
@@ -291,6 +292,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 			}
 			unique[symbol] = struct{}{}
 		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, nil, errors.Wrap(err, "failed to scan yarn.lock, scanner error")
 	}
 
 	libs, deps = parseResults(yarnLibs, dependsOn)
