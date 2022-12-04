@@ -3,6 +3,7 @@ package yarn
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"regexp"
 	"strings"
 
@@ -16,7 +17,7 @@ import (
 var (
 	yarnLocatorRegexp    = regexp.MustCompile(`^\s?\\?"?(?P<package>\S+?)@(?:(?P<protocol>\S+?):)?(?P<version>.+?)\\?"?:?$`)
 	yarnVersionRegexp    = regexp.MustCompile(`^"?version:?"?\s+"?(?P<version>[^"]+)"?`)
-	yarnDependencyRegexp = regexp.MustCompile(`"?(?P<package>.+?)"?:?\s"?(?P<version>[^"]+)"?`)
+	yarnDependencyRegexp = regexp.MustCompile(`\s{4,}"?(?P<package>.+?)"?:?\s"?(?P<version>[^"]+)"?`)
 )
 
 type LockFile struct {
@@ -32,6 +33,29 @@ type Library struct {
 type Dependency struct {
 	Locator string
 	Name    string
+}
+
+type LineScanner struct {
+	*bufio.Scanner
+	lineCount int
+}
+
+func NewLineScanner(r io.Reader) *LineScanner {
+	return &LineScanner{
+		Scanner: bufio.NewScanner(r),
+	}
+}
+
+func (s *LineScanner) Scan() bool {
+	scan := s.Scanner.Scan()
+	if scan {
+		s.lineCount++
+	}
+	return scan
+}
+
+func (s *LineScanner) LineNum(prevNum int) int {
+	return prevNum + s.lineCount - 1
 }
 
 func parseLocator(target string) (packagename, protocol, version string, err error) {
@@ -153,61 +177,51 @@ func scanBlocks(data []byte, atEOF bool) (advance int, token []byte, err error) 
 	return 0, nil, nil
 }
 
-func scanProperties(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if atEOF && len(data) == 0 {
-		return 0, nil, nil
-	}
-	lineRegex := regexp.MustCompile(`\n\s\s[\w"]`)
-	if loc := lineRegex.FindIndex(data); loc != nil {
-		// New dependency property line
-		return loc[1] - 1, data[0:loc[0]], nil
-	}
+func parseBlock(block []byte, lineNum int) (lib Library, deps []Dependency, newLine int, err error) {
+	var (
+		emptyLines int // lib can start with empty lines first
+		skipBlock  bool
+	)
 
-	// If we're at EOF, we have a final, non-terminated line. Return it.
-	if atEOF {
-		return len(data), data, nil
-	}
-	// Request more data.
-	return 0, nil, nil
-}
-
-func parseBlock(block []byte) (lib Library, deps []Dependency, err error) {
-	scanner := bufio.NewScanner(bytes.NewReader(block))
-	scanner.Split(scanProperties)
+	scanner := NewLineScanner(bytes.NewReader(block))
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if len(line) == 0 || line[0] == '#' {
+		if len(line) == 0 {
+			emptyLines++
+			continue
+		}
+
+		if line[0] == '#' || skipBlock {
 			continue
 		}
 
 		// Skip this block
 		if strings.HasPrefix(line, "__metadata") {
-			return
+			skipBlock = true
+			continue
 		}
 
-		line = strings.TrimPrefix(line, `"`)
+		line = strings.TrimPrefix(strings.TrimSpace(line), "\"")
 
 		switch {
 		case strings.HasPrefix(line, "version"):
-			if version, err := getVersion(line); err != nil {
-				return lib, nil, err
-			} else {
-				lib.Version = version
-				continue
+			if lib.Version, err = getVersion(line); err != nil {
+				skipBlock = true
 			}
+			continue
 		case strings.HasPrefix(line, "dependencies:"):
 			// start dependencies block
-			if deps, err = parseDependencies(scanner.Bytes()); err != nil {
-				return lib, nil, err
-			}
+			deps = parseDependencies(scanner)
 			continue
 		}
 
 		// try parse package locator
-		if name, protocol, locs, err := parsePackageLocators(line); err == nil {
+		if name, protocol, locs, locErr := parsePackageLocators(line); locErr == nil {
 			if locs == nil || !validProtocol(protocol) {
-				return lib, nil, xerrors.Errorf("failed to parse package locator")
+				skipBlock = true
+				err = xerrors.Errorf("failed to parse package locator")
+				continue
 			} else {
 				lib.Locators = locs
 				lib.Name = name
@@ -216,31 +230,20 @@ func parseBlock(block []byte) (lib Library, deps []Dependency, err error) {
 		}
 	}
 
-	return
+	lib.Location = types.Location{
+		StartLine: lineNum + emptyLines,
+		EndLine:   scanner.LineNum(lineNum),
+	}
+
+	return lib, deps, scanner.LineNum(lineNum), err
 }
 
-func calcBlockLineNumbers(currLine int, block []byte) (newLine, start, end int) {
-	// block seperator is 2 line breaks
-	currLine += 2
-	leadingLineBreaks := len(block) - len(bytes.TrimLeft(block, "\n"))
-	trailingLineBreaks := len(block) - len(bytes.TrimRight(block, "\n"))
-	start = currLine + leadingLineBreaks
-	end = start + bytes.Count(block, []byte("\n")) - leadingLineBreaks - trailingLineBreaks
-	newLine = end
-	return
-}
-
-func parseDependencies(depBlock []byte) (deps []Dependency, err error) {
-	scanner := bufio.NewScanner(bytes.NewReader(depBlock))
+func parseDependencies(scanner *LineScanner) (deps []Dependency) {
 	for scanner.Scan() {
 		line := scanner.Text()
-
-		if strings.HasPrefix(line, "dependencies:") {
-			continue
-		}
-
 		if dep, err := parseDependency(line); err != nil {
-			return deps, err
+			// finished dependencies block
+			return deps
 		} else {
 			deps = append(deps, dep)
 		}
@@ -250,7 +253,6 @@ func parseDependencies(depBlock []byte) (deps []Dependency, err error) {
 }
 
 func parseDependency(line string) (dep Dependency, err error) {
-	line = strings.TrimSpace(line)
 	if name, version, err := getDependency(line); err != nil {
 		return dep, err
 	} else {
@@ -262,7 +264,7 @@ func parseDependency(line string) (dep Dependency, err error) {
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
-	currLine := -1
+	lineNumber := 1
 	scanner := bufio.NewScanner(r)
 	scanner.Split(scanBlocks)
 	unique := map[string]struct{}{}
@@ -270,9 +272,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 	yarnLibs := map[string]Library{}
 	for scanner.Scan() {
 		block := scanner.Bytes()
-		lib, deps, err := parseBlock(block)
-		currLine, lib.Location.StartLine, lib.Location.EndLine = calcBlockLineNumbers(currLine, block)
-		if err == nil {
+		lib, deps, newLine, err := parseBlock(block, lineNumber)
+		lineNumber = newLine + 2
+		if err == nil && lib.Name != "" {
 			symbol := utils.PackageID(lib.Name, lib.Version)
 			if _, ok := unique[symbol]; ok {
 				continue
