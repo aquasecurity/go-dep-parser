@@ -235,6 +235,10 @@ func parseBlock(block []byte, lineNum int) (lib Library, deps []Dependency, newL
 		EndLine:   scanner.LineNum(lineNum),
 	}
 
+	if scanErr := scanner.Err(); err != scanErr {
+		err = scanErr
+	}
+
 	return lib, deps, scanner.LineNum(lineNum), err
 }
 
