@@ -82,6 +82,21 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
+			name:      "inherit properties from child to parent",
+			inputFile: filepath.Join("testdata", "parent-child-properties", "child", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "2.2.2",
+				},
+			},
+		},
+		{
 			name:      "inherit parent dependencies",
 			inputFile: filepath.Join("testdata", "parent-dependencies", "child", "pom.xml"),
 			local:     false,

@@ -90,7 +90,7 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	// Analyze root POM
-	result, err := p.analyze(root, nil, nil)
+	result, err := p.analyze(root, nil, nil, nil)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("analyze error (%s): %w", p.rootPath, err)
 	}
@@ -181,7 +181,7 @@ func (p *parser) parseModule(currentPath, relativePath string) (artifact, error)
 		return artifact{}, xerrors.Errorf("unable to open the relative path: %w", err)
 	}
 
-	result, err := p.analyze(module, nil, nil)
+	result, err := p.analyze(module, nil, nil, nil)
 	if err != nil {
 		return artifact{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -205,7 +205,7 @@ func (p *parser) resolve(art artifact) (analysisResult, error) {
 	if err != nil {
 		log.Logger.Debug(err)
 	}
-	result, err := p.analyze(pomContent, art.Exclusions, art.DependencyManagement)
+	result, err := p.analyze(pomContent, art.Exclusions, art.DependencyManagement, nil)
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -223,7 +223,7 @@ type analysisResult struct {
 	modules              []string
 }
 
-func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, depManagementFromUpperPoms map[string]pomDependency) (analysisResult, error) {
+func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, depManagementFromUpperPoms map[string]pomDependency, propsFromChildPom properties) (analysisResult, error) {
 	if pom == nil || pom.content == nil {
 		return analysisResult{}, nil
 	}
@@ -231,8 +231,12 @@ func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, depManagement
 	// Update remoteRepositories
 	p.remoteRepositories = utils.UniqueStrings(append(p.remoteRepositories, pom.repositories()...))
 
+	// child properties take precedence over parent properties
+	// we need to overwrite them and use them when parsing the parent
+	// this is necessary for correct parsing of dependencies from parents
+	pom.content.Properties = utils.MergeMaps(pom.content.Properties, propsFromChildPom)
 	// Parent
-	parent, err := p.parseParent(pom.filePath, pom.content.Parent)
+	parent, err := p.parseParent(pom.filePath, pom.content.Parent, pom.content.Properties)
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("parent error: %w", err)
 	}
@@ -331,7 +335,7 @@ func (p parser) mergeDependencies(parent, child []artifact, exclusions map[strin
 	return deps
 }
 
-func (p parser) parseParent(currentPath string, parent pomParent) (analysisResult, error) {
+func (p parser) parseParent(currentPath string, parent pomParent, propsFromChildPom properties) (analysisResult, error) {
 	// Pass nil properties so that variables in <parent> are not evaluated.
 	target := newArtifact(parent.GroupId, parent.ArtifactId, parent.Version, nil)
 	if target.IsEmpty() {
@@ -348,7 +352,7 @@ func (p parser) parseParent(currentPath string, parent pomParent) (analysisResul
 		log.Logger.Debugf("parent POM not found: %s", err)
 	}
 
-	result, err := p.analyze(parentPOM, nil, nil)
+	result, err := p.analyze(parentPOM, nil, nil, propsFromChildPom)
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -397,7 +401,7 @@ func (p parser) tryRelativePath(parentArtifact artifact, currentPath, relativePa
 		return nil, err
 	}
 
-	result, err := p.analyze(pom, nil, nil)
+	result, err := p.analyze(pom, nil, nil, nil)
 	if err != nil {
 		return nil, xerrors.Errorf("analyze error: %w", err)
 	}
