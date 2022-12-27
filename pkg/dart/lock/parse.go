@@ -42,7 +42,10 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 			ID:      fmt.Sprintf(idFormat, name, dep.Version),
 			Name:    name,
 			Version: dep.Version,
-			// there are 3 types of
+			// there are 3 types of dependency fields:
+			// "direct main", "direct dev" and transitive
+			// transitive non-string field
+			// so find Indirect dependencies using "direct main" and "direct dev" fields
 			Indirect: dep.Dependency != directDevDep && dep.Dependency != directMainDep,
 		}
 		libs = append(libs, lib)
