@@ -271,7 +271,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 	lineNumber := 1
 	scanner := bufio.NewScanner(r)
 	scanner.Split(scanBlocks)
-	unique := map[string]struct{}{}
 	dependsOn := map[string][]Dependency{}
 	yarnLibs := map[string]Library{}
 	for scanner.Scan() {
@@ -279,17 +278,12 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 		lib, deps, newLine, err := parseBlock(block, lineNumber)
 		lineNumber = newLine + 2
 		if err == nil && lib.Name != "" {
-			symbol := utils.PackageID(lib.Name, lib.Version)
-			if _, ok := unique[symbol]; ok {
-				continue
-			}
 			for _, loc := range lib.Locators {
 				yarnLibs[loc] = lib
 				if len(deps) > 0 {
 					dependsOn[loc] = deps
 				}
 			}
-			unique[symbol] = struct{}{}
 		}
 	}
 
