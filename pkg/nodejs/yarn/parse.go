@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	yarnLocatorRegexp    = regexp.MustCompile(`^\s?\\?"?(?P<package>\S+?)@(?:(?P<protocol>\S+?):)?(?P<version>.+?)\\?"?:?$`)
+	yarnPatternRegexp    = regexp.MustCompile(`^\s?\\?"?(?P<package>\S+?)@(?:(?P<protocol>\S+?):)?(?P<version>.+?)\\?"?:?$`)
 	yarnVersionRegexp    = regexp.MustCompile(`^"?version:?"?\s+"?(?P<version>[^"]+)"?`)
 	yarnDependencyRegexp = regexp.MustCompile(`\s{4,}"?(?P<package>.+?)"?:?\s"?(?P<version>[^"]+)"?`)
 )
@@ -25,13 +25,13 @@ type LockFile struct {
 }
 
 type Library struct {
-	Locators []string
+	Patterns []string
 	Name     string
 	Version  string
 	Location types.Location
 }
 type Dependency struct {
-	Locator string
+	Pattern string
 	Name    string
 }
 
@@ -58,12 +58,12 @@ func (s *LineScanner) LineNum(prevNum int) int {
 	return prevNum + s.lineCount - 1
 }
 
-func parseLocator(target string) (packagename, protocol, version string, err error) {
-	capture := yarnLocatorRegexp.FindStringSubmatch(target)
+func parsePattern(target string) (packagename, protocol, version string, err error) {
+	capture := yarnPatternRegexp.FindStringSubmatch(target)
 	if len(capture) < 3 {
 		return "", "", "", xerrors.New("not package format")
 	}
-	for i, group := range yarnLocatorRegexp.SubexpNames() {
+	for i, group := range yarnPatternRegexp.SubexpNames() {
 		switch group {
 		case "package":
 			packagename = capture[i]
@@ -76,14 +76,14 @@ func parseLocator(target string) (packagename, protocol, version string, err err
 	return
 }
 
-func parsePackageLocators(target string) (packagename, protocol string, locs []string, err error) {
-	locsSplit := strings.Split(target, ", ")
-	packagename, protocol, _, err = parseLocator(locsSplit[0])
+func parsePackagePatterns(target string) (packagename, protocol string, patterns []string, err error) {
+	patternsSplit := strings.Split(target, ", ")
+	packagename, protocol, _, err = parsePattern(patternsSplit[0])
 	if err != nil {
 		return "", "", nil, err
 	}
-	locs = lo.Map(locsSplit, func(loc string, _ int) string {
-		_, _, version, _ := parseLocator(loc)
+	patterns = lo.Map(patternsSplit, func(pattern string, _ int) string {
+		_, _, version, _ := parsePattern(pattern)
 		return utils.PackageID(packagename, version)
 	})
 	return
@@ -114,42 +114,18 @@ func validProtocol(protocol string) (valid bool) {
 	return false
 }
 
-func parseResults(yarnLibs map[string]Library, dependsOn map[string][]Dependency) (libs []types.Library, deps []types.Dependency) {
-	// find dependencies by locators
-	for libLoc, lib := range yarnLibs {
-		libs = append(libs, types.Library{
-			ID:      utils.PackageID(lib.Name, lib.Version),
-			Name:    lib.Name,
-			Version: lib.Version,
-			Locations: []types.Location{
-				lib.Location,
-			},
+func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (deps []types.Dependency) {
+	// find dependencies by patterns
+	for libID, depPatterns := range dependsOn {
+		depIDs := lo.Map(depPatterns, func(pattern string, index int) string {
+			return patternIDs[pattern]
 		})
-
-		if libDeps, ok := dependsOn[libLoc]; ok {
-			// find resolved version of each dependency
-			libDepIds := lo.FilterMap(libDeps, func(dep Dependency, _ int) (string, bool) {
-				if depLib, ok := yarnLibs[dep.Locator]; ok {
-					return utils.PackageID(depLib.Name, depLib.Version), true
-				}
-				return "", false
-			})
-			deps = append(deps, types.Dependency{
-				ID:        utils.PackageID(lib.Name, lib.Version),
-				DependsOn: libDepIds,
-			})
-		}
+		deps = append(deps, types.Dependency{
+			ID:        libID,
+			DependsOn: depIDs,
+		})
 	}
-
-	libs = lo.UniqBy(libs, func(lib types.Library) string {
-		return utils.PackageID(lib.Name, lib.Version)
-	})
-
-	deps = lo.UniqBy(deps, func(dep types.Dependency) string {
-		return dep.ID
-	})
-
-	return
+	return deps
 }
 
 type Parser struct{}
@@ -177,7 +153,7 @@ func scanBlocks(data []byte, atEOF bool) (advance int, token []byte, err error) 
 	return 0, nil, nil
 }
 
-func parseBlock(block []byte, lineNum int) (lib Library, deps []Dependency, newLine int, err error) {
+func parseBlock(block []byte, lineNum int) (lib Library, deps []string, newLine int, err error) {
 	var (
 		emptyLines int // lib can start with empty lines first
 		skipBlock  bool
@@ -216,14 +192,14 @@ func parseBlock(block []byte, lineNum int) (lib Library, deps []Dependency, newL
 			continue
 		}
 
-		// try parse package locator
-		if name, protocol, locs, locErr := parsePackageLocators(line); locErr == nil {
-			if locs == nil || !validProtocol(protocol) {
+		// try parse package patterns
+		if name, protocol, patterns, patternErr := parsePackagePatterns(line); patternErr == nil {
+			if patterns == nil || !validProtocol(protocol) {
 				skipBlock = true
-				err = xerrors.Errorf("failed to parse package locator")
+				err = xerrors.Errorf("failed to parse package patterns")
 				continue
 			} else {
-				lib.Locators = locs
+				lib.Patterns = patterns
 				lib.Name = name
 				continue
 			}
@@ -242,7 +218,7 @@ func parseBlock(block []byte, lineNum int) (lib Library, deps []Dependency, newL
 	return lib, deps, scanner.LineNum(lineNum), err
 }
 
-func parseDependencies(scanner *LineScanner) (deps []Dependency) {
+func parseDependencies(scanner *LineScanner) (deps []string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if dep, err := parseDependency(line); err != nil {
@@ -256,33 +232,50 @@ func parseDependencies(scanner *LineScanner) (deps []Dependency) {
 	return
 }
 
-func parseDependency(line string) (dep Dependency, err error) {
+func parseDependency(line string) (string, error) {
 	if name, version, err := getDependency(line); err != nil {
-		return dep, err
+		return "", err
 	} else {
-		dep.Locator = utils.PackageID(name, version)
-		dep.Name = name
+		return utils.PackageID(name, version), nil
 	}
-
-	return
 }
 
-func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
+func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	lineNumber := 1
+	var libs []types.Library
+
+	// patternIDs holds mapping between patterns and library IDs
+	// e.g. ajv@^6.5.5 => ajv@6.10.0
+	patternIDs := map[string]string{}
+
 	scanner := bufio.NewScanner(r)
 	scanner.Split(scanBlocks)
-	dependsOn := map[string][]Dependency{}
-	yarnLibs := map[string]Library{}
+	dependsOn := map[string][]string{}
 	for scanner.Scan() {
 		block := scanner.Bytes()
 		lib, deps, newLine, err := parseBlock(block, lineNumber)
 		lineNumber = newLine + 2
-		if err == nil && lib.Name != "" {
-			for _, loc := range lib.Locators {
-				yarnLibs[loc] = lib
-				if len(deps) > 0 {
-					dependsOn[loc] = deps
-				}
+		if err != nil {
+			return nil, nil, err
+		} else if lib.Name == "" {
+			continue
+		}
+
+		libID := utils.PackageID(lib.Name, lib.Version)
+		libs = append(libs, types.Library{
+			ID:        libID,
+			Name:      lib.Name,
+			Version:   lib.Version,
+			Locations: []types.Location{lib.Location},
+		})
+
+		for _, pattern := range lib.Patterns {
+			// e.g.
+			//   combined-stream@^1.0.6 => combined-stream@1.0.8
+			//   combined-stream@~1.0.6 => combined-stream@1.0.8
+			patternIDs[pattern] = libID
+			if len(deps) > 0 {
+				dependsOn[libID] = deps
 			}
 		}
 	}
@@ -291,6 +284,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 		return nil, nil, xerrors.Errorf("failed to scan yarn.lock, got scanner error: %s", err.Error())
 	}
 
-	libs, deps = parseResults(yarnLibs, dependsOn)
+	// Replace dependency patterns with library IDs
+	// e.g. ajv@^6.5.5 => ajv@6.10.0
+	deps := parseResults(patternIDs, dependsOn)
 	return libs, deps, nil
 }

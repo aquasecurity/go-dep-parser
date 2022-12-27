@@ -12,7 +12,7 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-func TestParseLocator(t *testing.T) {
+func TestParsePattern(t *testing.T) {
 	vectors := []struct {
 		name           string
 		target         string
@@ -84,7 +84,7 @@ func TestParseLocator(t *testing.T) {
 	}
 
 	for _, v := range vectors {
-		gotName, gotProtocol, gotVersion, err := parseLocator(v.target)
+		gotName, gotProtocol, gotVersion, err := parsePattern(v.target)
 
 		if v.occurErr != (err != nil) {
 			t.Errorf("expect error %t but err is %s", v.occurErr, err)
@@ -105,20 +105,20 @@ func TestParseLocator(t *testing.T) {
 	}
 }
 
-func TestParsePackageLocators(t *testing.T) {
+func TestParsePackagePatterns(t *testing.T) {
 	vectors := []struct {
 		name           string
 		target         string
 		expectName     string
 		expectProtocol string
-		expactLocators []string
+		expactPatterns []string
 		occurErr       bool
 	}{
 		{
 			name:       "normal",
 			target:     `asn1@~0.2.3:`,
 			expectName: "asn1",
-			expactLocators: []string{
+			expactPatterns: []string{
 				"asn1@~0.2.3",
 			},
 		},
@@ -126,7 +126,7 @@ func TestParsePackageLocators(t *testing.T) {
 			name:       "normal with quotes",
 			target:     `"asn1@~0.2.3":`,
 			expectName: "asn1",
-			expactLocators: []string{
+			expactPatterns: []string{
 				"asn1@~0.2.3",
 			},
 		},
@@ -135,25 +135,25 @@ func TestParsePackageLocators(t *testing.T) {
 			target:         `asn1@npm:~0.2.3:`,
 			expectName:     "asn1",
 			expectProtocol: "npm",
-			expactLocators: []string{
+			expactPatterns: []string{
 				"asn1@~0.2.3",
 			},
 		},
 		{
-			name:       "multiple locators",
+			name:       "multiple patterns",
 			target:     `loose-envify@^1.1.0, loose-envify@^1.4.0:`,
 			expectName: "loose-envify",
-			expactLocators: []string{
+			expactPatterns: []string{
 				"loose-envify@^1.1.0",
 				"loose-envify@^1.4.0",
 			},
 		},
 		{
-			name:           "multiple locators v2",
+			name:           "multiple patterns v2",
 			target:         `"loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":`,
 			expectName:     "loose-envify",
 			expectProtocol: "npm",
-			expactLocators: []string{
+			expactPatterns: []string{
 				"loose-envify@^1.1.0",
 				"loose-envify@^1.4.0",
 			},
@@ -165,7 +165,7 @@ func TestParsePackageLocators(t *testing.T) {
 	}
 
 	for _, v := range vectors {
-		gotName, gotProtocol, gotLocs, err := parsePackageLocators(v.target)
+		gotName, gotProtocol, gotPatterns, err := parsePackagePatterns(v.target)
 
 		if v.occurErr != (err != nil) {
 			t.Errorf("expect error %t but err is %s", v.occurErr, err)
@@ -180,10 +180,10 @@ func TestParsePackageLocators(t *testing.T) {
 			t.Errorf("protocol mismatch: got %s, want %s, target: %s", gotProtocol, v.expectProtocol, v.target)
 		}
 
-		sort.Strings(gotLocs)
-		sort.Strings(v.expactLocators)
+		sort.Strings(gotPatterns)
+		sort.Strings(v.expactPatterns)
 
-		assert.Equal(t, v.expactLocators, gotLocs)
+		assert.Equal(t, v.expactPatterns, gotPatterns)
 	}
 }
 
