@@ -8,8 +8,8 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/liamg/jfather v0.0.7
 	github.com/microsoft/go-rustaudit v0.0.0-20220808201409-204dfee52032
-	github.com/stretchr/testify v1.8.0
-	go.uber.org/zap v1.23.0
+	github.com/stretchr/testify v1.8.1
+	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20220407100705-7b9b53b0aca4
 	golang.org/x/mod v0.6.0-dev.0.20211013180041-c96bc1413d57
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
@@ -22,6 +22,7 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/samber/lo v1.33.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/text v0.3.3 // indirect
