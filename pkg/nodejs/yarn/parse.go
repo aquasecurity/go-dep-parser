@@ -205,7 +205,7 @@ func parseBlock(block []byte, lineNum int) (lib Library, deps []string, newLine 
 			if patterns == nil || !validProtocol(protocol) {
 				skipBlock = true
 				if !ignoreProtocol(protocol) {
-					err = xerrors.Errorf("failed to parse package patterns")
+					return Library{}, nil, -1,  xerrors.Errorf("failed to parse package patterns")
 				}
 				continue
 			} else {
