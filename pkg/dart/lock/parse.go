@@ -13,6 +13,7 @@ const (
 	transitiveDep = "transitive"
 )
 
+// Parser is a parser for pubspec.lock
 type Parser struct{}
 
 func NewParser() types.Parser {
