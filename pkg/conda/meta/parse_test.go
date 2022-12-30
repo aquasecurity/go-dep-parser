@@ -43,12 +43,12 @@ func TestParse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, err := os.Open(tt.input)
 			require.NoError(t, err)
+			defer f.Close()
 
 			got, _, err := meta.NewParser().Parse(f)
 
 			if tt.wantErr != "" {
-				require.NotNil(t, err)
-				assert.Contains(t, err.Error(), tt.wantErr)
+				assert.ErrorContains(t, err, tt.wantErr)
 				return
 			}
 

@@ -21,6 +21,9 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
+// Parse parses Anaconda (a.k.a. conda) environment metadata.
+// e.g. <conda-root>/envs/<env>/conda-meta/<package>.json
+// For details see https://conda.io/projects/conda/en/latest/user-guide/concepts/environments.html
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var data packageJSON
 	err := json.NewDecoder(r).Decode(&data)
