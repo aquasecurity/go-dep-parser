@@ -1,6 +1,7 @@
 package lock_test
 
 import (
+	"fmt"
 	"github.com/aquasecurity/go-dep-parser/pkg/dart/lock"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/stretchr/testify/assert"
@@ -10,16 +11,17 @@ import (
 	"testing"
 )
 
-func TestParse(t *testing.T) {
+func TestParser_Parse(t *testing.T) {
 	tests := []struct {
 		name      string
 		inputFile string
-		wantLibs  []types.Library
+		want      []types.Library
+		wantErr   assert.ErrorAssertionFunc
 	}{
 		{
 			name:      "happy path",
 			inputFile: "testdata/happy.lock",
-			wantLibs: []types.Library{
+			want: []types.Library{
 				{
 					ID:      "crypto@3.0.2",
 					Name:    "crypto",
@@ -37,10 +39,17 @@ func TestParse(t *testing.T) {
 					Indirect: true,
 				},
 			},
+			wantErr: assert.NoError,
 		},
 		{
 			name:      "empty path",
 			inputFile: "testdata/empty.lock",
+			wantErr:   assert.NoError,
+		},
+		{
+			name:      "broken yaml",
+			inputFile: "testdata/broken.lock",
+			wantErr:   assert.Error,
 		},
 	}
 
@@ -49,14 +58,17 @@ func TestParse(t *testing.T) {
 			f, err := os.Open(tt.inputFile)
 			require.NoError(t, err)
 			defer f.Close()
+
 			gotLibs, _, err := lock.NewParser().Parse(f)
-			require.NoError(t, err)
+			if !tt.wantErr(t, err, fmt.Sprintf("Parse(%v)", tt.inputFile)) {
+				return
+			}
 
 			sort.Slice(gotLibs, func(i, j int) bool {
 				return gotLibs[i].ID < gotLibs[j].ID
 			})
 
-			assert.Equal(t, tt.wantLibs, gotLibs)
+			assert.Equal(t, tt.want, gotLibs)
 		})
 	}
 }

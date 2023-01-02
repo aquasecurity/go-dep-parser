@@ -2,10 +2,11 @@ package lock
 
 import (
 	"fmt"
-	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/xerrors"
 	"gopkg.in/yaml.v3"
+
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 const (
