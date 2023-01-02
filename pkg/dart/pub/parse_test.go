@@ -1,14 +1,16 @@
-package lock_test
+package pub_test
 
 import (
 	"fmt"
-	"github.com/aquasecurity/go-dep-parser/pkg/dart/lock"
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/dart/pub"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -59,7 +61,7 @@ func TestParser_Parse(t *testing.T) {
 			require.NoError(t, err)
 			defer f.Close()
 
-			gotLibs, _, err := lock.NewParser().Parse(f)
+			gotLibs, _, err := pub.NewParser().Parse(f)
 			if !tt.wantErr(t, err, fmt.Sprintf("Parse(%v)", tt.inputFile)) {
 				return
 			}
