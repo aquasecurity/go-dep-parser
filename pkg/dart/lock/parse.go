@@ -32,12 +32,16 @@ type Dep struct {
 
 func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	l := &lock{}
-	decoder := yaml.NewDecoder(r)
-	if err := decoder.Decode(&l); err != nil {
-		return nil, nil, xerrors.Errorf("failed to decode pubspec.lock file: %w", err)
+	if err := yaml.NewDecoder(r).Decode(&l); err != nil {
+		return nil, nil, xerrors.Errorf("failed to decode pubspec.lock: %w", err)
 	}
 	var libs []types.Library
 	for name, dep := range l.Packages {
+		// We would like to exclude dev dependencies, but we cannot identify
+		// which indirect dependencies were introduced by dev dependencies
+		// as there are 3 dependency types, "direct main", "direct dev" and "transitive".
+		// It will be confusing if we exclude direct dev dependencies and include transitive dev dependencies.
+		// We decided to keep all dev dependencies until Pub will add support for "transitive main" and "transitive dev".
 		lib := types.Library{
 			ID:       pkgID(name, dep.Version),
 			Name:     name,
