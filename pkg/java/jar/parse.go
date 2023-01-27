@@ -182,27 +182,8 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 		log.Logger.Debug("search GAV from maven repository disabled in offline mode")
 	}
 
-	//if p.offline {
-	//	log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
-	//	// In offline mode, we will not check if the artifact information is correct.
-	//	if !manifestProps.valid() {
-	//
-	//		return libs, nil, nil
-	//	}
-	//	return append(libs, manifestProps.library()), nil, nil
-	//}
-
 	manifestProps := m.properties()
 	for _, s := range searchers {
-		if manifestProps.Valid() {
-			// Even if MANIFEST.MF is found, the groupId and artifactId might not be valid.
-			// We have to make sure that the artifact exists actually.
-			if ok, _ := s.Exists(manifestProps.GroupID, manifestProps.ArtifactID); ok {
-				// If groupId and artifactId are valid, they will be returned.
-				return append(libs, manifestProps.Library()), nil, nil
-			}
-		}
-
 		if digest, err := getSha1(r); err == nil {
 			// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
 			props, err := s.SearchBySHA1(digest)
