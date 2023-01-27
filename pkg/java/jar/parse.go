@@ -5,14 +5,15 @@ import (
 	"bufio"
 	"crypto/sha1"
 	"encoding/hex"
-	"encoding/json"
-	"fmt"
+	"errors"
+	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searcher"
+	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searcher/db"
+	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searcher/maven"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strings"
 	"time"
 
@@ -21,29 +22,26 @@ import (
 	"golang.org/x/xerrors"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
+	jtypes "github.com/aquasecurity/go-dep-parser/pkg/java/jar/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 const (
-	baseURL         = "https://search.maven.org/solrsearch/select"
-	idQuery         = `g:"%s" AND a:"%s"`
-	artifactIdQuery = `a:"%s" AND p:"jar"`
-	sha1Query       = `1:"%s"`
+	baseURL = "https://search.maven.org/solrsearch/select"
 )
 
 var (
 	jarFileRegEx = regexp.MustCompile(`^([a-zA-Z0-9\._-]*[^-*])-(\d\S*(?:-SNAPSHOT)?).jar$`)
-
-	ArtifactNotFoundErr = xerrors.New("no artifact found")
 )
 
 type Parser struct {
-	baseURL      string
-	rootFilePath string
-	httpClient   *http.Client
-	offline      bool
-	size         int64
+	baseURL        string
+	rootFilePath   string
+	httpClient     *http.Client
+	offline        bool
+	size           int64
+	javaDBCacheDir string
 }
 
 type Option func(*Parser)
@@ -75,6 +73,12 @@ func WithOffline(offline bool) Option {
 func WithSize(size int64) Option {
 	return func(p *Parser) {
 		p.size = size
+	}
+}
+
+func WithTrivyJavaDBDir(cacheDir string) Option {
+	return func(p *Parser) {
+		p.javaDBCacheDir = cacheDir
 	}
 }
 
@@ -134,10 +138,10 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 			if err != nil {
 				return nil, nil, xerrors.Errorf("failed to parse %s: %w", fileInJar.Name, err)
 			}
-			libs = append(libs, props.library())
+			libs = append(libs, props.Library())
 
 			// Check if the pom.properties is for the original JAR/WAR/EAR
-			if fileProps.artifactID == props.artifactID && fileProps.version == props.version {
+			if fileProps.ArtifactID == props.ArtifactID && fileProps.Version == props.Version {
 				foundPomProps = true
 			}
 		case filepath.Base(fileInJar.Name) == "MANIFEST.MF":
@@ -160,51 +164,79 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 		return libs, nil, nil
 	}
 
+	var searchers []searcher.Searcher
+	// enable search from trivy-java-db
+	if p.javaDBCacheDir != "" {
+		javaDBSearcher, err := db.NewSearcher(p.javaDBCacheDir)
+		if err == nil {
+			searchers = append(searchers, javaDBSearcher)
+		} else {
+			log.Logger.Warnf("can't init trivy-java-db: %s", err)
+		}
+	}
+
+	// enable search maven repository
+	if !p.offline {
+		searchers = append(searchers, maven.NewSearcher(p.baseURL, p.httpClient))
+	} else {
+		log.Logger.Debug("search GAV from maven repository disabled in offline mode")
+	}
+
+	//if p.offline {
+	//	log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
+	//	// In offline mode, we will not check if the artifact information is correct.
+	//	if !manifestProps.valid() {
+	//
+	//		return libs, nil, nil
+	//	}
+	//	return append(libs, manifestProps.library()), nil, nil
+	//}
+
 	manifestProps := m.properties()
-	if p.offline {
-		// In offline mode, we will not check if the artifact information is correct.
-		if !manifestProps.valid() {
-			log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
+	for _, s := range searchers {
+		if manifestProps.Valid() {
+			// Even if MANIFEST.MF is found, the groupId and artifactId might not be valid.
+			// We have to make sure that the artifact exists actually.
+			if ok, _ := s.Exists(manifestProps.GroupID, manifestProps.ArtifactID); ok {
+				// If groupId and artifactId are valid, they will be returned.
+				return append(libs, manifestProps.Library()), nil, nil
+			}
+		}
+
+		if digest, err := getSha1(r); err == nil {
+			// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
+			props, err := s.SearchBySHA1(digest)
+			if err == nil {
+				return append(libs, props.Library()), nil, nil
+			} else if !errors.Is(err, jtypes.ArtifactNotFoundErr) {
+				return nil, nil, xerrors.Errorf("failed to search by SHA1: %w", err)
+			}
+		}
+
+		log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
+
+		// Return when artifactId or version from the file name are empty
+		if fileProps.ArtifactID == "" || fileProps.Version == "" {
 			return libs, nil, nil
 		}
-		return append(libs, manifestProps.library()), nil, nil
-	}
 
-	if manifestProps.valid() {
-		// Even if MANIFEST.MF is found, the groupId and artifactId might not be valid.
-		// We have to make sure that the artifact exists actually.
-		if ok, _ := p.exists(manifestProps); ok {
-			// If groupId and artifactId are valid, they will be returned.
-			return append(libs, manifestProps.library()), nil, nil
+		// Try to search groupId by artifactId via sonatype API
+		// When some artifacts have the same groupIds, it might result in false detection.
+		fileProps.GroupID, err = s.SearchByArtifactID(fileProps.ArtifactID)
+		if err == nil {
+			log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
+				zap.String("artifact", fileProps.String()))
+			return append(libs, fileProps.Library()), nil, nil
+		} else if !errors.Is(err, jtypes.ArtifactNotFoundErr) {
+			return nil, nil, xerrors.Errorf("failed to search by artifact id: %w", err)
 		}
+
 	}
-
-	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
-	props, err := p.searchBySHA1(r)
-	if err == nil {
-		return append(libs, props.library()), nil, nil
-	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
-		return nil, nil, xerrors.Errorf("failed to search by SHA1: %w", err)
+	// if props didn't find with Searcher:
+	// insert props if props are valid
+	if manifestProps.Valid() {
+		libs = append(libs, manifestProps.Library())
 	}
-
-	log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
-
-	// Return when artifactId or version from the file name are empty
-	if fileProps.artifactID == "" || fileProps.version == "" {
-		return libs, nil, nil
-	}
-
-	// Try to search groupId by artifactId via sonatype API
-	// When some artifacts have the same groupIds, it might result in false detection.
-	fileProps.groupID, err = p.searchByArtifactID(fileProps.artifactID)
-	if err == nil {
-		log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
-			zap.String("artifact", fileProps.String()))
-		libs = append(libs, fileProps.library())
-	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
-		return nil, nil, xerrors.Errorf("failed to search by artifact id: %w", err)
-	}
-
 	return libs, nil, nil
 }
 
@@ -245,61 +277,43 @@ func isArtifact(name string) bool {
 	return false
 }
 
-func parseFileName(fileName string) properties {
+func parseFileName(fileName string) jtypes.Properties {
 	packageVersion := jarFileRegEx.FindStringSubmatch(fileName)
 	if len(packageVersion) != 3 {
-		return properties{}
+		return jtypes.Properties{}
 	}
 
-	return properties{
-		artifactID: packageVersion[1],
-		version:    packageVersion[2],
+	return jtypes.Properties{
+		ArtifactID: packageVersion[1],
+		Version:    packageVersion[2],
 	}
 }
 
-type properties struct {
-	groupID    string
-	artifactID string
-	version    string
-}
-
-func parsePomProperties(f *zip.File) (properties, error) {
+func parsePomProperties(f *zip.File) (jtypes.Properties, error) {
 	file, err := f.Open()
 	if err != nil {
-		return properties{}, xerrors.Errorf("unable to open pom.properties: %w", err)
+		return jtypes.Properties{}, xerrors.Errorf("unable to open pom.properties: %w", err)
 	}
 	defer file.Close()
 
-	var p properties
+	var p jtypes.Properties
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		switch {
 		case strings.HasPrefix(line, "groupId="):
-			p.groupID = strings.TrimPrefix(line, "groupId=")
+			p.GroupID = strings.TrimPrefix(line, "groupId=")
 		case strings.HasPrefix(line, "artifactId="):
-			p.artifactID = strings.TrimPrefix(line, "artifactId=")
+			p.ArtifactID = strings.TrimPrefix(line, "artifactId=")
 		case strings.HasPrefix(line, "version="):
-			p.version = strings.TrimPrefix(line, "version=")
+			p.Version = strings.TrimPrefix(line, "version=")
 		}
 	}
 
 	if err = scanner.Err(); err != nil {
-		return properties{}, xerrors.Errorf("scan error: %w", err)
+		return jtypes.Properties{}, xerrors.Errorf("scan error: %w", err)
 	}
 	return p, nil
-}
-
-func (p properties) library() types.Library {
-	return types.Library{Name: fmt.Sprintf("%s:%s", p.groupID, p.artifactID), Version: p.version}
-}
-
-func (p properties) valid() bool {
-	return p.groupID != "" && p.artifactID != "" && p.version != ""
-}
-
-func (p properties) String() string {
-	return fmt.Sprintf("%s:%s:%s", p.groupID, p.artifactID, p.version)
 }
 
 type manifest struct {
@@ -365,40 +379,26 @@ func parseManifest(f *zip.File) (manifest, error) {
 	return m, nil
 }
 
-type apiResponse struct {
-	Response struct {
-		NumFound int `json:"numFound"`
-		Docs     []struct {
-			ID           string `json:"id"`
-			GroupID      string `json:"g"`
-			ArtifactID   string `json:"a"`
-			Version      string `json:"v"`
-			P            string `json:"p"`
-			VersionCount int    `json:versionCount`
-		} `json:"docs"`
-	} `json:"response"`
-}
-
-func (m manifest) properties() properties {
+func (m manifest) properties() jtypes.Properties {
 	groupID, err := m.determineGroupID()
 	if err != nil {
-		return properties{}
+		return jtypes.Properties{}
 	}
 
 	artifactID, err := m.determineArtifactID()
 	if err != nil {
-		return properties{}
+		return jtypes.Properties{}
 	}
 
 	version, err := m.determineVersion()
 	if err != nil {
-		return properties{}
+		return jtypes.Properties{}
 	}
 
-	return properties{
-		groupID:    groupID,
-		artifactID: artifactID,
-		version:    version,
+	return jtypes.Properties{
+		GroupID:    groupID,
+		ArtifactID: artifactID,
+		Version:    version,
 	}
 }
 
@@ -455,124 +455,14 @@ func (m manifest) determineVersion() (string, error) {
 	return strings.TrimSpace(version), nil
 }
 
-func (p *Parser) exists(props properties) (bool, error) {
-	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
-	if err != nil {
-		return false, xerrors.Errorf("unable to initialize HTTP client: %w", err)
-	}
-
-	q := req.URL.Query()
-	q.Set("q", fmt.Sprintf(idQuery, props.groupID, props.artifactID))
-	q.Set("rows", "1")
-	req.URL.RawQuery = q.Encode()
-
-	resp, err := p.httpClient.Do(req)
-	if err != nil {
-		return false, xerrors.Errorf("http error: %w", err)
-	}
-	defer resp.Body.Close()
-
-	var res apiResponse
-	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return false, xerrors.Errorf("json decode error: %w", err)
-	}
-	return res.Response.NumFound > 0, nil
-}
-
-func (p *Parser) searchBySHA1(r io.ReadSeeker) (properties, error) {
+func getSha1(r io.ReadSeeker) (string, error) {
 	if _, err := r.Seek(0, io.SeekStart); err != nil {
-		return properties{}, xerrors.Errorf("file seek error: %w", err)
+		return "", xerrors.Errorf("file seek error: %w", err)
 	}
 
 	h := sha1.New()
 	if _, err := io.Copy(h, r); err != nil {
-		return properties{}, xerrors.Errorf("unable to calculate SHA-1: %w", err)
+		return "", xerrors.Errorf("unable to calculate SHA-1: %w", err)
 	}
-	digest := hex.EncodeToString(h.Sum(nil))
-
-	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
-	if err != nil {
-		return properties{}, xerrors.Errorf("unable to initialize HTTP client: %w", err)
-	}
-
-	q := req.URL.Query()
-	q.Set("q", fmt.Sprintf(sha1Query, digest))
-	q.Set("rows", "1")
-	q.Set("wt", "json")
-	req.URL.RawQuery = q.Encode()
-
-	resp, err := p.httpClient.Do(req)
-	if err != nil {
-		return properties{}, xerrors.Errorf("sha1 search error: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return properties{}, xerrors.Errorf("status %s from %s", resp.Status, req.URL.String())
-	}
-
-	var res apiResponse
-	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return properties{}, xerrors.Errorf("json decode error: %w", err)
-	}
-
-	if len(res.Response.Docs) == 0 {
-		return properties{}, xerrors.Errorf("digest %s: %w", digest, ArtifactNotFoundErr)
-	}
-
-	// Some artifacts might have the same SHA-1 digests.
-	// e.g. "javax.servlet:jstl" and "jstl:jstl"
-	docs := res.Response.Docs
-	sort.Slice(docs, func(i, j int) bool {
-		return docs[i].ID < docs[j].ID
-	})
-	d := docs[0]
-
-	return properties{
-		groupID:    d.GroupID,
-		artifactID: d.ArtifactID,
-		version:    d.Version,
-	}, nil
-}
-
-func (p *Parser) searchByArtifactID(artifactID string) (string, error) {
-	req, err := http.NewRequest(http.MethodGet, p.baseURL, nil)
-	if err != nil {
-		return "", xerrors.Errorf("unable to initialize HTTP client: %w", err)
-	}
-
-	q := req.URL.Query()
-	q.Set("q", fmt.Sprintf(artifactIdQuery, artifactID))
-	q.Set("rows", "20")
-	q.Set("wt", "json")
-	req.URL.RawQuery = q.Encode()
-
-	resp, err := p.httpClient.Do(req)
-	if err != nil {
-		return "", xerrors.Errorf("artifactID search error: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", xerrors.Errorf("status %s from %s", resp.Status, req.URL.String())
-	}
-
-	var res apiResponse
-	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return "", xerrors.Errorf("json decode error: %w", err)
-	}
-
-	if len(res.Response.Docs) == 0 {
-		return "", xerrors.Errorf("artifactID %s: %w", artifactID, ArtifactNotFoundErr)
-	}
-
-	// Some artifacts might have the same artifactId.
-	// e.g. "javax.servlet:jstl" and "jstl:jstl"
-	docs := res.Response.Docs
-	sort.Slice(docs, func(i, j int) bool {
-		return docs[i].VersionCount > docs[j].VersionCount
-	})
-	d := docs[0]
-
-	return d.GroupID, nil
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
