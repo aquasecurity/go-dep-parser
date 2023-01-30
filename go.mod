@@ -27,5 +27,3 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
-
-replace github.com/aquasecurity/trivy-java-db => github.com/DmitriyLewen/trivy-java-db v0.0.0-20230127064158-abac0999f6d8
