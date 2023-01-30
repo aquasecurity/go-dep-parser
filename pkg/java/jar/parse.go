@@ -177,10 +177,12 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 	var searchers []searchers.Searcher
 	// enable search from trivy-java-db
 	err = p.dbSearcher.InitDB()
-	if err == nil && p.dbSearcher.DBDir != "" {
-		searchers = append(searchers, p.dbSearcher)
-	} else {
-		log.Logger.Warnf("can't init trivy-java-db: %s", err)
+	if p.dbSearcher.DBDir != "" {
+		if err == nil {
+			searchers = append(searchers, p.dbSearcher)
+		} else {
+			log.Logger.Warnf("can't init trivy-java-db: %s", err)
+		}
 	}
 
 	// enable search maven repository
