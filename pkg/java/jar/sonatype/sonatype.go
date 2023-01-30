@@ -1,19 +1,23 @@
-package maven
+package sonatype
 
 import (
 	"encoding/json"
 	"fmt"
-	jtypes "github.com/aquasecurity/go-dep-parser/pkg/java/jar/types"
+	"github.com/hashicorp/go-retryablehttp"
 	"golang.org/x/xerrors"
 	"net/http"
+	"os"
 	"sort"
+	"time"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/java/jar"
 )
 
 const (
+	baseURL         = "https://search.maven.org/solrsearch/select"
 	idQuery         = `g:"%s" AND a:"%s"`
 	artifactIdQuery = `a:"%s" AND p:"jar"`
 	sha1Query       = `1:"%s"`
-	searcherName    = "maven repository"
 )
 
 type apiResponse struct {
@@ -30,20 +34,55 @@ type apiResponse struct {
 	} `json:"response"`
 }
 
-type Searcher struct {
-	BaseURL    string
-	HttpClient *http.Client
+type Sonatype struct {
+	baseURL    string
+	httpClient *http.Client
 }
 
-func NewSearcher(baseURL string, httpClient *http.Client) Searcher {
-	return Searcher{
-		BaseURL:    baseURL,
-		HttpClient: httpClient,
+type Option func(*Sonatype)
+
+func WithURL(url string) Option {
+	return func(p *Sonatype) {
+		p.baseURL = url
 	}
 }
 
-func (s Searcher) Exists(groupID, artifactID string) (bool, error) {
-	req, err := http.NewRequest(http.MethodGet, s.BaseURL, nil)
+func WithHTTPClient(client *http.Client) Option {
+	return func(p *Sonatype) {
+		p.httpClient = client
+	}
+}
+
+func New(opts ...Option) Sonatype {
+	// for HTTP retry
+	retryClient := retryablehttp.NewClient()
+	retryClient.Logger = logger{}
+	retryClient.RetryWaitMin = 20 * time.Second
+	retryClient.RetryWaitMax = 5 * time.Minute
+	retryClient.RetryMax = 5
+	client := retryClient.StandardClient()
+
+	// attempt to read the maven central api url from os environment, if it's
+	// not set use the default
+	mavenURL, ok := os.LookupEnv("MAVEN_CENTRAL_URL")
+	if !ok {
+		mavenURL = baseURL
+	}
+
+	s := Sonatype{
+		baseURL:    mavenURL,
+		httpClient: client,
+	}
+
+	for _, opt := range opts {
+		opt(&s)
+	}
+
+	return s
+}
+
+func (s Sonatype) Exists(groupID, artifactID string) (bool, error) {
+	req, err := http.NewRequest(http.MethodGet, s.baseURL, nil)
 	if err != nil {
 		return false, xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
@@ -53,7 +92,7 @@ func (s Searcher) Exists(groupID, artifactID string) (bool, error) {
 	q.Set("rows", "1")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := s.HttpClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return false, xerrors.Errorf("http error: %w", err)
 	}
@@ -66,11 +105,11 @@ func (s Searcher) Exists(groupID, artifactID string) (bool, error) {
 	return res.Response.NumFound > 0, nil
 }
 
-func (s Searcher) SearchBySHA1(sha1 string) (jtypes.Properties, error) {
+func (s Sonatype) SearchBySHA1(sha1 string) (jar.Properties, error) {
 
-	req, err := http.NewRequest(http.MethodGet, s.BaseURL, nil)
+	req, err := http.NewRequest(http.MethodGet, s.baseURL, nil)
 	if err != nil {
-		return jtypes.Properties{}, xerrors.Errorf("unable to initialize HTTP client: %w", err)
+		return jar.Properties{}, xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
 
 	q := req.URL.Query()
@@ -79,23 +118,23 @@ func (s Searcher) SearchBySHA1(sha1 string) (jtypes.Properties, error) {
 	q.Set("wt", "json")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := s.HttpClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		return jtypes.Properties{}, xerrors.Errorf("sha1 search error: %w", err)
+		return jar.Properties{}, xerrors.Errorf("sha1 search error: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return jtypes.Properties{}, xerrors.Errorf("status %s from %s", resp.Status, req.URL.String())
+		return jar.Properties{}, xerrors.Errorf("status %s from %s", resp.Status, req.URL.String())
 	}
 
 	var res apiResponse
 	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return jtypes.Properties{}, xerrors.Errorf("json decode error: %w", err)
+		return jar.Properties{}, xerrors.Errorf("json decode error: %w", err)
 	}
 
 	if len(res.Response.Docs) == 0 {
-		return jtypes.Properties{}, xerrors.Errorf("digest %s: %w", sha1, jtypes.ArtifactNotFoundErr)
+		return jar.Properties{}, xerrors.Errorf("digest %s: %w", sha1, jar.ArtifactNotFoundErr)
 	}
 
 	// Some artifacts might have the same SHA-1 digests.
@@ -106,15 +145,15 @@ func (s Searcher) SearchBySHA1(sha1 string) (jtypes.Properties, error) {
 	})
 	d := docs[0]
 
-	return jtypes.Properties{
+	return jar.Properties{
 		GroupID:    d.GroupID,
 		ArtifactID: d.ArtifactID,
 		Version:    d.Version,
 	}, nil
 }
 
-func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
-	req, err := http.NewRequest(http.MethodGet, s.BaseURL, nil)
+func (s Sonatype) SearchByArtifactID(artifactID string) (string, error) {
+	req, err := http.NewRequest(http.MethodGet, s.baseURL, nil)
 	if err != nil {
 		return "", xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
@@ -125,7 +164,7 @@ func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
 	q.Set("wt", "json")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := s.HttpClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return "", xerrors.Errorf("artifactID search error: %w", err)
 	}
@@ -141,7 +180,7 @@ func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
 	}
 
 	if len(res.Response.Docs) == 0 {
-		return "", xerrors.Errorf("artifactID %s: %w", artifactID, jtypes.ArtifactNotFoundErr)
+		return "", xerrors.Errorf("artifactID %s: %w", artifactID, jar.ArtifactNotFoundErr)
 	}
 
 	// Some artifacts might have the same artifactId.
@@ -153,8 +192,4 @@ func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
 	d := docs[0]
 
 	return d.GroupID, nil
-}
-
-func (s Searcher) GetSearcherName() string {
-	return searcherName
 }

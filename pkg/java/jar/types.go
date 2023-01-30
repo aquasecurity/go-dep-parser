@@ -1,4 +1,4 @@
-package types
+package jar
 
 import (
 	"fmt"
@@ -15,7 +15,10 @@ type Properties struct {
 }
 
 func (p Properties) Library() types.Library {
-	return types.Library{Name: fmt.Sprintf("%s:%s", p.GroupID, p.ArtifactID), Version: p.Version}
+	return types.Library{
+		Name:    fmt.Sprintf("%s:%s", p.GroupID, p.ArtifactID),
+		Version: p.Version,
+	}
 }
 
 func (p Properties) Valid() bool {

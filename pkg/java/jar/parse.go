@@ -5,63 +5,44 @@ import (
 	"bufio"
 	"crypto/sha1"
 	"encoding/hex"
-	"errors"
-	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searchers"
-	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searchers/db"
-	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searchers/maven"
+	"go.uber.org/zap"
+	"golang.org/x/xerrors"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
-
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
-	"go.uber.org/zap"
-	"golang.org/x/xerrors"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
-	jtypes "github.com/aquasecurity/go-dep-parser/pkg/java/jar/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-const (
-	baseURL   = "https://search.maven.org/solrsearch/select"
-	baseDBDir = "trivy/java-db"
-)
+const ()
 
 var (
 	jarFileRegEx = regexp.MustCompile(`^([a-zA-Z0-9\._-]*[^-*])-(\d\S*(?:-SNAPSHOT)?).jar$`)
 )
+
+type Client interface {
+	Exists(groupID, artifactID string) (bool, error)
+	SearchBySHA1(sha1 string) (Properties, error)
+	SearchByArtifactID(artifactID string) (string, error)
+}
 
 type Parser struct {
 	rootFilePath string
 	offline      bool
 	size         int64
 
-	mavenSearcher maven.Searcher
-	dbSearcher    db.Searcher
+	client Client
 }
 
 type Option func(*Parser)
 
-func WithURL(url string) Option {
-	return func(p *Parser) {
-		p.mavenSearcher.BaseURL = url
-	}
-}
-
 func WithFilePath(filePath string) Option {
 	return func(p *Parser) {
 		p.rootFilePath = filePath
-	}
-}
-
-func WithHTTPClient(client *http.Client) Option {
-	return func(p *Parser) {
-		p.mavenSearcher.HttpClient = client
 	}
 }
 
@@ -77,40 +58,9 @@ func WithSize(size int64) Option {
 	}
 }
 
-func WithDBDir(dbDir string) Option {
-	return func(p *Parser) {
-		p.dbSearcher = db.NewSearcher(dbDir)
-	}
-}
-
-func NewParser(opts ...Option) types.Parser {
-	// for HTTP retry
-	retryClient := retryablehttp.NewClient()
-	retryClient.Logger = logger{}
-	retryClient.RetryWaitMin = 20 * time.Second
-	retryClient.RetryWaitMax = 5 * time.Minute
-	retryClient.RetryMax = 5
-	client := retryClient.StandardClient()
-
-	// attempt to read the maven central api url from os environment, if it's
-	// not set use the default
-	mavenURL, ok := os.LookupEnv("MAVEN_CENTRAL_URL")
-	if !ok {
-		mavenURL = baseURL
-	}
-
-	dbDir, ok := os.LookupEnv("TRIVY_JAVA_DB_DIR")
-	if !ok {
-		cacheDir, err := os.UserCacheDir()
-		if err == nil {
-			dbDir = filepath.Join(cacheDir, baseDBDir)
-		}
-
-	}
-
+func NewParser(c Client, opts ...Option) types.Parser {
 	p := &Parser{
-		mavenSearcher: maven.NewSearcher(mavenURL, client),
-		dbSearcher:    db.NewSearcher(dbDir),
+		client: c,
 	}
 
 	for _, opt := range opts {
@@ -174,60 +124,51 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 		return libs, nil, nil
 	}
 
-	var searchers []searchers.Searcher
-	// enable search from trivy-java-db
-	err = p.dbSearcher.InitDB()
-	if p.dbSearcher.DBDir != "" {
-		if err == nil {
-			searchers = append(searchers, p.dbSearcher)
-		} else {
-			log.Logger.Warnf("can't init trivy-java-db: %s", err)
-		}
-	}
-
-	// enable search maven repository
-	if !p.offline {
-		searchers = append(searchers, p.mavenSearcher)
-	} else {
-		log.Logger.Debug("search GAV from maven repository disabled in offline mode")
-	}
-
 	manifestProps := m.properties()
-	for _, s := range searchers {
-		if digest, err := getSha1(r); err == nil {
-			// If groupId and artifactId are not found, use Searchers to find GAV with SHA-1 digest.
-			props, err := s.SearchBySHA1(digest)
-			if err == nil {
-				return append(libs, props.Library()), nil, nil
-			} else if !errors.Is(err, jtypes.ArtifactNotFoundErr) {
-				return nil, nil, xerrors.Errorf("failed to search by SHA1: %w", err)
-			}
+	if p.offline {
+		// In offline mode, we will not check if the artifact information is correct.
+		if !manifestProps.Valid() {
+			log.Logger.Debugw("Unable to identify POM in offline mode", zap.String("file", fileName))
+			return libs, nil, nil
 		}
-
-		log.Logger.Debugw("No such 'jar' in "+s.GetSearcherName(), zap.String("file", fileName))
-
-		// Return when artifactId or version from the file name are empty
-		if fileProps.ArtifactID == "" || fileProps.Version == "" {
-			continue
-		}
-
-		// Try to search groupId by artifactId via sonatype API
-		// When some artifacts have the same groupIds, it might result in false detection.
-		fileProps.GroupID, err = s.SearchByArtifactID(fileProps.ArtifactID)
-		if err == nil {
-			log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
-				zap.String("artifact", fileProps.String()))
-			return append(libs, fileProps.Library()), nil, nil
-		} else if !errors.Is(err, jtypes.ArtifactNotFoundErr) {
-			return nil, nil, xerrors.Errorf("failed to search by artifact id: %w", err)
-		}
-
+		return append(libs, manifestProps.Library()), nil, nil
 	}
-	// if props didn't find with Searcher:
-	// insert props if props are valid
+
 	if manifestProps.Valid() {
-		libs = append(libs, manifestProps.Library())
+		// Even if MANIFEST.MF is found, the groupId and artifactId might not be valid.
+		// We have to make sure that the artifact exists actually.
+		if ok, _ := p.client.Exists(manifestProps.GroupID, manifestProps.ArtifactID); ok {
+			// If groupId and artifactId are valid, they will be returned.
+			return append(libs, manifestProps.Library()), nil, nil
+		}
 	}
+
+	// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
+	props, err := p.searchBySHA1(r)
+	if err == nil {
+		return append(libs, props.Library()), nil, nil
+	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
+		return nil, nil, xerrors.Errorf("failed to search by SHA1: %w", err)
+	}
+
+	log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
+
+	// Return when artifactId or version from the file name are empty
+	if fileProps.ArtifactID == "" || fileProps.Version == "" {
+		return libs, nil, nil
+	}
+
+	// Try to search groupId by artifactId via sonatype API
+	// When some artifacts have the same groupIds, it might result in false detection.
+	fileProps.GroupID, err = p.client.SearchByArtifactID(fileProps.ArtifactID)
+	if err == nil {
+		log.Logger.Debugw("POM was determined in a heuristic way", zap.String("file", fileName),
+			zap.String("artifact", fileProps.String()))
+		libs = append(libs, fileProps.Library())
+	} else if !xerrors.Is(err, ArtifactNotFoundErr) {
+		return nil, nil, xerrors.Errorf("failed to search by artifact id: %w", err)
+	}
+
 	return libs, nil, nil
 }
 
@@ -260,6 +201,23 @@ func (p *Parser) parseInnerJar(zf *zip.File) ([]types.Library, []types.Dependenc
 	return innerLibs, innerDeps, nil
 }
 
+func (p *Parser) searchBySHA1(r io.ReadSeeker) (Properties, error) {
+	if _, err := r.Seek(0, io.SeekStart); err != nil {
+		return Properties{}, xerrors.Errorf("file seek error: %w", err)
+	}
+
+	h := sha1.New()
+	if _, err := io.Copy(h, r); err != nil {
+		return Properties{}, xerrors.Errorf("unable to calculate SHA-1: %w", err)
+	}
+	s := hex.EncodeToString(h.Sum(nil))
+	prop, err := p.client.SearchBySHA1(s)
+	if err != nil {
+		return Properties{}, err
+	}
+	return prop, nil
+}
+
 func isArtifact(name string) bool {
 	ext := filepath.Ext(name)
 	if ext == ".jar" || ext == ".ear" || ext == ".war" {
@@ -268,26 +226,26 @@ func isArtifact(name string) bool {
 	return false
 }
 
-func parseFileName(fileName string) jtypes.Properties {
+func parseFileName(fileName string) Properties {
 	packageVersion := jarFileRegEx.FindStringSubmatch(fileName)
 	if len(packageVersion) != 3 {
-		return jtypes.Properties{}
+		return Properties{}
 	}
 
-	return jtypes.Properties{
+	return Properties{
 		ArtifactID: packageVersion[1],
 		Version:    packageVersion[2],
 	}
 }
 
-func parsePomProperties(f *zip.File) (jtypes.Properties, error) {
+func parsePomProperties(f *zip.File) (Properties, error) {
 	file, err := f.Open()
 	if err != nil {
-		return jtypes.Properties{}, xerrors.Errorf("unable to open pom.properties: %w", err)
+		return Properties{}, xerrors.Errorf("unable to open pom.properties: %w", err)
 	}
 	defer file.Close()
 
-	var p jtypes.Properties
+	var p Properties
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -302,7 +260,7 @@ func parsePomProperties(f *zip.File) (jtypes.Properties, error) {
 	}
 
 	if err = scanner.Err(); err != nil {
-		return jtypes.Properties{}, xerrors.Errorf("scan error: %w", err)
+		return Properties{}, xerrors.Errorf("scan error: %w", err)
 	}
 	return p, nil
 }
@@ -370,23 +328,23 @@ func parseManifest(f *zip.File) (manifest, error) {
 	return m, nil
 }
 
-func (m manifest) properties() jtypes.Properties {
+func (m manifest) properties() Properties {
 	groupID, err := m.determineGroupID()
 	if err != nil {
-		return jtypes.Properties{}
+		return Properties{}
 	}
 
 	artifactID, err := m.determineArtifactID()
 	if err != nil {
-		return jtypes.Properties{}
+		return Properties{}
 	}
 
 	version, err := m.determineVersion()
 	if err != nil {
-		return jtypes.Properties{}
+		return Properties{}
 	}
 
-	return jtypes.Properties{
+	return Properties{
 		GroupID:    groupID,
 		ArtifactID: artifactID,
 		Version:    version,
@@ -444,16 +402,4 @@ func (m manifest) determineVersion() (string, error) {
 		return "", xerrors.New("no version found")
 	}
 	return strings.TrimSpace(version), nil
-}
-
-func getSha1(r io.ReadSeeker) (string, error) {
-	if _, err := r.Seek(0, io.SeekStart); err != nil {
-		return "", xerrors.Errorf("file seek error: %w", err)
-	}
-
-	h := sha1.New()
-	if _, err := io.Copy(h, r); err != nil {
-		return "", xerrors.Errorf("unable to calculate SHA-1: %w", err)
-	}
-	return hex.EncodeToString(h.Sum(nil)), nil
 }
