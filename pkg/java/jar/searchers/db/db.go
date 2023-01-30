@@ -7,12 +7,21 @@ import (
 	"golang.org/x/xerrors"
 )
 
+const searcherName = "trivy-java-db"
+
 type Searcher struct {
+	DBDir string
 }
 
-func NewSearcher(cacheDir string) (Searcher, error) {
-	err := db.Init(cacheDir)
-	return Searcher{}, err
+func NewSearcher(dbDir string) Searcher {
+	return Searcher{DBDir: dbDir}
+}
+
+func (s Searcher) InitDB() error {
+	if s.DBDir == "" {
+		return nil
+	}
+	return db.Init(s.DBDir)
 }
 
 func (s Searcher) Exists(groupID, artifactID string) (bool, error) {
@@ -59,4 +68,9 @@ func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
 	}
 
 	return groupID, nil
+}
+
+// GetSearcherName return searcher name to insert in logs
+func (s Searcher) GetSearcherName() string {
+	return searcherName
 }

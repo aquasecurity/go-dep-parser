@@ -65,6 +65,10 @@ var (
 		{Name: "com.google.j2objc:j2objc-annotations", Version: "1.3"},
 		{Name: "org.apache.hadoop.thirdparty:hadoop-shaded-guava", Version: "1.1.0-SNAPSHOT"},
 	}
+
+	wantTrivyJavaDB = []types.Library{
+		{Name: "org.apache.tomcat.embed:tomcat-embed-websocket", Version: "9.0.65"},
+	}
 )
 
 type apiResponse struct {
@@ -90,6 +94,7 @@ func TestParse(t *testing.T) {
 		name    string
 		file    string // Test input file
 		offline bool
+		dbDir   string
 		want    []types.Library
 	}{
 		{
@@ -103,15 +108,23 @@ func TestParse(t *testing.T) {
 			want: wantGradle,
 		},
 		{
-			name: "sha1 search",
-			file: "testdata/test.jar",
-			want: wantSHA1,
+			name:  "sha1 search",
+			file:  "testdata/test.jar",
+			dbDir: "testdata/testdb",
+			want:  wantSHA1,
 		},
 		{
 			name:    "offline",
 			file:    "testdata/test.jar",
 			offline: true,
 			want:    wantOffline,
+		},
+		{
+			name:    "Trivy java DB",
+			file:    "testdata/trivy-java-db-test.jar",
+			dbDir:   "testdata/testdb",
+			offline: true,
+			want:    wantTrivyJavaDB,
 		},
 		{
 			name: "artifactId search",
@@ -170,8 +183,8 @@ func TestParse(t *testing.T) {
 
 			stat, err := f.Stat()
 			require.NoError(t, err)
-			p := jar.NewParser(jar.WithURL(ts.URL), jar.WithFilePath(v.file),
-				jar.WithHTTPClient(ts.Client()), jar.WithOffline(v.offline), jar.WithSize(stat.Size()))
+			p := jar.NewParser(jar.WithURL(ts.URL), jar.WithFilePath(v.file), jar.WithHTTPClient(ts.Client()),
+				jar.WithOffline(v.offline), jar.WithSize(stat.Size()), jar.WithDBDir(v.dbDir))
 
 			got, _, err := p.Parse(f)
 			require.NoError(t, err)

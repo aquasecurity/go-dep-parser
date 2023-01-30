@@ -13,6 +13,7 @@ const (
 	idQuery         = `g:"%s" AND a:"%s"`
 	artifactIdQuery = `a:"%s" AND p:"jar"`
 	sha1Query       = `1:"%s"`
+	searcherName    = "maven repository"
 )
 
 type apiResponse struct {
@@ -30,19 +31,19 @@ type apiResponse struct {
 }
 
 type Searcher struct {
-	baseURL    string
-	httpClient *http.Client
+	BaseURL    string
+	HttpClient *http.Client
 }
 
 func NewSearcher(baseURL string, httpClient *http.Client) Searcher {
 	return Searcher{
-		baseURL:    baseURL,
-		httpClient: httpClient,
+		BaseURL:    baseURL,
+		HttpClient: httpClient,
 	}
 }
 
 func (s Searcher) Exists(groupID, artifactID string) (bool, error) {
-	req, err := http.NewRequest(http.MethodGet, s.baseURL, nil)
+	req, err := http.NewRequest(http.MethodGet, s.BaseURL, nil)
 	if err != nil {
 		return false, xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
@@ -52,7 +53,7 @@ func (s Searcher) Exists(groupID, artifactID string) (bool, error) {
 	q.Set("rows", "1")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := s.httpClient.Do(req)
+	resp, err := s.HttpClient.Do(req)
 	if err != nil {
 		return false, xerrors.Errorf("http error: %w", err)
 	}
@@ -67,7 +68,7 @@ func (s Searcher) Exists(groupID, artifactID string) (bool, error) {
 
 func (s Searcher) SearchBySHA1(sha1 string) (jtypes.Properties, error) {
 
-	req, err := http.NewRequest(http.MethodGet, s.baseURL, nil)
+	req, err := http.NewRequest(http.MethodGet, s.BaseURL, nil)
 	if err != nil {
 		return jtypes.Properties{}, xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
@@ -78,7 +79,7 @@ func (s Searcher) SearchBySHA1(sha1 string) (jtypes.Properties, error) {
 	q.Set("wt", "json")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := s.httpClient.Do(req)
+	resp, err := s.HttpClient.Do(req)
 	if err != nil {
 		return jtypes.Properties{}, xerrors.Errorf("sha1 search error: %w", err)
 	}
@@ -113,7 +114,7 @@ func (s Searcher) SearchBySHA1(sha1 string) (jtypes.Properties, error) {
 }
 
 func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
-	req, err := http.NewRequest(http.MethodGet, s.baseURL, nil)
+	req, err := http.NewRequest(http.MethodGet, s.BaseURL, nil)
 	if err != nil {
 		return "", xerrors.Errorf("unable to initialize HTTP client: %w", err)
 	}
@@ -124,7 +125,7 @@ func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
 	q.Set("wt", "json")
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := s.httpClient.Do(req)
+	resp, err := s.HttpClient.Do(req)
 	if err != nil {
 		return "", xerrors.Errorf("artifactID search error: %w", err)
 	}
@@ -152,4 +153,8 @@ func (s Searcher) SearchByArtifactID(artifactID string) (string, error) {
 	d := docs[0]
 
 	return d.GroupID, nil
+}
+
+func (s Searcher) GetSearcherName() string {
+	return searcherName
 }

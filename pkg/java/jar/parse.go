@@ -6,9 +6,9 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
-	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searcher"
-	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searcher/db"
-	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searcher/maven"
+	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searchers"
+	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searchers/db"
+	"github.com/aquasecurity/go-dep-parser/pkg/java/jar/searchers/maven"
 	"io"
 	"net/http"
 	"os"
@@ -28,7 +28,8 @@ import (
 )
 
 const (
-	baseURL = "https://search.maven.org/solrsearch/select"
+	baseURL   = "https://search.maven.org/solrsearch/select"
+	baseDBDir = "trivy/java-db"
 )
 
 var (
@@ -36,19 +37,19 @@ var (
 )
 
 type Parser struct {
-	baseURL        string
-	rootFilePath   string
-	httpClient     *http.Client
-	offline        bool
-	size           int64
-	javaDBCacheDir string
+	rootFilePath string
+	offline      bool
+	size         int64
+
+	mavenSearcher maven.Searcher
+	dbSearcher    db.Searcher
 }
 
 type Option func(*Parser)
 
 func WithURL(url string) Option {
 	return func(p *Parser) {
-		p.baseURL = url
+		p.mavenSearcher.BaseURL = url
 	}
 }
 
@@ -60,7 +61,7 @@ func WithFilePath(filePath string) Option {
 
 func WithHTTPClient(client *http.Client) Option {
 	return func(p *Parser) {
-		p.httpClient = client
+		p.mavenSearcher.HttpClient = client
 	}
 }
 
@@ -76,9 +77,9 @@ func WithSize(size int64) Option {
 	}
 }
 
-func WithTrivyJavaDBDir(cacheDir string) Option {
+func WithDBDir(dbDir string) Option {
 	return func(p *Parser) {
-		p.javaDBCacheDir = cacheDir
+		p.dbSearcher = db.NewSearcher(dbDir)
 	}
 }
 
@@ -98,9 +99,18 @@ func NewParser(opts ...Option) types.Parser {
 		mavenURL = baseURL
 	}
 
+	dbDir, ok := os.LookupEnv("TRIVY_JAVA_DB_DIR")
+	if !ok {
+		cacheDir, err := os.UserCacheDir()
+		if err == nil {
+			dbDir = filepath.Join(cacheDir, baseDBDir)
+		}
+
+	}
+
 	p := &Parser{
-		baseURL:    mavenURL,
-		httpClient: client,
+		mavenSearcher: maven.NewSearcher(mavenURL, client),
+		dbSearcher:    db.NewSearcher(dbDir),
 	}
 
 	for _, opt := range opts {
@@ -164,20 +174,18 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 		return libs, nil, nil
 	}
 
-	var searchers []searcher.Searcher
+	var searchers []searchers.Searcher
 	// enable search from trivy-java-db
-	if p.javaDBCacheDir != "" {
-		javaDBSearcher, err := db.NewSearcher(p.javaDBCacheDir)
-		if err == nil {
-			searchers = append(searchers, javaDBSearcher)
-		} else {
-			log.Logger.Warnf("can't init trivy-java-db: %s", err)
-		}
+	err = p.dbSearcher.InitDB()
+	if err == nil && p.dbSearcher.DBDir != "" {
+		searchers = append(searchers, p.dbSearcher)
+	} else {
+		log.Logger.Warnf("can't init trivy-java-db: %s", err)
 	}
 
 	// enable search maven repository
 	if !p.offline {
-		searchers = append(searchers, maven.NewSearcher(p.baseURL, p.httpClient))
+		searchers = append(searchers, p.mavenSearcher)
 	} else {
 		log.Logger.Debug("search GAV from maven repository disabled in offline mode")
 	}
@@ -185,7 +193,7 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 	manifestProps := m.properties()
 	for _, s := range searchers {
 		if digest, err := getSha1(r); err == nil {
-			// If groupId and artifactId are not found, call Maven Central's search API with SHA-1 digest.
+			// If groupId and artifactId are not found, use Searchers to find GAV with SHA-1 digest.
 			props, err := s.SearchBySHA1(digest)
 			if err == nil {
 				return append(libs, props.Library()), nil, nil
@@ -194,11 +202,11 @@ func (p *Parser) parseArtifact(fileName string, size int64, r dio.ReadSeekerAt) 
 			}
 		}
 
-		log.Logger.Debugw("No such POM in the central repositories", zap.String("file", fileName))
+		log.Logger.Debugw("No such 'jar' in "+s.GetSearcherName(), zap.String("file", fileName))
 
 		// Return when artifactId or version from the file name are empty
 		if fileProps.ArtifactID == "" || fileProps.Version == "" {
-			return libs, nil, nil
+			continue
 		}
 
 		// Try to search groupId by artifactId via sonatype API
