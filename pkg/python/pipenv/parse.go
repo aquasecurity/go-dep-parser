@@ -12,7 +12,6 @@ import (
 
 type lockFile struct {
 	Default map[string]dependency `json:"default"`
-	//Develop map[string]dependency `json:"develop"`
 }
 type dependency struct {
 	Version   string `json:"version"`
