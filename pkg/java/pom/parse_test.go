@@ -82,7 +82,7 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
-			name:      "inherit properties from child to parent",
+			name:      "dependencyManagement prefers child properties",
 			inputFile: filepath.Join("testdata", "parent-child-properties", "child", "pom.xml"),
 			local:     true,
 			want: []types.Library{
