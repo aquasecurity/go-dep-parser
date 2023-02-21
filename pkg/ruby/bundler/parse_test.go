@@ -14,23 +14,28 @@ import (
 func TestParse(t *testing.T) {
 	vectors := []struct {
 		file string // Test input file
-		want []types.Library
+		libs []types.Library
+		deps []types.Dependency
 	}{
 		{
 			file: "testdata/Gemfile_normal.lock",
-			want: BundlerNormal,
+			libs: BundlerNormal,
+			deps: BundlerNormalDeps,
 		},
 		{
 			file: "testdata/Gemfile_rails.lock",
-			want: BundlerRails,
+			libs: BundlerRails,
+			deps: BundlerRailsDeps,
 		},
 		{
 			file: "testdata/Gemfile_many.lock",
-			want: BundlerMany,
+			libs: BundlerMany,
+			deps: BundlerManyDeps,
 		},
 		{
 			file: "testdata/Gemfile_rails7.lock",
-			want: BundlerV2RailsV7,
+			libs: BundlerV2RailsV7,
+			deps: BundlerV2RailsV7Deps,
 		},
 	}
 
@@ -39,10 +44,11 @@ func TestParse(t *testing.T) {
 			f, err := os.Open(v.file)
 			require.NoError(t, err)
 
-			got, _, err := NewParser().Parse(f)
+			libs, deps, err := NewParser().Parse(f)
 			require.NoError(t, err)
 
-			assert.Equal(t, v.want, got)
+			assert.Equal(t, v.libs, libs)
+			assert.Equal(t, v.deps, deps)
 		})
 	}
 }
