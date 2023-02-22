@@ -39,6 +39,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		return nil, nil, xerrors.Errorf("failed to decode poetry.lock: %w", err)
 	}
 
+	// dependencies of libraries use version range
 	// store all installed versions of libraries for use in dependsOn
 	libsVersions := map[string][]string{}
 	for _, pkg := range lockfile.Packages {
@@ -68,7 +69,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		for name, versRange := range pkg.Dependencies {
 			dep, err := parseDependency(name, versRange, libsVersions)
 			if err != nil {
-				log.Logger.Debugf("failed to parse dependency: %s", err)
+				log.Logger.Debugf("failed to parse poetry dependency: %s", err)
 			}
 			if dep != "" {
 				dependsOn = append(dependsOn, dep)
