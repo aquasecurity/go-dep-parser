@@ -272,9 +272,14 @@ func (p parser) dependencyManagement(deps []pomDependency, props properties) map
 	for _, d := range deps {
 		// https://howtodoinjava.com/maven/maven-dependency-scopes/#import
 		if d.Scope == "import" {
+			// Evaluate variables
+			d = d.Resolve(props, nil, nil)
 			art := newArtifact(d.GroupID, d.ArtifactID, d.Version, props)
 			result, err := p.resolve(art)
 			if err == nil {
+				for name, dd := range result.dependencyManagement {
+					result.dependencyManagement[name] = dd.Resolve(result.properties, nil, nil)
+				}
 				depManagement = p.mergeDependencyManagements(depManagement, result.dependencyManagement)
 			}
 			continue
