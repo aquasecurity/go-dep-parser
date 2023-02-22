@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/samber/lo"
+
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
 
@@ -169,7 +171,7 @@ func (d pomDependency) Name() string {
 }
 
 // Resolve evaluates variables in the dependency and inherit some fields from dependencyManagement to the dependency.
-func (d pomDependency) Resolve(props map[string]string, depManagement map[string]pomDependency, depManagementFromUpperPoms map[string]pomDependency) pomDependency {
+func (d pomDependency) Resolve(props map[string]string, depManagement, depManagementFromUpperPoms []pomDependency) pomDependency {
 	// Evaluate variables
 	dep := pomDependency{
 		Text:       d.Text,
@@ -183,7 +185,7 @@ func (d pomDependency) Resolve(props map[string]string, depManagement map[string
 
 	// if this dependency is in the upper pom.xml in `dependencyManagement`
 	// then we need to take non-empty fields from the upper pom.xml
-	if managed, ok := depManagementFromUpperPoms[d.Name()]; ok { // dependencyManagement from upper pom.xml
+	if managed, found := findDep(d.Name(), depManagementFromUpperPoms); found { // dependencyManagement from upper pom.xml
 		if managed.Version != "" {
 			dep.Version = evaluateVariable(managed.Version, props, nil)
 		}
@@ -200,7 +202,7 @@ func (d pomDependency) Resolve(props map[string]string, depManagement map[string
 	}
 
 	// Inherit version, scope and optional from dependencyManagement
-	if managed, ok := depManagement[d.Name()]; ok { // dependencyManagement from parent
+	if managed, found := findDep(d.Name(), depManagement); found { // dependencyManagement from parent
 		if dep.Version == "" {
 			dep.Version = evaluateVariable(managed.Version, props, nil)
 		}
@@ -220,7 +222,7 @@ func (d pomDependency) Resolve(props map[string]string, depManagement map[string
 
 // ToArtifact converts dependency to artifact.
 // It should be called after calling Resolve() so that variables can be evaluated.
-func (d pomDependency) ToArtifact(exclusions map[string]struct{}, depManagement map[string]pomDependency) artifact {
+func (d pomDependency) ToArtifact(exclusions map[string]struct{}, depManagement []pomDependency) artifact {
 	if exclusions == nil {
 		exclusions = map[string]struct{}{}
 	}
@@ -257,4 +259,10 @@ func (props *properties) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 		(*props)[p.XMLName.Local] = p.Value
 	}
 	return nil
+}
+
+func findDep(name string, depManagement []pomDependency) (pomDependency, bool) {
+	return lo.Find(depManagement, func(item pomDependency) bool {
+		return item.Name() == name
+	})
 }

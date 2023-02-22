@@ -19,7 +19,7 @@ type artifact struct {
 	ArtifactID           string
 	Version              version
 	Module               bool
-	DependencyManagement map[string]pomDependency
+	DependencyManagement []pomDependency
 	Exclusions           map[string]struct{}
 }
 
