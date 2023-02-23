@@ -150,6 +150,12 @@ func TestParser_Parse(t *testing.T) {
 			wantDeps: Bundler2Deps,
 			wantErr:  assert.NoError,
 		},
+		{
+			name:     "malformed",
+			file:     "testdata/Gemfile_malformed.lock",
+			wantLibs: []types.Library{},
+			wantErr:  assert.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
