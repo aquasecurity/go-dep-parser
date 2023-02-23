@@ -1,15 +1,17 @@
 package poetry
 
 import (
+	"fmt"
+	"sort"
+	"strings"
+
 	"github.com/BurntSushi/toml"
+	"golang.org/x/xerrors"
+
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
-	"golang.org/x/xerrors"
-	"sort"
-	"strings"
-
 	version "github.com/aquasecurity/go-pep440-version"
 )
 
@@ -35,24 +37,15 @@ func NewParser() types.Parser {
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockfile Lockfile
-	if _, err := toml.NewDecoder(r).Decode(&lockfile); err != nil {
+	metadata, err := toml.NewDecoder(r).Decode(&lockfile)
+	if err != nil {
 		return nil, nil, xerrors.Errorf("failed to decode poetry.lock: %w", err)
 	}
+	keys := metadata.Keys()
+	fmt.Println(keys)
 
-	// dependencies of libraries use version range
-	// store all installed versions of libraries for use in dependsOn
-	libsVersions := map[string][]string{}
-	for _, pkg := range lockfile.Packages {
-		if pkg.Category == "dev" {
-			continue
-		}
-		vers, ok := libsVersions[pkg.Name]
-		if ok {
-			libsVersions[pkg.Name] = append(vers, pkg.Version)
-			continue
-		}
-		libsVersions[pkg.Name] = []string{pkg.Version}
-	}
+	// Keep all installed versions
+	libVersions := parseVersions(lockfile)
 
 	var libs []types.Library
 	var deps []types.Dependency
@@ -60,27 +53,18 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		if pkg.Category == "dev" {
 			continue
 		}
+
+		pkgID := utils.PackageID(pkg.Name, pkg.Version)
 		libs = append(libs, types.Library{
-			ID:      utils.PackageID(pkg.Name, pkg.Version),
+			ID:      pkgID,
 			Name:    pkg.Name,
 			Version: pkg.Version,
 		})
-		var dependsOn []string
-		for name, versRange := range pkg.Dependencies {
-			dep, err := parseDependency(name, versRange, libsVersions)
-			if err != nil {
-				log.Logger.Debugf("failed to parse poetry dependency: %s", err)
-			}
-			if dep != "" {
-				dependsOn = append(dependsOn, dep)
-			}
-		}
-		if len(dependsOn) > 0 {
-			sort.Slice(dependsOn, func(i, j int) bool {
-				return dependsOn[i] < dependsOn[j]
-			})
+
+		dependsOn := parseDependencies(pkg.Dependencies, libVersions)
+		if len(dependsOn) != 0 {
 			deps = append(deps, types.Dependency{
-				ID:        utils.PackageID(pkg.Name, pkg.Version),
+				ID:        pkgID,
 				DependsOn: dependsOn,
 			})
 		}
@@ -88,34 +72,66 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	return libs, deps, nil
 }
 
-func parseDependency(name string, versRange interface{}, libsVersions map[string][]string) (string, error) {
-	name = handlePackageName(name)
-	vers, ok := libsVersions[name]
-	if ok {
-		for _, ver := range vers {
-			var vRange string
-
-			switch r := versRange.(type) {
-			case string:
-				vRange = r
-			case map[string]interface{}:
-				for k, v := range r {
-					if k == "version" {
-						vRange = v.(string)
-					}
-				}
-			}
-
-			matched, err := matchVersion(ver, vRange)
-			if err != nil {
-				return "", xerrors.Errorf("failed to match version for %s: %w", name, err)
-			}
-			if matched {
-				return utils.PackageID(name, ver), nil
-			}
+// parseVersions stores all installed versions of libraries for use in dependsOn
+// as the dependencies of libraries use version range.
+func parseVersions(lockfile Lockfile) map[string][]string {
+	libVersions := map[string][]string{}
+	for _, pkg := range lockfile.Packages {
+		if pkg.Category == "dev" {
+			continue
+		}
+		if vers, ok := libVersions[pkg.Name]; ok {
+			libVersions[pkg.Name] = append(vers, pkg.Version)
+		} else {
+			libVersions[pkg.Name] = []string{pkg.Version}
 		}
 	}
-	return "", xerrors.Errorf("failed to find version for %q", name)
+	return libVersions
+}
+
+func parseDependencies(deps map[string]any, libVersions map[string][]string) []string {
+	var dependsOn []string
+	for name, versRange := range deps {
+		if dep, err := parseDependency(name, versRange, libVersions); err != nil {
+			log.Logger.Debugf("failed to parse poetry dependency: %s", err)
+		} else if dep != "" {
+			dependsOn = append(dependsOn, dep)
+		}
+	}
+	sort.Slice(dependsOn, func(i, j int) bool {
+		return dependsOn[i] < dependsOn[j]
+	})
+	return dependsOn
+}
+
+func parseDependency(name string, versRange any, libVersions map[string][]string) (string, error) {
+	name = normalizePkgName(name)
+	vers, ok := libVersions[name]
+	if !ok {
+		return "", xerrors.Errorf("no version found for %q", name)
+	}
+
+	for _, ver := range vers {
+		var vRange string
+
+		switch r := versRange.(type) {
+		case string:
+			vRange = r
+		case map[string]interface{}:
+			for k, v := range r {
+				if k == "version" {
+					vRange = v.(string)
+				}
+			}
+		}
+
+		if matched, err := matchVersion(ver, vRange); err != nil {
+			return "", xerrors.Errorf("failed to match version for %s: %w", name, err)
+		} else if matched {
+			return utils.PackageID(name, ver), nil
+		}
+	}
+	return "", xerrors.Errorf("no matched version found for %q", name)
 }
 
 // matchVersion checks if the package version satisfies the given constraint.
@@ -133,10 +149,9 @@ func matchVersion(currentVersion, constraint string) (bool, error) {
 	return c.Check(v), nil
 }
 
-func handlePackageName(name string) string {
-	// Library names doesn't use `_`, `.` or upper case
-	// But Dependency struct can contain them
-	// We need to fix this
+func normalizePkgName(name string) string {
+	// The package names don't use `_`, `.` or upper case, but dependency names can contain them.
+	// We need to normalize those names.
 	name = strings.ToLower(name)              // e.g. https://github.com/python-poetry/poetry/blob/c8945eb110aeda611cc6721565d7ad0c657d453a/poetry.lock#L819
 	name = strings.ReplaceAll(name, "_", "-") // e.g. https://github.com/python-poetry/poetry/blob/c8945eb110aeda611cc6721565d7ad0c657d453a/poetry.lock#L50
 	name = strings.ReplaceAll(name, ".", "-") // e.g. https://github.com/python-poetry/poetry/blob/c8945eb110aeda611cc6721565d7ad0c657d453a/poetry.lock#L816

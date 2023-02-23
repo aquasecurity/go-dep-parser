@@ -1,9 +1,8 @@
 package poetry
 
 import (
+	"fmt"
 	"os"
-	"path"
-	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,53 +11,48 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
-func TestParse(t *testing.T) {
-	vectors := []struct {
-		file     string // Test input file
+func TestParser_Parse(t *testing.T) {
+	tests := []struct {
+		name     string
+		file     string
 		wantLibs []types.Library
 		wantDeps []types.Dependency
+		wantErr  assert.ErrorAssertionFunc
 	}{
 		{
+			name:     "normal",
 			file:     "testdata/poetry_normal.lock",
 			wantLibs: poetryNormal,
+			wantErr:  assert.NoError,
 		},
 		{
+			name:     "many",
 			file:     "testdata/poetry_many.lock",
 			wantLibs: poetryMany,
 			wantDeps: poetryManyDeps,
+			wantErr:  assert.NoError,
 		},
 		{
+			name:     "flask",
 			file:     "testdata/poetry_flask.lock",
 			wantLibs: poetryFlask,
 			wantDeps: poetryFlaskDeps,
+			wantErr:  assert.NoError,
 		},
 	}
-
-	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
-			f, err := os.Open(v.file)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f, err := os.Open(tt.file)
 			require.NoError(t, err)
+			defer f.Close()
 
-			gotLibs, gotDeps, err := NewParser().Parse(f)
-			require.NoError(t, err)
-
-			// check libs
-			sort.Slice(gotLibs, func(i, j int) bool {
-				return gotLibs[i].ID < gotLibs[j].ID
-			})
-			sort.Slice(v.wantLibs, func(i, j int) bool {
-				return v.wantLibs[i].ID < v.wantLibs[j].ID
-			})
-			assert.Equal(t, v.wantLibs, gotLibs)
-
-			// check deps
-			sort.Slice(gotDeps, func(i, j int) bool {
-				return gotDeps[i].ID < gotDeps[j].ID
-			})
-			sort.Slice(v.wantDeps, func(i, j int) bool {
-				return v.wantDeps[i].ID < v.wantDeps[j].ID
-			})
-			assert.Equal(t, v.wantDeps, gotDeps)
+			p := &Parser{}
+			gotLibs, gotDeps, err := p.Parse(f)
+			if !tt.wantErr(t, err, fmt.Sprintf("Parse(%v)", tt.file)) {
+				return
+			}
+			assert.Equalf(t, tt.wantLibs, gotLibs, "Parse(%v)", tt.file)
+			assert.Equalf(t, tt.wantDeps, gotDeps, "Parse(%v)", tt.file)
 		})
 	}
 }
@@ -116,7 +110,7 @@ func TestParseDependency(t *testing.T) {
 			packageName:  "test",
 			versionRange: ">=1.0.0",
 			libsVersions: map[string][]string{},
-			wantErr:      "failed to find version for \"test\"",
+			wantErr:      "no version found",
 		},
 	}
 
