@@ -15,14 +15,16 @@ import (
 var (
 	NormalLibs = []types.Library{
 		{
-			ID:      "coderay@1.1.2",
-			Name:    "coderay",
-			Version: "1.1.2",
+			ID:       "coderay@1.1.2",
+			Name:     "coderay",
+			Version:  "1.1.2",
+			Indirect: true,
 		},
 		{
-			ID:      "concurrent-ruby@1.1.5",
-			Name:    "concurrent-ruby",
-			Version: "1.1.5",
+			ID:       "concurrent-ruby@1.1.5",
+			Name:     "concurrent-ruby",
+			Version:  "1.1.5",
+			Indirect: true,
 		},
 		{
 			ID:      "dotenv@2.7.2",
@@ -35,14 +37,16 @@ var (
 			Version: "1.9.3",
 		},
 		{
-			ID:      "i18n@1.6.0",
-			Name:    "i18n",
-			Version: "1.6.0",
+			ID:       "i18n@1.6.0",
+			Name:     "i18n",
+			Version:  "1.6.0",
+			Indirect: true,
 		},
 		{
-			ID:      "method_source@0.9.2",
-			Name:    "method_source",
-			Version: "0.9.2",
+			ID:       "method_source@0.9.2",
+			Name:     "method_source",
+			Version:  "0.9.2",
+			Indirect: true,
 		},
 		{
 			ID:      "pry@0.12.2",
@@ -69,14 +73,16 @@ var (
 	}
 	Bundler2Libs = []types.Library{
 		{
-			ID:      "coderay@1.1.3",
-			Name:    "coderay",
-			Version: "1.1.3",
+			ID:       "coderay@1.1.3",
+			Name:     "coderay",
+			Version:  "1.1.3",
+			Indirect: true,
 		},
 		{
-			ID:      "concurrent-ruby@1.1.10",
-			Name:    "concurrent-ruby",
-			Version: "1.1.10",
+			ID:       "concurrent-ruby@1.1.10",
+			Name:     "concurrent-ruby",
+			Version:  "1.1.10",
+			Indirect: true,
 		},
 		{
 			ID:      "dotenv@2.7.6",
@@ -89,9 +95,10 @@ var (
 			Version: "2.21.0",
 		},
 		{
-			ID:      "i18n@1.10.0",
-			Name:    "i18n",
-			Version: "1.10.0",
+			ID:       "i18n@1.10.0",
+			Name:     "i18n",
+			Version:  "1.10.0",
+			Indirect: true,
 		},
 		{
 			ID:      "json@2.6.2",
@@ -99,9 +106,10 @@ var (
 			Version: "2.6.2",
 		},
 		{
-			ID:      "method_source@1.0.0",
-			Name:    "method_source",
-			Version: "1.0.0",
+			ID:       "method_source@1.0.0",
+			Name:     "method_source",
+			Version:  "1.0.0",
+			Indirect: true,
 		},
 		{
 			ID:      "pry@0.14.1",
