@@ -79,6 +79,15 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		skipIndirect = lessThan117(modFileParsed.Go.Version)
 	}
 
+	if m := modFileParsed.Module; m != nil {
+		libs[m.Mod.Path] = types.Library{
+			ID:       m.Mod.Path,
+			Name:     m.Mod.Path,
+			Version:  "", // go.mod doesn't contain the module version
+			Indirect: false,
+		}
+	}
+
 	for _, require := range modFileParsed.Require {
 		// Skip indirect dependencies less than Go 1.17
 		if skipIndirect && require.Indirect {

@@ -6,6 +6,11 @@ var (
 	// execute go mod tidy in normal folder
 	GoModNormal = []types.Library{
 		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
+		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20211224170007-df43bca6b6ff",
 			Name:     "github.com/aquasecurity/go-dep-parser",
 			Version:  "0.0.0-20211224170007-df43bca6b6ff",
@@ -40,6 +45,11 @@ var (
 	// execute go mod tidy in replaced folder
 	GoModReplaced = []types.Library{
 		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
+		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20220406074731-71021a481237",
 			Name:     "github.com/aquasecurity/go-dep-parser",
 			Version:  "0.0.0-20220406074731-71021a481237",
@@ -62,6 +72,11 @@ var (
 	// execute go mod tidy in replaced-with-version folder
 	GoModReplacedWithVersion = []types.Library{
 		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
+		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20220406074731-71021a481237",
 			Name:     "github.com/aquasecurity/go-dep-parser",
 			Version:  "0.0.0-20220406074731-71021a481237",
@@ -83,6 +98,11 @@ var (
 
 	// execute go mod tidy in replaced-with-version-mismatch folder
 	GoModReplacedWithVersionMismatch = []types.Library{
+		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
 		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20211224170007-df43bca6b6ff",
 			Name:     "github.com/aquasecurity/go-dep-parser",
@@ -118,6 +138,11 @@ var (
 	// execute go mod tidy in replaced-with-local-path folder
 	GoModReplacedWithLocalPath = []types.Library{
 		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
+		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20211224170007-df43bca6b6ff",
 			Name:     "github.com/aquasecurity/go-dep-parser",
 			Version:  "0.0.0-20211224170007-df43bca6b6ff",
@@ -146,6 +171,11 @@ var (
 	// execute go mod tidy in replaced-with-local-path-and-version folder
 	GoModReplacedWithLocalPathAndVersion = []types.Library{
 		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
+		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20211224170007-df43bca6b6ff",
 			Name:     "github.com/aquasecurity/go-dep-parser",
 			Version:  "0.0.0-20211224170007-df43bca6b6ff",
@@ -173,6 +203,11 @@ var (
 
 	// execute go mod tidy in replaced-with-local-path-and-version-mismatch folder
 	GoModReplacedWithLocalPathAndVersionMismatch = []types.Library{
+		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
 		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20211224170007-df43bca6b6ff",
 			Name:     "github.com/aquasecurity/go-dep-parser",
@@ -208,6 +243,11 @@ var (
 	// execute go mod tidy in go116 folder
 	GoMod116 = []types.Library{
 		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
+		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20211224170007-df43bca6b6ff",
 			Name:     "github.com/aquasecurity/go-dep-parser",
 			Version:  "0.0.0-20211224170007-df43bca6b6ff",
@@ -223,6 +263,11 @@ var (
 
 	// execute go mod tidy in no-go-version folder
 	GoModNoGoVersion = []types.Library{
+		{
+			ID:       "github.com/org/repo",
+			Name:     "github.com/org/repo",
+			Indirect: false,
+		},
 		{
 			ID:       "github.com/aquasecurity/go-dep-parser@v0.0.0-20211224170007-df43bca6b6ff",
 			Name:     "github.com/aquasecurity/go-dep-parser",
