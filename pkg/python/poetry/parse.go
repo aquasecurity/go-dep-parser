@@ -1,7 +1,6 @@
 package poetry
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -37,12 +36,9 @@ func NewParser() types.Parser {
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var lockfile Lockfile
-	metadata, err := toml.NewDecoder(r).Decode(&lockfile)
-	if err != nil {
+	if _, err := toml.NewDecoder(r).Decode(&lockfile); err != nil {
 		return nil, nil, xerrors.Errorf("failed to decode poetry.lock: %w", err)
 	}
-	keys := metadata.Keys()
-	fmt.Println(keys)
 
 	// Keep all installed versions
 	libVersions := parseVersions(lockfile)
