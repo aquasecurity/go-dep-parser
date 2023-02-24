@@ -1,6 +1,7 @@
 package mod
 
 import (
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
@@ -35,7 +36,12 @@ func NewParser() types.Parser {
 
 func (p *Parser) GetExternalRefs(path string) []types.ExternalRef {
 	if url := resolveVCSUrl(path); url != "" {
-		return []types.ExternalRef{{Type: types.RefVCS, URL: url}}
+		return []types.ExternalRef{
+			{
+				Type: types.RefVCS,
+				URL:  url,
+			},
+		}
 	}
 
 	return nil
@@ -79,6 +85,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			continue
 		}
 		libs[require.Mod.Path] = types.Library{
+			ID:                 pkgID(require.Mod.Path, require.Mod.Version[1:]),
 			Name:               require.Mod.Path,
 			Version:            require.Mod.Version[1:],
 			Indirect:           require.Indirect,
@@ -111,6 +118,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 		// Add replaced library to library register.
 		libs[replace.New.Path] = types.Library{
+			ID:                 pkgID(replace.New.Path, replace.New.Version[1:]),
 			Name:               replace.New.Path,
 			Version:            replace.New.Version[1:],
 			Indirect:           old.Indirect,
@@ -137,4 +145,8 @@ func lessThan117(ver string) bool {
 	}
 
 	return major <= 1 && minor < 17
+}
+
+func pkgID(name, version string) string {
+	return fmt.Sprintf("%s@v%s", name, version)
 }
