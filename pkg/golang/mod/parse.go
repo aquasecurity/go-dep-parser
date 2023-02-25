@@ -28,10 +28,14 @@ var (
 	VCSUrlGoPkgInRegexWithoutUser = regexp.MustCompile(`^gopkg\.in/([^.]+)\..*$`)
 )
 
-type Parser struct{}
+type Parser struct {
+	replace bool // 'replace' represents if the 'replace' directive should be taken into account.
+}
 
-func NewParser() types.Parser {
-	return &Parser{}
+func NewParser(replace bool) types.Parser {
+	return &Parser{
+		replace: replace,
+	}
 }
 
 func (p *Parser) GetExternalRefs(path string) []types.ExternalRef {
@@ -79,15 +83,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		skipIndirect = lessThan117(modFileParsed.Go.Version)
 	}
 
-	if m := modFileParsed.Module; m != nil {
-		libs[m.Mod.Path] = types.Library{
-			ID:       m.Mod.Path,
-			Name:     m.Mod.Path,
-			Version:  "", // go.mod doesn't contain the module version
-			Indirect: false,
-		}
-	}
-
 	for _, require := range modFileParsed.Require {
 		// Skip indirect dependencies less than Go 1.17
 		if skipIndirect && require.Indirect {
@@ -102,36 +97,38 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		}
 	}
 
-	for _, replace := range modFileParsed.Replace {
-		// Check if replaced path is actually in our libs.
-		old, ok := libs[replace.Old.Path]
-		if !ok {
-			continue
-		}
+	if p.replace {
+		for _, rep := range modFileParsed.Replace {
+			// Check if replaced path is actually in our libs.
+			old, ok := libs[rep.Old.Path]
+			if !ok {
+				continue
+			}
 
-		// If the replace directive has a version on the left side, make sure it matches the version that was imported.
-		if replace.Old.Version != "" && old.Version != replace.Old.Version[1:] {
-			continue
-		}
+			// If the replace directive has a version on the left side, make sure it matches the version that was imported.
+			if rep.Old.Version != "" && old.Version != rep.Old.Version[1:] {
+				continue
+			}
 
-		// Only support replace directive with version on the right side.
-		// Directive without version is a local path.
-		if replace.New.Version == "" {
-			// Delete old lib, since it's a local path now.
-			delete(libs, replace.Old.Path)
-			continue
-		}
+			// Only support replace directive with version on the right side.
+			// Directive without version is a local path.
+			if rep.New.Version == "" {
+				// Delete old lib, since it's a local path now.
+				delete(libs, rep.Old.Path)
+				continue
+			}
 
-		// Delete old lib, in case the path has changed.
-		delete(libs, replace.Old.Path)
+			// Delete old lib, in case the path has changed.
+			delete(libs, rep.Old.Path)
 
-		// Add replaced library to library register.
-		libs[replace.New.Path] = types.Library{
-			ID:                 pkgID(replace.New.Path, replace.New.Version[1:]),
-			Name:               replace.New.Path,
-			Version:            replace.New.Version[1:],
-			Indirect:           old.Indirect,
-			ExternalReferences: p.GetExternalRefs(replace.New.Path),
+			// Add replaced library to library register.
+			libs[rep.New.Path] = types.Library{
+				ID:                 pkgID(rep.New.Path, rep.New.Version[1:]),
+				Name:               rep.New.Path,
+				Version:            rep.New.Version[1:],
+				Indirect:           old.Indirect,
+				ExternalReferences: p.GetExternalRefs(rep.New.Path),
+			}
 		}
 	}
 
