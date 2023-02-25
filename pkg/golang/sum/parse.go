@@ -2,6 +2,7 @@ package sum
 
 import (
 	"bufio"
+	"fmt"
 	"strings"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
@@ -38,10 +39,15 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	for k, v := range uniqueLibs {
 		libs = append(libs, types.Library{
+			ID:      pkgID(k, v),
 			Name:    k,
 			Version: v,
 		})
 	}
 
 	return libs, nil, nil
+}
+
+func pkgID(name, version string) string {
+	return fmt.Sprintf("%s@v%s", name, version)
 }
