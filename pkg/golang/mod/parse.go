@@ -97,6 +97,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		}
 	}
 
+	// No need to evaluate the 'replace' directive for indirect dependencies
 	if p.replace {
 		for _, rep := range modFileParsed.Replace {
 			// Check if replaced path is actually in our libs.
