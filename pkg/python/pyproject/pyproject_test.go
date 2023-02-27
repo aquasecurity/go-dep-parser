@@ -1,11 +1,14 @@
-package pyproject
+package pyproject_test
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/python/pyproject"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -33,7 +36,7 @@ func TestParser_Parse(t *testing.T) {
 			require.NoError(t, err)
 			defer f.Close()
 
-			p := &Parser{}
+			p := &pyproject.Parser{}
 			got, err := p.Parse(f)
 			if !tt.wantErr(t, err, fmt.Sprintf("Parse(%v)", tt.file)) {
 				return
