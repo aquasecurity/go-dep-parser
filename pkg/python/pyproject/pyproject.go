@@ -18,6 +18,8 @@ type Poetry struct {
 	Dependencies map[string]string `toml:"dependencies"`
 }
 
+// Parser parses pyproject.toml defined in PEP518.
+// https://peps.python.org/pep-0518/
 type Parser struct {
 }
 
