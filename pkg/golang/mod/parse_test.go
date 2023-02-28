@@ -99,3 +99,37 @@ func TestParse(t *testing.T) {
 		})
 	}
 }
+
+func TestModuleID(t *testing.T) {
+	type args struct {
+		name    string
+		version string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "normal",
+			args: args{
+				name:    "github.com/aquasecurity/trivy",
+				version: "0.38.0",
+			},
+			want: "github.com/aquasecurity/trivy@v0.38.0",
+		},
+		{
+			name: "pseudo version",
+			args: args{
+				name:    "github.com/aquasecurity/go-dep-parser",
+				version: "0.0.0-20230130190635-5e31092b0621",
+			},
+			want: "github.com/aquasecurity/go-dep-parser@v0.0.0-20230130190635-5e31092b0621",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, ModuleID(tt.args.name, tt.args.version), "ModuleID(%v, %v)", tt.args.name, tt.args.version)
+		})
+	}
+}
