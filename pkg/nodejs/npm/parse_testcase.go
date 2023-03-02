@@ -15,8 +15,14 @@ var (
 
 	npmNormalDeps = []types.Dependency{
 		{
-			ID:        "promise@8.0.3",
-			DependsOn: []string{"asap@2.0.7"},
+			ID:            "promise@8.0.3",
+			DependsOn:     []string{"asap@2.0.7"},
+			DirectParents: nil,
+		},
+		{
+			ID:            "asap@2.0.7",
+			DependsOn:     nil,
+			DirectParents: []string{"promise@8.0.3"},
 		},
 	}
 
@@ -40,28 +46,71 @@ var (
 	}
 	npmReactDeps = []types.Dependency{
 		{
-			ID:        "loose-envify@1.4.0",
-			DependsOn: []string{"js-tokens@4.0.0"},
+			ID:            "loose-envify@1.4.0",
+			DependsOn:     []string{"js-tokens@4.0.0"},
+			DirectParents: []string{"react@16.8.6", "redux@4.0.1", "scheduler@0.13.6", "prop-types@15.7.2"},
 		},
 		{
-			ID:        "promise@8.0.3",
-			DependsOn: []string{"asap@2.0.6"},
+			ID:            "promise@8.0.3",
+			DependsOn:     []string{"asap@2.0.6"},
+			DirectParents: nil,
 		},
 		{
-			ID:        "prop-types@15.7.2",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "react-is@16.8.6"},
+			ID:            "prop-types@15.7.2",
+			DependsOn:     []string{"loose-envify@1.4.0", "object-assign@4.1.1", "react-is@16.8.6"},
+			DirectParents: []string{"react@16.8.6"},
 		},
 		{
-			ID:        "react@16.8.6",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "prop-types@15.7.2", "scheduler@0.13.6"},
+			ID:            "react@16.8.6",
+			DependsOn:     []string{"loose-envify@1.4.0", "object-assign@4.1.1", "prop-types@15.7.2", "scheduler@0.13.6"},
+			DirectParents: nil,
 		},
 		{
-			ID:        "redux@4.0.1",
-			DependsOn: []string{"loose-envify@1.4.0", "symbol-observable@1.2.0"},
+			ID:            "redux@4.0.1",
+			DependsOn:     []string{"loose-envify@1.4.0", "symbol-observable@1.2.0"},
+			DirectParents: nil,
 		},
 		{
-			ID:        "scheduler@0.13.6",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1"},
+			ID:            "scheduler@0.13.6",
+			DependsOn:     []string{"loose-envify@1.4.0", "object-assign@4.1.1"},
+			DirectParents: []string{"react@16.8.6"},
+		},
+		{
+			ID:        "asap@2.0.6",
+			DependsOn: nil,
+			DirectParents: []string{
+				"promise@8.0.3",
+			},
+		},
+		{
+			ID:        "js-tokens@4.0.0",
+			DependsOn: nil,
+			DirectParents: []string{
+				"loose-envify@1.4.0",
+			},
+		},
+		{
+			ID:        "object-assign@4.1.1",
+			DependsOn: nil,
+			DirectParents: []string{
+				"prop-types@15.7.2",
+				"scheduler@0.13.6",
+				"react@16.8.6",
+			},
+		},
+		{
+			ID:        "react-is@16.8.6",
+			DependsOn: nil,
+			DirectParents: []string{
+				"prop-types@15.7.2",
+			},
+		},
+		{
+			ID:        "symbol-observable@1.2.0",
+			DependsOn: nil,
+			DirectParents: []string{
+				"redux@4.0.1",
+			},
 		},
 	}
 
@@ -86,30 +135,17 @@ var (
 	}
 
 	npmWithDevDeps = []types.Dependency{
-		{
-			ID:        "loose-envify@1.4.0",
-			DependsOn: []string{"js-tokens@4.0.0"},
-		},
-		{
-			ID:        "promise@8.0.3",
-			DependsOn: []string{"asap@2.0.6"},
-		},
-		{
-			ID:        "prop-types@15.7.2",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "react-is@16.8.6"},
-		},
-		{
-			ID:        "react@16.8.6",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "prop-types@15.7.2", "scheduler@0.13.6"},
-		},
-		{
-			ID:        "redux@4.0.1",
-			DependsOn: []string{"loose-envify@1.4.0", "symbol-observable@1.2.0"},
-		},
-		{
-			ID:        "scheduler@0.13.6",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1"},
-		},
+		{ID: "asap@2.0.6", DependsOn: nil, DirectParents: []string{"promise@8.0.3"}},
+		{ID: "js-tokens@4.0.0", DependsOn: nil, DirectParents: []string{"loose-envify@1.4.0"}},
+		{ID: "loose-envify@1.4.0", DependsOn: []string{"js-tokens@4.0.0"}, DirectParents: []string{"prop-types@15.7.2", "react@16.8.6", "redux@4.0.1", "scheduler@0.13.6"}},
+		{ID: "object-assign@4.1.1", DependsOn: nil, DirectParents: []string{"prop-types@15.7.2", "react@16.8.6", "scheduler@0.13.6"}},
+		{ID: "promise@8.0.3", DependsOn: []string{"asap@2.0.6"}, DirectParents: nil},
+		{ID: "prop-types@15.7.2", DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "react-is@16.8.6"}, DirectParents: []string{"react@16.8.6"}},
+		{ID: "react-is@16.8.6", DependsOn: nil, DirectParents: []string{"prop-types@15.7.2"}},
+		{ID: "react@16.8.6", DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "prop-types@15.7.2", "scheduler@0.13.6"}, DirectParents: nil},
+		{ID: "redux@4.0.1", DependsOn: []string{"loose-envify@1.4.0", "symbol-observable@1.2.0"}, DirectParents: nil},
+		{ID: "scheduler@0.13.6", DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1"}, DirectParents: []string{"react@16.8.6"}},
+		{ID: "symbol-observable@1.2.0", DependsOn: nil, DirectParents: []string{"redux@4.0.1"}},
 	}
 
 	// docker run --name node --rm -it node:12-alpine sh
@@ -241,186 +277,7 @@ var (
 	}
 
 	npmManyDeps = []types.Dependency{
-		{
-			ID:        "accepts@1.3.6",
-			DependsOn: []string{"mime-types@2.1.24", "negotiator@0.6.1"},
-		},
-		{
-			ID:        "ajv@6.10.0",
-			DependsOn: []string{"fast-deep-equal@2.0.1", "fast-json-stable-stringify@2.0.0", "json-schema-traverse@0.4.1", "uri-js@4.2.2"},
-		},
-		{
-			ID:        "ansi-styles@3.2.1",
-			DependsOn: []string{"color-convert@1.9.3"},
-		},
-		{
-			ID:        "asn1@0.2.4",
-			DependsOn: []string{"safer-buffer@2.1.2"},
-		},
-		{
-			ID:        "async@2.6.2",
-			DependsOn: []string{"lodash@4.17.11"},
-		},
-		{
-			ID:        "axios@0.18.0",
-			DependsOn: []string{"follow-redirects@1.7.0", "is-buffer@1.1.6"},
-		},
-		{
-			ID:        "bcrypt-pbkdf@1.0.2",
-			DependsOn: []string{"tweetnacl@0.14.5"},
-		},
-		{
-			ID:        "body-parser@1.18.3",
-			DependsOn: []string{"bytes@3.0.0", "content-type@1.0.4", "debug@2.6.9", "depd@1.1.2", "http-errors@1.6.3", "iconv-lite@0.4.23", "on-finished@2.3.0", "qs@6.5.2", "raw-body@2.3.3", "type-is@1.6.18"},
-		},
-		{
-			ID:        "chalk@2.4.2",
-			DependsOn: []string{"ansi-styles@3.2.1", "escape-string-regexp@1.0.5", "supports-color@5.5.0"},
-		},
-		{
-			ID:        "color-convert@1.9.3",
-			DependsOn: []string{"color-name@1.1.3"},
-		},
-		{
-			ID:        "combined-stream@1.0.7",
-			DependsOn: []string{"delayed-stream@1.0.0"},
-		},
-		{
-			ID:        "dashdash@1.14.1",
-			DependsOn: []string{"assert-plus@1.0.0"},
-		},
-		{
-			ID:        "debug@3.2.6",
-			DependsOn: []string{"ms@2.1.1"},
-		},
-		{
-			ID:        "ecc-jsbn@0.1.2",
-			DependsOn: []string{"jsbn@0.1.1", "safer-buffer@2.1.2"},
-		},
-		{
-			ID:        "express@4.16.4",
-			DependsOn: []string{"accepts@1.3.6", "array-flatten@1.1.1", "body-parser@1.18.3", "content-disposition@0.5.2", "content-type@1.0.4", "cookie-signature@1.0.6", "cookie@0.3.1", "debug@2.6.9", "depd@1.1.2", "encodeurl@1.0.2", "escape-html@1.0.3", "etag@1.8.1", "finalhandler@1.1.1", "fresh@0.5.2", "merge-descriptors@1.0.1", "methods@1.1.2", "on-finished@2.3.0", "parseurl@1.3.3", "path-to-regexp@0.1.7", "proxy-addr@2.0.5", "qs@6.5.2", "range-parser@1.2.0", "safe-buffer@5.1.2", "send@0.16.2", "serve-static@1.13.2", "setprototypeof@1.1.0", "statuses@1.4.0", "type-is@1.6.18", "utils-merge@1.0.1", "vary@1.1.2"},
-		},
-		{
-			ID:        "finalhandler@1.1.1",
-			DependsOn: []string{"debug@2.6.9", "encodeurl@1.0.2", "escape-html@1.0.3", "on-finished@2.3.0", "parseurl@1.3.3", "statuses@1.4.0", "unpipe@1.0.0"},
-		},
-		{
-			ID:        "follow-redirects@1.7.0",
-			DependsOn: []string{"debug@3.2.6"},
-		},
-		{
-			ID:        "form-data@2.3.3",
-			DependsOn: []string{"asynckit@0.4.0", "combined-stream@1.0.7", "mime-types@2.1.24"},
-		},
-		{
-			ID:        "getpass@0.1.7",
-			DependsOn: []string{"assert-plus@1.0.0"},
-		},
-		{
-			ID:        "har-validator@5.1.3",
-			DependsOn: []string{"ajv@6.10.0", "har-schema@2.0.0"},
-		},
-		{
-			ID:        "http-errors@1.6.3",
-			DependsOn: []string{"depd@1.1.2", "inherits@2.0.3", "setprototypeof@1.1.0", "statuses@1.4.0"},
-		},
-		{
-			ID:        "http-signature@1.2.0",
-			DependsOn: []string{"assert-plus@1.0.0", "jsprim@1.4.1", "sshpk@1.16.1"},
-		},
-		{
-			ID:        "iconv-lite@0.4.23",
-			DependsOn: []string{"safer-buffer@2.1.2"},
-		},
-		{
-			ID:        "jsprim@1.4.1",
-			DependsOn: []string{"assert-plus@1.0.0", "extsprintf@1.3.0", "json-schema@0.2.3", "verror@1.10.0"},
-		},
-		{
-			ID:        "loose-envify@1.4.0",
-			DependsOn: []string{"js-tokens@4.0.0"},
-		},
-		{
-			ID:        "mime-types@2.1.24",
-			DependsOn: []string{"mime-db@1.40.0"},
-		},
-		{
-			ID:        "on-finished@2.3.0",
-			DependsOn: []string{"ee-first@1.1.1"},
-		},
-		{
-			ID:        "promise@8.0.3",
-			DependsOn: []string{"asap@2.0.6"},
-		},
-		{
-			ID:        "prop-types@15.7.2",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "react-is@16.8.6"},
-		},
-		{
-			ID:        "proxy-addr@2.0.5",
-			DependsOn: []string{"forwarded@0.1.2", "ipaddr.js@1.9.0"},
-		},
-		{
-			ID:        "raw-body@2.3.3",
-			DependsOn: []string{"bytes@3.0.0", "http-errors@1.6.3", "iconv-lite@0.4.23", "unpipe@1.0.0"},
-		},
-		{
-			ID:        "react@16.8.6",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "prop-types@15.7.2", "scheduler@0.13.6"},
-		},
-		{
-			ID:        "redux@4.0.1",
-			DependsOn: []string{"loose-envify@1.4.0", "symbol-observable@1.2.0"},
-		},
-		{
-			ID:        "request@2.88.0",
-			DependsOn: []string{"aws-sign2@0.7.0", "aws4@1.8.0", "caseless@0.12.0", "combined-stream@1.0.7", "extend@3.0.2", "forever-agent@0.6.1", "form-data@2.3.3", "har-validator@5.1.3", "http-signature@1.2.0", "is-typedarray@1.0.0", "isstream@0.1.2", "json-stringify-safe@5.0.1", "mime-types@2.1.24", "oauth-sign@0.9.0", "performance-now@2.1.0", "qs@6.5.2", "safe-buffer@5.1.2", "tough-cookie@2.4.3", "tunnel-agent@0.6.0", "uuid@3.3.2"},
-		},
-		{
-			ID:        "scheduler@0.13.6",
-			DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1"},
-		},
-		{
-			ID:        "send@0.16.2",
-			DependsOn: []string{"debug@2.6.9", "depd@1.1.2", "destroy@1.0.4", "encodeurl@1.0.2", "escape-html@1.0.3", "etag@1.8.1", "fresh@0.5.2", "http-errors@1.6.3", "mime@1.4.1", "ms@2.0.0", "on-finished@2.3.0", "range-parser@1.2.0", "statuses@1.4.0"},
-		},
-		{
-			ID:        "serve-static@1.13.2",
-			DependsOn: []string{"encodeurl@1.0.2", "escape-html@1.0.3", "parseurl@1.3.3", "send@0.16.2"},
-		},
-		{
-			ID:        "sshpk@1.16.1",
-			DependsOn: []string{"asn1@0.2.4", "assert-plus@1.0.0", "bcrypt-pbkdf@1.0.2", "dashdash@1.14.1", "ecc-jsbn@0.1.2", "getpass@0.1.7", "jsbn@0.1.1", "safer-buffer@2.1.2", "tweetnacl@0.14.5"},
-		},
-		{
-			ID:        "tough-cookie@2.4.3",
-			DependsOn: []string{"psl@1.1.31", "punycode@1.4.1"},
-		},
-		{
-			ID:        "tunnel-agent@0.6.0",
-			DependsOn: []string{"safe-buffer@5.1.2"},
-		},
-		{
-			ID:        "type-is@1.6.18",
-			DependsOn: []string{"media-typer@0.3.0", "mime-types@2.1.24"},
-		},
-		{
-			ID:        "uri-js@4.2.2",
-			DependsOn: []string{"punycode@2.1.1"},
-		},
-		{
-			ID:        "verror@1.10.0",
-			DependsOn: []string{"assert-plus@1.0.0", "core-util-is@1.0.2", "extsprintf@1.3.0"},
-		},
-		{
-			ID:        "debug@2.6.9",
-			DependsOn: []string{"ms@2.0.0"},
-		},
-		{
-			ID:        "supports-color@5.5.0",
-			DependsOn: []string{"has-flag@3.0.0"},
-		},
+		{ID: "accepts@1.3.6", DependsOn: []string{"mime-types@2.1.24", "negotiator@0.6.1"}, DirectParents: []string{"express@4.16.4"}}, {ID: "ajv@6.10.0", DependsOn: []string{"fast-deep-equal@2.0.1", "fast-json-stable-stringify@2.0.0", "json-schema-traverse@0.4.1", "uri-js@4.2.2"}, DirectParents: []string{"har-validator@5.1.3"}}, {ID: "ansi-styles@3.2.1", DependsOn: []string{"color-convert@1.9.3"}, DirectParents: []string{"chalk@2.4.2"}}, {ID: "array-flatten@1.1.1", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "asap@2.0.6", DependsOn: nil, DirectParents: []string{"promise@8.0.3"}}, {ID: "asn1@0.2.4", DependsOn: []string{"safer-buffer@2.1.2"}, DirectParents: []string{"sshpk@1.16.1"}}, {ID: "assert-plus@1.0.0", DependsOn: nil, DirectParents: []string{"dashdash@1.14.1", "getpass@0.1.7", "http-signature@1.2.0", "jsprim@1.4.1", "sshpk@1.16.1", "verror@1.10.0"}}, {ID: "async@2.6.2", DependsOn: []string{"lodash@4.17.11"}, DirectParents: nil}, {ID: "asynckit@0.4.0", DependsOn: nil, DirectParents: []string{"form-data@2.3.3"}}, {ID: "aws-sign2@0.7.0", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "aws4@1.8.0", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "axios@0.18.0", DependsOn: []string{"follow-redirects@1.7.0", "is-buffer@1.1.6"}, DirectParents: nil}, {ID: "bcrypt-pbkdf@1.0.2", DependsOn: []string{"tweetnacl@0.14.5"}, DirectParents: []string{"sshpk@1.16.1"}}, {ID: "body-parser@1.18.3", DependsOn: []string{"bytes@3.0.0", "content-type@1.0.4", "debug@2.6.9", "depd@1.1.2", "http-errors@1.6.3", "iconv-lite@0.4.23", "on-finished@2.3.0", "qs@6.5.2", "raw-body@2.3.3", "type-is@1.6.18"}, DirectParents: []string{"express@4.16.4"}}, {ID: "bytes@3.0.0", DependsOn: nil, DirectParents: []string{"body-parser@1.18.3", "raw-body@2.3.3"}}, {ID: "caseless@0.12.0", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "chalk@2.4.2", DependsOn: []string{"ansi-styles@3.2.1", "escape-string-regexp@1.0.5", "supports-color@5.5.0"}, DirectParents: nil}, {ID: "color-convert@1.9.3", DependsOn: []string{"color-name@1.1.3"}, DirectParents: []string{"ansi-styles@3.2.1"}}, {ID: "color-name@1.1.3", DependsOn: nil, DirectParents: []string{"color-convert@1.9.3"}}, {ID: "combined-stream@1.0.7", DependsOn: []string{"delayed-stream@1.0.0"}, DirectParents: []string{"form-data@2.3.3", "request@2.88.0"}}, {ID: "content-disposition@0.5.2", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "content-type@1.0.4", DependsOn: nil, DirectParents: []string{"body-parser@1.18.3", "express@4.16.4"}}, {ID: "cookie-signature@1.0.6", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "cookie@0.3.1", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "core-util-is@1.0.2", DependsOn: nil, DirectParents: []string{"verror@1.10.0"}}, {ID: "dashdash@1.14.1", DependsOn: []string{"assert-plus@1.0.0"}, DirectParents: []string{"sshpk@1.16.1"}}, {ID: "debug@2.6.9", DependsOn: []string{"ms@2.0.0"}, DirectParents: []string{"body-parser@1.18.3", "express@4.16.4", "finalhandler@1.1.1", "send@0.16.2"}}, {ID: "debug@3.2.6", DependsOn: []string{"ms@2.1.1"}, DirectParents: []string{"follow-redirects@1.7.0"}}, {ID: "delayed-stream@1.0.0", DependsOn: nil, DirectParents: []string{"combined-stream@1.0.7"}}, {ID: "depd@1.1.2", DependsOn: nil, DirectParents: []string{"body-parser@1.18.3", "express@4.16.4", "http-errors@1.6.3", "send@0.16.2"}}, {ID: "destroy@1.0.4", DependsOn: nil, DirectParents: []string{"send@0.16.2"}}, {ID: "ecc-jsbn@0.1.2", DependsOn: []string{"jsbn@0.1.1", "safer-buffer@2.1.2"}, DirectParents: []string{"sshpk@1.16.1"}}, {ID: "ee-first@1.1.1", DependsOn: nil, DirectParents: []string{"on-finished@2.3.0"}}, {ID: "encodeurl@1.0.2", DependsOn: nil, DirectParents: []string{"express@4.16.4", "finalhandler@1.1.1", "send@0.16.2", "serve-static@1.13.2"}}, {ID: "escape-html@1.0.3", DependsOn: nil, DirectParents: []string{"express@4.16.4", "finalhandler@1.1.1", "send@0.16.2", "serve-static@1.13.2"}}, {ID: "escape-string-regexp@1.0.5", DependsOn: nil, DirectParents: []string{"chalk@2.4.2"}}, {ID: "etag@1.8.1", DependsOn: nil, DirectParents: []string{"express@4.16.4", "send@0.16.2"}}, {ID: "express@4.16.4", DependsOn: []string{"accepts@1.3.6", "array-flatten@1.1.1", "body-parser@1.18.3", "content-disposition@0.5.2", "content-type@1.0.4", "cookie-signature@1.0.6", "cookie@0.3.1", "debug@2.6.9", "depd@1.1.2", "encodeurl@1.0.2", "escape-html@1.0.3", "etag@1.8.1", "finalhandler@1.1.1", "fresh@0.5.2", "merge-descriptors@1.0.1", "methods@1.1.2", "on-finished@2.3.0", "parseurl@1.3.3", "path-to-regexp@0.1.7", "proxy-addr@2.0.5", "qs@6.5.2", "range-parser@1.2.0", "safe-buffer@5.1.2", "send@0.16.2", "serve-static@1.13.2", "setprototypeof@1.1.0", "statuses@1.4.0", "type-is@1.6.18", "utils-merge@1.0.1", "vary@1.1.2"}, DirectParents: nil}, {ID: "extend@3.0.2", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "extsprintf@1.3.0", DependsOn: nil, DirectParents: []string{"jsprim@1.4.1", "verror@1.10.0"}}, {ID: "fast-deep-equal@2.0.1", DependsOn: nil, DirectParents: []string{"ajv@6.10.0"}}, {ID: "fast-json-stable-stringify@2.0.0", DependsOn: nil, DirectParents: []string{"ajv@6.10.0"}}, {ID: "finalhandler@1.1.1", DependsOn: []string{"debug@2.6.9", "encodeurl@1.0.2", "escape-html@1.0.3", "on-finished@2.3.0", "parseurl@1.3.3", "statuses@1.4.0", "unpipe@1.0.0"}, DirectParents: []string{"express@4.16.4"}}, {ID: "follow-redirects@1.7.0", DependsOn: []string{"debug@3.2.6"}, DirectParents: []string{"axios@0.18.0"}}, {ID: "forever-agent@0.6.1", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "form-data@2.3.3", DependsOn: []string{"asynckit@0.4.0", "combined-stream@1.0.7", "mime-types@2.1.24"}, DirectParents: []string{"request@2.88.0"}}, {ID: "forwarded@0.1.2", DependsOn: nil, DirectParents: []string{"proxy-addr@2.0.5"}}, {ID: "fresh@0.5.2", DependsOn: nil, DirectParents: []string{"express@4.16.4", "send@0.16.2"}}, {ID: "getpass@0.1.7", DependsOn: []string{"assert-plus@1.0.0"}, DirectParents: []string{"sshpk@1.16.1"}}, {ID: "har-schema@2.0.0", DependsOn: nil, DirectParents: []string{"har-validator@5.1.3"}}, {ID: "har-validator@5.1.3", DependsOn: []string{"ajv@6.10.0", "har-schema@2.0.0"}, DirectParents: []string{"request@2.88.0"}}, {ID: "has-flag@3.0.0", DependsOn: nil, DirectParents: []string{"supports-color@5.5.0"}}, {ID: "http-errors@1.6.3", DependsOn: []string{"depd@1.1.2", "inherits@2.0.3", "setprototypeof@1.1.0", "statuses@1.4.0"}, DirectParents: []string{"body-parser@1.18.3", "raw-body@2.3.3", "send@0.16.2"}}, {ID: "http-signature@1.2.0", DependsOn: []string{"assert-plus@1.0.0", "jsprim@1.4.1", "sshpk@1.16.1"}, DirectParents: []string{"request@2.88.0"}}, {ID: "iconv-lite@0.4.23", DependsOn: []string{"safer-buffer@2.1.2"}, DirectParents: []string{"body-parser@1.18.3", "raw-body@2.3.3"}}, {ID: "inherits@2.0.3", DependsOn: nil, DirectParents: []string{"http-errors@1.6.3"}}, {ID: "ipaddr.js@1.9.0", DependsOn: nil, DirectParents: []string{"proxy-addr@2.0.5"}}, {ID: "is-buffer@1.1.6", DependsOn: nil, DirectParents: []string{"axios@0.18.0"}}, {ID: "is-typedarray@1.0.0", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "isstream@0.1.2", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "js-tokens@4.0.0", DependsOn: nil, DirectParents: []string{"loose-envify@1.4.0"}}, {ID: "jsbn@0.1.1", DependsOn: nil, DirectParents: []string{"ecc-jsbn@0.1.2", "sshpk@1.16.1"}}, {ID: "json-schema-traverse@0.4.1", DependsOn: nil, DirectParents: []string{"ajv@6.10.0"}}, {ID: "json-schema@0.2.3", DependsOn: nil, DirectParents: []string{"jsprim@1.4.1"}}, {ID: "json-stringify-safe@5.0.1", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "jsprim@1.4.1", DependsOn: []string{"assert-plus@1.0.0", "extsprintf@1.3.0", "json-schema@0.2.3", "verror@1.10.0"}, DirectParents: []string{"http-signature@1.2.0"}}, {ID: "lodash@4.17.11", DependsOn: nil, DirectParents: []string{"async@2.6.2"}}, {ID: "loose-envify@1.4.0", DependsOn: []string{"js-tokens@4.0.0"}, DirectParents: []string{"prop-types@15.7.2", "react@16.8.6", "redux@4.0.1", "scheduler@0.13.6"}}, {ID: "media-typer@0.3.0", DependsOn: nil, DirectParents: []string{"type-is@1.6.18"}}, {ID: "merge-descriptors@1.0.1", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "methods@1.1.2", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "mime-db@1.40.0", DependsOn: nil, DirectParents: []string{"mime-types@2.1.24"}}, {ID: "mime-types@2.1.24", DependsOn: []string{"mime-db@1.40.0"}, DirectParents: []string{"accepts@1.3.6", "form-data@2.3.3", "request@2.88.0", "type-is@1.6.18"}}, {ID: "mime@1.4.1", DependsOn: nil, DirectParents: []string{"send@0.16.2"}}, {ID: "ms@2.0.0", DependsOn: nil, DirectParents: []string{"debug@2.6.9", "send@0.16.2"}}, {ID: "ms@2.1.1", DependsOn: nil, DirectParents: []string{"debug@3.2.6"}}, {ID: "negotiator@0.6.1", DependsOn: nil, DirectParents: []string{"accepts@1.3.6"}}, {ID: "oauth-sign@0.9.0", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "object-assign@4.1.1", DependsOn: nil, DirectParents: []string{"prop-types@15.7.2", "react@16.8.6", "scheduler@0.13.6"}}, {ID: "on-finished@2.3.0", DependsOn: []string{"ee-first@1.1.1"}, DirectParents: []string{"body-parser@1.18.3", "express@4.16.4", "finalhandler@1.1.1", "send@0.16.2"}}, {ID: "parseurl@1.3.3", DependsOn: nil, DirectParents: []string{"express@4.16.4", "finalhandler@1.1.1", "serve-static@1.13.2"}}, {ID: "path-to-regexp@0.1.7", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "performance-now@2.1.0", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "promise@8.0.3", DependsOn: []string{"asap@2.0.6"}, DirectParents: nil}, {ID: "prop-types@15.7.2", DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "react-is@16.8.6"}, DirectParents: []string{"react@16.8.6"}}, {ID: "proxy-addr@2.0.5", DependsOn: []string{"forwarded@0.1.2", "ipaddr.js@1.9.0"}, DirectParents: []string{"express@4.16.4"}}, {ID: "psl@1.1.31", DependsOn: nil, DirectParents: []string{"tough-cookie@2.4.3"}}, {ID: "punycode@1.4.1", DependsOn: nil, DirectParents: []string{"tough-cookie@2.4.3"}}, {ID: "punycode@2.1.1", DependsOn: nil, DirectParents: []string{"uri-js@4.2.2"}}, {ID: "qs@6.5.2", DependsOn: nil, DirectParents: []string{"body-parser@1.18.3", "express@4.16.4", "request@2.88.0"}}, {ID: "range-parser@1.2.0", DependsOn: nil, DirectParents: []string{"express@4.16.4", "send@0.16.2"}}, {ID: "raw-body@2.3.3", DependsOn: []string{"bytes@3.0.0", "http-errors@1.6.3", "iconv-lite@0.4.23", "unpipe@1.0.0"}, DirectParents: []string{"body-parser@1.18.3"}}, {ID: "react-is@16.8.6", DependsOn: nil, DirectParents: []string{"prop-types@15.7.2"}}, {ID: "react@16.8.6", DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1", "prop-types@15.7.2", "scheduler@0.13.6"}, DirectParents: nil}, {ID: "redux@4.0.1", DependsOn: []string{"loose-envify@1.4.0", "symbol-observable@1.2.0"}, DirectParents: nil}, {ID: "request@2.88.0", DependsOn: []string{"aws-sign2@0.7.0", "aws4@1.8.0", "caseless@0.12.0", "combined-stream@1.0.7", "extend@3.0.2", "forever-agent@0.6.1", "form-data@2.3.3", "har-validator@5.1.3", "http-signature@1.2.0", "is-typedarray@1.0.0", "isstream@0.1.2", "json-stringify-safe@5.0.1", "mime-types@2.1.24", "oauth-sign@0.9.0", "performance-now@2.1.0", "qs@6.5.2", "safe-buffer@5.1.2", "tough-cookie@2.4.3", "tunnel-agent@0.6.0", "uuid@3.3.2"}, DirectParents: nil}, {ID: "safe-buffer@5.1.2", DependsOn: nil, DirectParents: []string{"express@4.16.4", "request@2.88.0", "tunnel-agent@0.6.0"}}, {ID: "safer-buffer@2.1.2", DependsOn: nil, DirectParents: []string{"asn1@0.2.4", "ecc-jsbn@0.1.2", "iconv-lite@0.4.23", "sshpk@1.16.1"}}, {ID: "scheduler@0.13.6", DependsOn: []string{"loose-envify@1.4.0", "object-assign@4.1.1"}, DirectParents: []string{"react@16.8.6"}}, {ID: "send@0.16.2", DependsOn: []string{"debug@2.6.9", "depd@1.1.2", "destroy@1.0.4", "encodeurl@1.0.2", "escape-html@1.0.3", "etag@1.8.1", "fresh@0.5.2", "http-errors@1.6.3", "mime@1.4.1", "ms@2.0.0", "on-finished@2.3.0", "range-parser@1.2.0", "statuses@1.4.0"}, DirectParents: []string{"express@4.16.4", "serve-static@1.13.2"}}, {ID: "serve-static@1.13.2", DependsOn: []string{"encodeurl@1.0.2", "escape-html@1.0.3", "parseurl@1.3.3", "send@0.16.2"}, DirectParents: []string{"express@4.16.4"}}, {ID: "setprototypeof@1.1.0", DependsOn: nil, DirectParents: []string{"express@4.16.4", "http-errors@1.6.3"}}, {ID: "sshpk@1.16.1", DependsOn: []string{"asn1@0.2.4", "assert-plus@1.0.0", "bcrypt-pbkdf@1.0.2", "dashdash@1.14.1", "ecc-jsbn@0.1.2", "getpass@0.1.7", "jsbn@0.1.1", "safer-buffer@2.1.2", "tweetnacl@0.14.5"}, DirectParents: []string{"http-signature@1.2.0"}}, {ID: "statuses@1.4.0", DependsOn: nil, DirectParents: []string{"express@4.16.4", "finalhandler@1.1.1", "http-errors@1.6.3", "send@0.16.2"}}, {ID: "supports-color@5.5.0", DependsOn: []string{"has-flag@3.0.0"}, DirectParents: []string{"chalk@2.4.2"}}, {ID: "symbol-observable@1.2.0", DependsOn: nil, DirectParents: []string{"redux@4.0.1"}}, {ID: "tough-cookie@2.4.3", DependsOn: []string{"psl@1.1.31", "punycode@1.4.1"}, DirectParents: []string{"request@2.88.0"}}, {ID: "tunnel-agent@0.6.0", DependsOn: []string{"safe-buffer@5.1.2"}, DirectParents: []string{"request@2.88.0"}}, {ID: "tweetnacl@0.14.5", DependsOn: nil, DirectParents: []string{"bcrypt-pbkdf@1.0.2", "sshpk@1.16.1"}}, {ID: "type-is@1.6.18", DependsOn: []string{"media-typer@0.3.0", "mime-types@2.1.24"}, DirectParents: []string{"body-parser@1.18.3", "express@4.16.4"}}, {ID: "unpipe@1.0.0", DependsOn: nil, DirectParents: []string{"finalhandler@1.1.1", "raw-body@2.3.3"}}, {ID: "uri-js@4.2.2", DependsOn: []string{"punycode@2.1.1"}, DirectParents: []string{"ajv@6.10.0"}}, {ID: "utils-merge@1.0.1", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "uuid@3.3.2", DependsOn: nil, DirectParents: []string{"request@2.88.0"}}, {ID: "vary@1.1.2", DependsOn: nil, DirectParents: []string{"express@4.16.4"}}, {ID: "verror@1.10.0", DependsOn: []string{"assert-plus@1.0.0", "core-util-is@1.0.2", "extsprintf@1.3.0"}, DirectParents: []string{"jsprim@1.4.1"}},
 	}
 
 	// manually created
@@ -448,20 +305,7 @@ var (
 		{ID: "statuses@1.5.0", Name: "statuses", Version: "1.5.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/statuses/-/statuses-1.5.0.tgz"}}, Locations: []types.Location{{StartLine: 144, EndLine: 148}}},
 		{ID: "toidentifier@1.0.0", Name: "toidentifier", Version: "1.0.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/toidentifier/-/toidentifier-1.0.0.tgz"}}, Locations: []types.Location{{StartLine: 149, EndLine: 153}}}}
 
-	npmNestedDeps = []types.Dependency{{
-		ID:        "send@0.17.1",
-		DependsOn: []string{"fresh@0.5.2", "ms@2.1.1", "on-finished@2.3.0", "statuses@1.5.0", "escape-html@1.0.3", "depd@1.1.2", "destroy@1.0.4", "encodeurl@1.0.2", "etag@1.8.1", "http-errors@1.7.3", "mime@1.6.0", "range-parser@1.2.1", "debug@2.6.9"},
-	}, {
-		ID:        "http-errors@1.7.3",
-		DependsOn: []string{"depd@1.1.2", "inherits@2.0.4", "setprototypeof@1.1.1", "statuses@1.5.0", "toidentifier@1.0.0"},
-	}, {
-		ID: "on-finished@2.3.0", DependsOn: []string{"ee-first@1.1.1"},
-	}, {
-		ID: "debug@2.0.0", DependsOn: []string{"ms@0.6.2"},
-	}, {
-		ID:        "debug@2.6.9",
-		DependsOn: []string{"ms@2.0.0"},
-	}}
+	npmNestedDeps = []types.Dependency{{ID: "debug@2.0.0", DependsOn: []string{"ms@0.6.2"}, DirectParents: nil}, {ID: "debug@2.6.9", DependsOn: []string{"ms@2.0.0"}, DirectParents: []string{"send@0.17.1"}}, {ID: "depd@1.1.2", DependsOn: nil, DirectParents: []string{"http-errors@1.7.3", "send@0.17.1"}}, {ID: "destroy@1.0.4", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "ee-first@1.1.1", DependsOn: nil, DirectParents: []string{"on-finished@2.3.0"}}, {ID: "encodeurl@1.0.2", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "escape-html@1.0.3", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "etag@1.8.1", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "fresh@0.5.2", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "http-errors@1.7.3", DependsOn: []string{"depd@1.1.2", "inherits@2.0.4", "setprototypeof@1.1.1", "statuses@1.5.0", "toidentifier@1.0.0"}, DirectParents: []string{"send@0.17.1"}}, {ID: "inherits@2.0.4", DependsOn: nil, DirectParents: []string{"http-errors@1.7.3"}}, {ID: "mime@1.6.0", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "ms@0.6.2", DependsOn: nil, DirectParents: []string{"debug@2.0.0"}}, {ID: "ms@2.0.0", DependsOn: nil, DirectParents: []string{"debug@2.6.9"}}, {ID: "ms@2.1.1", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "on-finished@2.3.0", DependsOn: []string{"ee-first@1.1.1"}, DirectParents: []string{"send@0.17.1"}}, {ID: "range-parser@1.2.1", DependsOn: nil, DirectParents: []string{"send@0.17.1"}}, {ID: "send@0.17.1", DependsOn: []string{"debug@2.6.9", "depd@1.1.2", "destroy@1.0.4", "encodeurl@1.0.2", "escape-html@1.0.3", "etag@1.8.1", "fresh@0.5.2", "http-errors@1.7.3", "mime@1.6.0", "ms@2.1.1", "on-finished@2.3.0", "range-parser@1.2.1", "statuses@1.5.0"}, DirectParents: nil}, {ID: "setprototypeof@1.1.1", DependsOn: nil, DirectParents: []string{"http-errors@1.7.3"}}, {ID: "statuses@1.5.0", DependsOn: nil, DirectParents: []string{"http-errors@1.7.3", "send@0.17.1"}}, {ID: "toidentifier@1.0.0", DependsOn: nil, DirectParents: []string{"http-errors@1.7.3"}}}
 
 	npmDeepNested = []types.Library{
 		{ID: "ansi-regex@0.2.1", Name: "ansi-regex", Version: "0.2.1", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/ansi-regex/-/ansi-regex-0.2.1.tgz"}}, Locations: []types.Location{{StartLine: 7, EndLine: 11}}},
@@ -522,190 +366,7 @@ var (
 		{ID: "yargs@6.6.0", Name: "yargs", Version: "6.6.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/yargs/-/yargs-6.6.0.tgz"}}, Locations: []types.Location{{StartLine: 298, EndLine: 456}}},
 		{ID: "yargs-parser@4.2.1", Name: "yargs-parser", Version: "4.2.1", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/yargs-parser/-/yargs-parser-4.2.1.tgz"}}, Locations: []types.Location{{StartLine: 447, EndLine: 454}}}}
 
-	npmDeepNestedDeps = []types.Dependency{
-		{
-			ID: "cliui@3.2.0",
-			DependsOn: []string{
-				"string-width@1.0.2",
-				"strip-ansi@3.0.1",
-				"wrap-ansi@2.1.0",
-			},
-		},
-		{
-			ID:        "error-ex@1.3.2",
-			DependsOn: []string{"is-arrayish@0.2.1"},
-		},
-		{
-			ID: "find-up@1.1.2",
-			DependsOn: []string{"path-exists@2.1.0",
-				"pinkie-promise@2.0.1",
-			},
-		},
-		{
-			ID:        "has@1.0.3",
-			DependsOn: []string{"function-bind@1.1.1"},
-		},
-		{
-			ID:        "is-core-module@2.9.0",
-			DependsOn: []string{"has@1.0.3"},
-		},
-		{
-			ID:        "is-fullwidth-code-point@1.0.0",
-			DependsOn: []string{"number-is-nan@1.0.1"},
-		},
-		{
-			ID:        "lcid@1.0.0",
-			DependsOn: []string{"invert-kv@1.0.0"},
-		},
-		{
-			ID: "load-json-file@1.1.0",
-			DependsOn: []string{
-				"graceful-fs@4.2.10",
-				"parse-json@2.2.0",
-				"pify@2.3.0",
-				"pinkie-promise@2.0.1",
-				"strip-bom@2.0.0",
-			},
-		},
-		{
-			ID: "normalize-package-data@2.5.0",
-			DependsOn: []string{
-				"hosted-git-info@2.8.9",
-				"resolve@1.22.0",
-				"semver@5.7.1",
-				"validate-npm-package-license@3.0.4",
-			},
-		},
-		{
-			ID:        "os-locale@1.4.0",
-			DependsOn: []string{"lcid@1.0.0"},
-		},
-		{
-			ID:        "parse-json@2.2.0",
-			DependsOn: []string{"error-ex@1.3.2"},
-		},
-		{
-			ID:        "path-exists@2.1.0",
-			DependsOn: []string{"pinkie-promise@2.0.1"},
-		},
-		{
-			ID: "path-type@1.1.0",
-			DependsOn: []string{
-				"graceful-fs@4.2.10",
-				"pify@2.3.0",
-				"pinkie-promise@2.0.1",
-			},
-		},
-		{
-			ID:        "pinkie-promise@2.0.1",
-			DependsOn: []string{"pinkie@2.0.4"},
-		},
-		{
-			ID: "read-pkg-up@1.0.1",
-			DependsOn: []string{
-				"find-up@1.1.2",
-				"read-pkg@1.1.0",
-			},
-		},
-		{
-			ID: "read-pkg@1.1.0",
-			DependsOn: []string{
-				"load-json-file@1.1.0",
-				"normalize-package-data@2.5.0",
-				"path-type@1.1.0",
-			},
-		},
-		{
-			ID: "resolve@1.22.0",
-			DependsOn: []string{
-				"is-core-module@2.9.0",
-				"path-parse@1.0.7",
-				"supports-preserve-symlinks-flag@1.0.0",
-			},
-		},
-		{
-			ID: "spdx-correct@3.1.1",
-			DependsOn: []string{
-				"spdx-expression-parse@3.0.1",
-				"spdx-license-ids@3.0.11",
-			},
-		},
-		{
-			ID: "spdx-expression-parse@3.0.1",
-			DependsOn: []string{
-				"spdx-exceptions@2.3.0",
-				"spdx-license-ids@3.0.11",
-			},
-		},
-		{
-			ID: "string-width@1.0.2",
-			DependsOn: []string{
-				"code-point-at@1.1.0",
-				"is-fullwidth-code-point@1.0.0",
-				"strip-ansi@3.0.1",
-			},
-		},
-		{
-			ID: "string-width@5.1.2",
-			DependsOn: []string{
-				"eastasianwidth@0.2.0",
-				"emoji-regex@9.2.2",
-				"strip-ansi@7.0.1",
-			},
-		},
-		{
-			ID:        "strip-ansi@1.0.0",
-			DependsOn: []string{"ansi-regex@0.2.1"},
-		},
-		{
-			ID:        "strip-ansi@3.0.1",
-			DependsOn: []string{"ansi-regex@2.1.1"},
-		},
-		{
-			ID:        "strip-ansi@7.0.1",
-			DependsOn: []string{"ansi-regex@6.0.1"},
-		},
-		{
-			ID:        "strip-bom@2.0.0",
-			DependsOn: []string{"is-utf8@0.2.1"},
-		},
-		{
-			ID: "validate-npm-package-license@3.0.4",
-			DependsOn: []string{
-				"spdx-correct@3.1.1",
-				"spdx-expression-parse@3.0.1",
-			},
-		},
-		{
-			ID: "wrap-ansi@2.1.0",
-			DependsOn: []string{
-				"string-width@1.0.2",
-				"strip-ansi@3.0.1",
-			},
-		},
-		{
-			ID:        "yargs-parser@4.2.1",
-			DependsOn: []string{"camelcase@3.0.0"},
-		},
-		{
-			ID: "yargs@6.6.0",
-			DependsOn: []string{
-				"camelcase@3.0.0",
-				"cliui@3.2.0",
-				"decamelize@1.2.0",
-				"get-caller-file@1.0.3",
-				"os-locale@1.4.0",
-				"read-pkg-up@1.0.1",
-				"require-directory@2.1.1",
-				"require-main-filename@1.0.1",
-				"set-blocking@2.0.0",
-				"string-width@1.0.2",
-				"which-module@1.0.0",
-				"y18n@3.2.2",
-				"yargs-parser@4.2.1",
-			},
-		},
-	}
+	npmDeepNestedDeps = []types.Dependency{{ID: "ansi-regex@0.2.1", DependsOn: nil, DirectParents: []string{"strip-ansi@1.0.0"}}, {ID: "ansi-regex@2.1.1", DependsOn: nil, DirectParents: []string{"strip-ansi@3.0.1"}}, {ID: "ansi-regex@6.0.1", DependsOn: nil, DirectParents: []string{"strip-ansi@7.0.1"}}, {ID: "camelcase@3.0.0", DependsOn: nil, DirectParents: []string{"yargs-parser@4.2.1", "yargs@6.6.0"}}, {ID: "cliui@3.2.0", DependsOn: []string{"string-width@1.0.2", "strip-ansi@3.0.1", "wrap-ansi@2.1.0"}, DirectParents: []string{"yargs@6.6.0"}}, {ID: "code-point-at@1.1.0", DependsOn: nil, DirectParents: []string{"string-width@1.0.2"}}, {ID: "decamelize@1.2.0", DependsOn: nil, DirectParents: []string{"yargs@6.6.0"}}, {ID: "eastasianwidth@0.2.0", DependsOn: nil, DirectParents: []string{"string-width@5.1.2"}}, {ID: "emoji-regex@9.2.2", DependsOn: nil, DirectParents: []string{"string-width@5.1.2"}}, {ID: "error-ex@1.3.2", DependsOn: []string{"is-arrayish@0.2.1"}, DirectParents: []string{"parse-json@2.2.0"}}, {ID: "find-up@1.1.2", DependsOn: []string{"path-exists@2.1.0", "pinkie-promise@2.0.1"}, DirectParents: []string{"read-pkg-up@1.0.1"}}, {ID: "function-bind@1.1.1", DependsOn: nil, DirectParents: []string{"has@1.0.3"}}, {ID: "get-caller-file@1.0.3", DependsOn: nil, DirectParents: []string{"yargs@6.6.0"}}, {ID: "graceful-fs@4.2.10", DependsOn: nil, DirectParents: []string{"load-json-file@1.1.0", "path-type@1.1.0"}}, {ID: "has@1.0.3", DependsOn: []string{"function-bind@1.1.1"}, DirectParents: []string{"is-core-module@2.9.0"}}, {ID: "hosted-git-info@2.8.9", DependsOn: nil, DirectParents: []string{"normalize-package-data@2.5.0"}}, {ID: "invert-kv@1.0.0", DependsOn: nil, DirectParents: []string{"lcid@1.0.0"}}, {ID: "is-arrayish@0.2.1", DependsOn: nil, DirectParents: []string{"error-ex@1.3.2"}}, {ID: "is-core-module@2.9.0", DependsOn: []string{"has@1.0.3"}, DirectParents: []string{"resolve@1.22.0"}}, {ID: "is-fullwidth-code-point@1.0.0", DependsOn: []string{"number-is-nan@1.0.1"}, DirectParents: []string{"string-width@1.0.2"}}, {ID: "is-utf8@0.2.1", DependsOn: nil, DirectParents: []string{"strip-bom@2.0.0"}}, {ID: "lcid@1.0.0", DependsOn: []string{"invert-kv@1.0.0"}, DirectParents: []string{"os-locale@1.4.0"}}, {ID: "load-json-file@1.1.0", DependsOn: []string{"graceful-fs@4.2.10", "parse-json@2.2.0", "pify@2.3.0", "pinkie-promise@2.0.1", "strip-bom@2.0.0"}, DirectParents: []string{"read-pkg@1.1.0"}}, {ID: "normalize-package-data@2.5.0", DependsOn: []string{"hosted-git-info@2.8.9", "resolve@1.22.0", "semver@5.7.1", "validate-npm-package-license@3.0.4"}, DirectParents: []string{"read-pkg@1.1.0"}}, {ID: "number-is-nan@1.0.1", DependsOn: nil, DirectParents: []string{"is-fullwidth-code-point@1.0.0"}}, {ID: "os-locale@1.4.0", DependsOn: []string{"lcid@1.0.0"}, DirectParents: []string{"yargs@6.6.0"}}, {ID: "parse-json@2.2.0", DependsOn: []string{"error-ex@1.3.2"}, DirectParents: []string{"load-json-file@1.1.0"}}, {ID: "path-exists@2.1.0", DependsOn: []string{"pinkie-promise@2.0.1"}, DirectParents: []string{"find-up@1.1.2"}}, {ID: "path-parse@1.0.7", DependsOn: nil, DirectParents: []string{"resolve@1.22.0"}}, {ID: "path-type@1.1.0", DependsOn: []string{"graceful-fs@4.2.10", "pify@2.3.0", "pinkie-promise@2.0.1"}, DirectParents: []string{"read-pkg@1.1.0"}}, {ID: "pify@2.3.0", DependsOn: nil, DirectParents: []string{"load-json-file@1.1.0", "path-type@1.1.0"}}, {ID: "pinkie-promise@2.0.1", DependsOn: []string{"pinkie@2.0.4"}, DirectParents: []string{"find-up@1.1.2", "load-json-file@1.1.0", "path-exists@2.1.0", "path-type@1.1.0"}}, {ID: "pinkie@2.0.4", DependsOn: nil, DirectParents: []string{"pinkie-promise@2.0.1"}}, {ID: "read-pkg-up@1.0.1", DependsOn: []string{"find-up@1.1.2", "read-pkg@1.1.0"}, DirectParents: []string{"yargs@6.6.0"}}, {ID: "read-pkg@1.1.0", DependsOn: []string{"load-json-file@1.1.0", "normalize-package-data@2.5.0", "path-type@1.1.0"}, DirectParents: []string{"read-pkg-up@1.0.1"}}, {ID: "require-directory@2.1.1", DependsOn: nil, DirectParents: []string{"yargs@6.6.0"}}, {ID: "require-main-filename@1.0.1", DependsOn: nil, DirectParents: []string{"yargs@6.6.0"}}, {ID: "resolve@1.22.0", DependsOn: []string{"is-core-module@2.9.0", "path-parse@1.0.7", "supports-preserve-symlinks-flag@1.0.0"}, DirectParents: []string{"normalize-package-data@2.5.0"}}, {ID: "semver@5.7.1", DependsOn: nil, DirectParents: []string{"normalize-package-data@2.5.0"}}, {ID: "set-blocking@2.0.0", DependsOn: nil, DirectParents: []string{"yargs@6.6.0"}}, {ID: "spdx-correct@3.1.1", DependsOn: []string{"spdx-expression-parse@3.0.1", "spdx-license-ids@3.0.11"}, DirectParents: []string{"validate-npm-package-license@3.0.4"}}, {ID: "spdx-exceptions@2.3.0", DependsOn: nil, DirectParents: []string{"spdx-expression-parse@3.0.1"}}, {ID: "spdx-expression-parse@3.0.1", DependsOn: []string{"spdx-exceptions@2.3.0", "spdx-license-ids@3.0.11"}, DirectParents: []string{"spdx-correct@3.1.1", "validate-npm-package-license@3.0.4"}}, {ID: "spdx-license-ids@3.0.11", DependsOn: nil, DirectParents: []string{"spdx-correct@3.1.1", "spdx-expression-parse@3.0.1"}}, {ID: "string-width@1.0.2", DependsOn: []string{"code-point-at@1.1.0", "is-fullwidth-code-point@1.0.0", "strip-ansi@3.0.1"}, DirectParents: []string{"cliui@3.2.0", "wrap-ansi@2.1.0", "yargs@6.6.0"}}, {ID: "string-width@5.1.2", DependsOn: []string{"eastasianwidth@0.2.0", "emoji-regex@9.2.2", "strip-ansi@7.0.1"}, DirectParents: nil}, {ID: "strip-ansi@1.0.0", DependsOn: []string{"ansi-regex@0.2.1"}, DirectParents: nil}, {ID: "strip-ansi@3.0.1", DependsOn: []string{"ansi-regex@2.1.1"}, DirectParents: []string{"cliui@3.2.0", "string-width@1.0.2", "wrap-ansi@2.1.0"}}, {ID: "strip-ansi@7.0.1", DependsOn: []string{"ansi-regex@6.0.1"}, DirectParents: []string{"string-width@5.1.2"}}, {ID: "strip-bom@2.0.0", DependsOn: []string{"is-utf8@0.2.1"}, DirectParents: []string{"load-json-file@1.1.0"}}, {ID: "supports-preserve-symlinks-flag@1.0.0", DependsOn: nil, DirectParents: []string{"resolve@1.22.0"}}, {ID: "validate-npm-package-license@3.0.4", DependsOn: []string{"spdx-correct@3.1.1", "spdx-expression-parse@3.0.1"}, DirectParents: []string{"normalize-package-data@2.5.0"}}, {ID: "which-module@1.0.0", DependsOn: nil, DirectParents: []string{"yargs@6.6.0"}}, {ID: "wrap-ansi@2.1.0", DependsOn: []string{"string-width@1.0.2", "strip-ansi@3.0.1"}, DirectParents: []string{"cliui@3.2.0"}}, {ID: "y18n@3.2.2", DependsOn: nil, DirectParents: []string{"yargs@6.6.0"}}, {ID: "yargs-parser@4.2.1", DependsOn: []string{"camelcase@3.0.0"}, DirectParents: []string{"yargs@6.6.0"}}, {ID: "yargs@6.6.0", DependsOn: []string{"camelcase@3.0.0", "cliui@3.2.0", "decamelize@1.2.0", "get-caller-file@1.0.3", "os-locale@1.4.0", "read-pkg-up@1.0.1", "require-directory@2.1.1", "require-main-filename@1.0.1", "set-blocking@2.0.0", "string-width@1.0.2", "which-module@1.0.0", "y18n@3.2.2", "yargs-parser@4.2.1"}, DirectParents: nil}}
 
 	npmWithPkgs = []types.Library{
 		{ID: "asap@2.0.7", Name: "asap", Version: "2.0.7", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/asap/-/asap-2.0.7.tgz"}}, Locations: []types.Location{{StartLine: 27, EndLine: 31}}},
@@ -716,9 +377,6 @@ var (
 	}
 
 	npmWithPkgsDeps = []types.Dependency{
-		{
-			ID:        "promise@8.0.3",
-			DependsOn: []string{"asap@2.0.7"},
-		},
+		{ID: "asap@2.0.7", DependsOn: nil, DirectParents: []string{"promise@8.0.3"}}, {ID: "promise@8.0.3", DependsOn: []string{"asap@2.0.7"}, DirectParents: nil},
 	}
 )

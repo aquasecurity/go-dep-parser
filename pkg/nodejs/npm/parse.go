@@ -54,12 +54,13 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	dircetDeps := lockFile.Packages[""].Dependencies
-	libs, deps := p.parse(lockFile.Dependencies, dircetDeps, map[string]string{})
+	directParents := map[string][]string{}
+	libs, deps := p.parse(lockFile.Dependencies, dircetDeps, map[string]string{}, directParents)
 
-	return utils.UniqueLibraries(libs), uniqueDeps(deps), nil
+	return utils.UniqueLibraries(libs), uniqueDeps(deps, directParents), nil
 }
 
-func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string]string, versions map[string]string) ([]types.Library, []types.Dependency) {
+func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string]string, versions map[string]string, directParents map[string][]string) ([]types.Library, []types.Dependency) {
 	// Update package name and version mapping.
 	for pkgName, dep := range dependencies {
 		// Overwrite the existing package version so that the nested version can take precedence.
@@ -94,12 +95,15 @@ func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string
 			if resolvedDep, ok := dependency.Dependencies[libName]; ok {
 				libID := utils.PackageID(libName, resolvedDep.Version)
 				dependsOn = append(dependsOn, libID)
+				directParents[libID] = append(directParents[libID], lib.ID)
 				continue
 			}
 
 			// Try to resolve the version with the higher level dependencies
 			if ver, ok := versions[libName]; ok {
-				dependsOn = append(dependsOn, utils.PackageID(libName, ver))
+				libID := utils.PackageID(libName, ver)
+				dependsOn = append(dependsOn, libID)
+				directParents[libID] = append(directParents[libID], lib.ID)
 				continue
 			}
 
@@ -113,7 +117,7 @@ func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			childLibs, childDeps := p.parse(dependency.Dependencies, dircetDeps, maps.Clone(versions))
+			childLibs, childDeps := p.parse(dependency.Dependencies, dircetDeps, maps.Clone(versions), directParents)
 			libs = append(libs, childLibs...)
 			deps = append(deps, childDeps...)
 		}
@@ -122,18 +126,32 @@ func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string
 	return libs, deps
 }
 
-func uniqueDeps(deps []types.Dependency) []types.Dependency {
+func uniqueDeps(deps []types.Dependency, directParents map[string][]string) []types.Dependency {
 	var uniqDeps []types.Dependency
 	unique := make(map[string]struct{})
+	parentDeps := make(map[string]struct{})
 
 	for _, dep := range deps {
 		sort.Strings(dep.DependsOn)
 		depKey := fmt.Sprintf("%s:%s", dep.ID, strings.Join(dep.DependsOn, ","))
 		if _, ok := unique[depKey]; !ok {
 			unique[depKey] = struct{}{}
+			parentDeps[dep.ID] = struct{}{}
+			dep.DirectParents = utils.UniqueStrings(directParents[dep.ID])
 			uniqDeps = append(uniqDeps, dep)
 		}
 	}
+
+	for dep, parents := range directParents {
+		if len(parents) == 0 {
+			continue
+		}
+
+		if _, ok := parentDeps[dep]; !ok {
+			uniqDeps = append(uniqDeps, types.Dependency{ID: dep, DirectParents: utils.UniqueStrings(parents)})
+		}
+	}
+
 	return uniqDeps
 }
 

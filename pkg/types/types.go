@@ -24,8 +24,9 @@ type ExternalRef struct {
 }
 
 type Dependency struct {
-	ID        string
-	DependsOn []string
+	ID            string
+	DependsOn     []string
+	DirectParents []string
 }
 
 type Parser interface {

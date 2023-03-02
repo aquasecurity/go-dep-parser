@@ -91,6 +91,7 @@ func sortDeps(deps []types.Dependency) {
 
 	for i := range deps {
 		sort.Strings(deps[i].DependsOn)
+		sort.Strings(deps[i].DirectParents)
 	}
 }
 
