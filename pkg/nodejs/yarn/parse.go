@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/Masterminds/semver"
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
@@ -261,6 +262,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	scanner := bufio.NewScanner(r)
 	scanner.Split(scanBlocks)
 	dependsOn := map[string][]string{}
+	indirectMap := map[string]bool{}
+
 	for scanner.Scan() {
 		block := scanner.Bytes()
 		lib, deps, newLine, err := parseBlock(block, lineNumber)
@@ -288,6 +291,12 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 				dependsOn[libID] = deps
 			}
 		}
+
+		for _, dep := range deps {
+			if _, ok := indirectMap[dep]; !ok {
+				indirectMap[dep] = true
+			}
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -297,5 +306,33 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	// Replace dependency patterns with library IDs
 	// e.g. ajv@^6.5.5 => ajv@6.10.0
 	deps := parseResults(patternIDs, dependsOn)
+
+	for i, lib := range libs {
+		for key, val := range indirectMap {
+
+			splitDepIndex := strings.LastIndex(key, "@")
+			splitLibIndex := strings.LastIndex(lib.ID, "@")
+			if lib.ID[:splitLibIndex] == key[:splitDepIndex] {
+				if CheckIfDependencyInRange(key[splitDepIndex+1:], lib.ID[splitLibIndex+1:]) {
+					libs[i].Indirect = val
+					break
+				}
+			}
+		}
+
+	}
+
 	return libs, deps, nil
+}
+
+func CheckIfDependencyInRange(versionToCheck, fixedVersion string) bool {
+	v, err := semver.NewVersion(fixedVersion)
+	if err == nil {
+		vRange, err := semver.NewConstraint(versionToCheck)
+		if err == nil {
+			return vRange.Check(v)
+		}
+	}
+
+	return false
 }
