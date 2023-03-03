@@ -56,7 +56,7 @@ func parseLicense(val interface{}) string {
 	return ""
 }
 
-func (p *Parser) ParseDependencies(r dio.ReadSeekerAt) (map[string]string, error) {
+func (p *Parser) ParseProdDependencies(r dio.ReadSeekerAt) (map[string]string, error) {
 	deps := dependencies{}
 	if err := json.NewDecoder(r).Decode(&deps); err != nil {
 		return nil, xerrors.Errorf("JSON decode error: %w", err)

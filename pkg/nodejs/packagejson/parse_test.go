@@ -108,7 +108,7 @@ func TestParseDependencies(t *testing.T) {
 			require.NoError(t, err)
 
 			p := packagejson.Parser{}
-			got, err := p.ParseDependencies(f)
+			got, err := p.ParseProdDependencies(f)
 			if tt.wantErr != "" {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.wantErr)
