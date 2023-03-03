@@ -14,6 +14,10 @@ type packageJSON struct {
 	Version string      `json:"version"`
 	License interface{} `json:"license"`
 }
+
+type dependencies struct {
+	Dependencies map[string]string `json:"dependencies"`
+}
 type Parser struct{}
 
 func NewParser() types.Parser {
@@ -50,4 +54,15 @@ func parseLicense(val interface{}) string {
 		}
 	}
 	return ""
+}
+
+func (p *Parser) ParseDependencies(r dio.ReadSeekerAt) (map[string]string, error) {
+	deps := dependencies{}
+	if err := json.NewDecoder(r).Decode(&deps); err != nil {
+		return nil, xerrors.Errorf("JSON decode error: %w", err)
+	}
+	if len(deps.Dependencies) > 0 {
+		return deps.Dependencies, nil
+	}
+	return nil, nil
 }

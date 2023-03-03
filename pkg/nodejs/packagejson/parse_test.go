@@ -76,3 +76,47 @@ func TestParse(t *testing.T) {
 		})
 	}
 }
+
+func TestParseDependencies(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputFile string
+		want      map[string]string
+		wantErr   string
+	}{
+		{
+			name:      "happy path",
+			inputFile: "testdata/package.json",
+			want: map[string]string{
+				"js-tokens": "4.0.0",
+			},
+		},
+		{
+			name:      "no deps",
+			inputFile: "testdata/legacy_package.json",
+		},
+		{
+			name:      "sad path",
+			inputFile: "testdata/invalid_package.json",
+			wantErr:   "JSON decode error",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f, err := os.Open(tt.inputFile)
+			require.NoError(t, err)
+
+			p := packagejson.Parser{}
+			got, err := p.ParseDependencies(f)
+			if tt.wantErr != "" {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.wantErr)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
