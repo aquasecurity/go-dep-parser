@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Masterminds/semver"
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
@@ -123,7 +122,9 @@ func ignoreProtocol(protocol string) bool {
 	return false
 }
 
-func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (deps []types.Dependency) {
+func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (deps []types.Dependency, indirectMap map[string]bool) {
+	indirectMap = make(map[string]bool)
+
 	// find dependencies by patterns
 	for libID, depPatterns := range dependsOn {
 		depIDs := lo.Map(depPatterns, func(pattern string, index int) string {
@@ -133,8 +134,15 @@ func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (
 			ID:        libID,
 			DependsOn: depIDs,
 		})
+
+		// check if libId in indirectMap
+		for _, depID := range depIDs {
+			if _, ok := indirectMap[depID]; !ok {
+				indirectMap[depID] = true
+			}
+		}
 	}
-	return deps
+	return deps, indirectMap
 }
 
 type Parser struct{}
@@ -262,7 +270,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	scanner := bufio.NewScanner(r)
 	scanner.Split(scanBlocks)
 	dependsOn := map[string][]string{}
-	indirectMap := map[string]bool{}
 
 	for scanner.Scan() {
 		block := scanner.Bytes()
@@ -291,12 +298,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 				dependsOn[libID] = deps
 			}
 		}
-
-		for _, dep := range deps {
-			if _, ok := indirectMap[dep]; !ok {
-				indirectMap[dep] = true
-			}
-		}
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -305,34 +306,12 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	// Replace dependency patterns with library IDs
 	// e.g. ajv@^6.5.5 => ajv@6.10.0
-	deps := parseResults(patternIDs, dependsOn)
+	deps, indirectMap := parseResults(patternIDs, dependsOn)
 
 	for i, lib := range libs {
-		for key, val := range indirectMap {
-
-			splitDepIndex := strings.LastIndex(key, "@")
-			splitLibIndex := strings.LastIndex(lib.ID, "@")
-			if lib.ID[:splitLibIndex] == key[:splitDepIndex] {
-				if CheckIfDependencyInRange(key[splitDepIndex+1:], lib.ID[splitLibIndex+1:]) {
-					libs[i].Indirect = val
-					break
-				}
-			}
-		}
-
+		_, ok := indirectMap[lib.ID]
+		libs[i].Indirect = ok
 	}
 
 	return libs, deps, nil
-}
-
-func CheckIfDependencyInRange(versionToCheck, fixedVersion string) bool {
-	v, err := semver.NewVersion(fixedVersion)
-	if err == nil {
-		vRange, err := semver.NewConstraint(versionToCheck)
-		if err == nil {
-			return vRange.Check(v)
-		}
-	}
-
-	return false
 }
