@@ -90,7 +90,7 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	// Analyze root POM
-	result, err := p.analyze(root, nil, nil)
+	result, err := p.analyze(root, analysisOptions{})
 	if err != nil {
 		return nil, nil, xerrors.Errorf("analyze error (%s): %w", p.rootPath, err)
 	}
@@ -181,7 +181,7 @@ func (p *parser) parseModule(currentPath, relativePath string) (artifact, error)
 		return artifact{}, xerrors.Errorf("unable to open the relative path: %w", err)
 	}
 
-	result, err := p.analyze(module, nil, nil)
+	result, err := p.analyze(module, analysisOptions{})
 	if err != nil {
 		return artifact{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -205,7 +205,10 @@ func (p *parser) resolve(art artifact) (analysisResult, error) {
 	if err != nil {
 		log.Logger.Debug(err)
 	}
-	result, err := p.analyze(pomContent, art.Exclusions, art.DependencyManagement)
+	result, err := p.analyze(pomContent, analysisOptions{
+		exclusions:    art.Exclusions,
+		depManagement: art.DependencyManagement,
+	})
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -223,7 +226,12 @@ type analysisResult struct {
 	modules              []string
 }
 
-func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, depManagementFromUpperPoms []pomDependency) (analysisResult, error) {
+type analysisOptions struct {
+	exclusions    map[string]struct{}
+	depManagement []pomDependency
+}
+
+func (p *parser) analyze(pom *pom, opts analysisOptions) (analysisResult, error) {
 	if pom == nil || pom.content == nil {
 		return analysisResult{}, nil
 	}
@@ -244,19 +252,19 @@ func (p *parser) analyze(pom *pom, exclusions map[string]struct{}, depManagement
 	props := pom.properties()
 
 	// Convert "dependencyManagement"
-	//depManagement := p.dependencyManagement(pom.content.DependencyManagement.Dependencies.Dependency)
 	// dependencyManagements have next priority:
-	// 1. depManagementFromUpperPoms - depManagements from all upper poms.
+	// 1. Managed dependencies from the upper POMs
 	// e.g. 'Package A' includes 'Package B' and 'Package B' includes 'Package C' (A -> B -> C)
 	// for 'Package C' depManagementFromUpperPoms = depManagement from 'Package A' + depManagement from 'Package B'
-	// 2. depManagement - depManagements from this pom.xml
-	// 3. parent.dependencyManagement - depManagements from parent of this pom.xml
-	depManagement := p.mergeDependencyManagements(depManagementFromUpperPoms,
+	// 2. Managed dependencies from this POM
+	// 3. Managed dependencies from parent of this POM
+	depManagement := p.mergeDependencyManagements(opts.depManagement,
 		pom.content.DependencyManagement.Dependencies.Dependency, parent.dependencyManagement)
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
-	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, depManagementFromUpperPoms, exclusions)
-	deps = p.mergeDependencies(parent.dependencies, deps, exclusions)
+	// Parents don't have to resolve dependencies.
+	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, opts.depManagement, opts.exclusions)
+	deps = p.mergeDependencies(parent.dependencies, deps, opts.exclusions)
 
 	return analysisResult{
 		filePath:             pom.filePath,
@@ -286,6 +294,11 @@ func (p *parser) mergeDependencyManagements(depManagements ...[]pomDependency) [
 
 func (p *parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement, depManagementFromUpperPoms []pomDependency,
 	exclusions map[string]struct{}) []artifact {
+	// Imported POMs often have no dependencies, so dependencyManagement resolution can be skipped.
+	if len(deps) == 0 {
+		return nil
+	}
+
 	// Resolve dependencyManagement
 	depManagement = p.resolveDepManagement(props, depManagement)
 
@@ -303,26 +316,32 @@ func (p *parser) parseDependencies(deps []pomDependency, props map[string]string
 }
 
 func (p *parser) resolveDepManagement(props map[string]string, depManagement []pomDependency) []pomDependency {
+	var newDepManagement, imports []pomDependency
 	for _, dep := range depManagement {
-		// Evaluate variables
-		dep = dep.Resolve(props, nil, nil)
-
-		// https://howtodoinjava.com/maven/maven-dependency-scopes/#import
+		// cf. https://howtodoinjava.com/maven/maven-dependency-scopes/#import
 		if dep.Scope == "import" {
-			art := newArtifact(dep.GroupID, dep.ArtifactID, dep.Version, props)
-			result, err := p.resolve(art)
-			if err != nil {
-				continue
-			}
-			for k, dd := range result.dependencyManagement {
-				// Evaluate variables
-				result.dependencyManagement[k] = dd.Resolve(result.properties, nil, nil)
-			}
-			depManagement = p.mergeDependencyManagements(depManagement, result.dependencyManagement)
-			continue
+			imports = append(imports, dep)
+		} else {
+			// Evaluate variables
+			newDepManagement = append(newDepManagement, dep.Resolve(props, nil, nil))
 		}
 	}
-	return depManagement
+
+	// Managed dependencies with a scope of "import" should be processed after other managed dependencies.
+	// cf. https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#importing-dependencies
+	for _, imp := range imports {
+		art := newArtifact(imp.GroupID, imp.ArtifactID, imp.Version, props)
+		result, err := p.resolve(art)
+		if err != nil {
+			continue
+		}
+		for k, dd := range result.dependencyManagement {
+			// Evaluate variables and overwrite dependencyManagement
+			result.dependencyManagement[k] = dd.Resolve(result.properties, nil, nil)
+		}
+		newDepManagement = p.mergeDependencyManagements(newDepManagement, result.dependencyManagement)
+	}
+	return newDepManagement
 }
 
 func (p *parser) mergeDependencies(parent, child []artifact, exclusions map[string]struct{}) []artifact {
@@ -349,6 +368,10 @@ func (p *parser) parseParent(currentPath string, parent pomParent) (analysisResu
 	if target.IsEmpty() {
 		return analysisResult{}, nil
 	}
+	log.Logger.Debugf("Start parent: %s", target.String())
+	defer func() {
+		log.Logger.Debugf("Exit parent: %s", target.String())
+	}()
 
 	// If the artifact is found in cache, it is returned.
 	if result := p.cache.get(target); result != nil {
@@ -360,7 +383,7 @@ func (p *parser) parseParent(currentPath string, parent pomParent) (analysisResu
 		log.Logger.Debugf("parent POM not found: %s", err)
 	}
 
-	result, err := p.analyze(parentPOM, nil, nil)
+	result, err := p.analyze(parentPOM, analysisOptions{})
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
@@ -409,7 +432,7 @@ func (p *parser) tryRelativePath(parentArtifact artifact, currentPath, relativeP
 		return nil, err
 	}
 
-	result, err := p.analyze(pom, nil, nil)
+	result, err := p.analyze(pom, analysisOptions{})
 	if err != nil {
 		return nil, xerrors.Errorf("analyze error: %w", err)
 	}
