@@ -383,6 +383,31 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
+			name:      "transitive dependencyManagement should not be inherited",
+			inputFile: "testdata/transitive-dependency-management/pom.xml",
+			local:     true,
+			want: []types.Library{
+				// Managed dependencies (org.example:example-api:1.7.30) in org.example:example-dependency-management3
+				// should not affect dependencies of example-dependency (org.example:example-api:2.0.0)
+				{
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
+				{
+					Name:    "org.example:example-dependency-management3",
+					Version: "1.1.1",
+				},
+				{
+					Name:    "org.example:transitive-dependency-management",
+					Version: "2.0.0",
+				},
+			},
+		},
+		{
 			name:      "parent not found",
 			inputFile: filepath.Join("testdata", "not-found-parent", "pom.xml"),
 			local:     true,
