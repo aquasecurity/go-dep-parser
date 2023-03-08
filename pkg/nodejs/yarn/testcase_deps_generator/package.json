@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
-    "yaml": "^2.1.3"
+    "yaml": "^2.1.3",
+    "yargs": "^16.2.0"
   }
 }
