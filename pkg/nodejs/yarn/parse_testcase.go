@@ -13567,7 +13567,6 @@ var (
 	// awk '/^\S+@[~^*]?(>= )?[0-9.]*/,/^$/{if($0=="") {print "--"prev} else { if(substr($0,1,2)!="  ") {print NR":"$0} else {print $0}} prev=NR}; END{print "--"prev}' | awk 'BEGIN {s=""}; {(substr($0,1,2)=="--") ? (s=s$0"\n") : (s=s$0)}; END { print s}' | sed -E 's/@([0-9~><*\^]|npm).*version:? "?/:/' | sed 's/  /:/' | sed 's/"//g'| awk 'match($0, /[[:digit:]]+$/) {print substr($0, RSTART, RLENGTH)":"$0 }' |  awk -F":" '{print "{ID: \""$3"@"$4"\", Name: \""$3"\", Version: \""$4"\", Locations: []types.Location{{StartLine: "$2", EndLine: "$1"}}},"}'
 	// and remove 'code@workspace' and 'fsevents@patch' dependencies
 	yarnV2WithDev = []types.Library{
-		{ID: "fsevents@2.1.3", Name: "fsevents", Version: "2.1.3", Indirect: true, Locations: []types.Location{{StartLine: 622, EndLine: 629}}},
 		{ID: "@types/color-name@1.1.1", Name: "@types/color-name", Version: "1.1.1", Indirect: true, Locations: []types.Location{{StartLine: 8, EndLine: 13}}},
 		{ID: "abbrev@1.1.1", Name: "abbrev", Version: "1.1.1", Indirect: true, Locations: []types.Location{{StartLine: 15, EndLine: 20}}},
 		{ID: "ajv@6.12.4", Name: "ajv", Version: "6.12.4", Indirect: true, Locations: []types.Location{{StartLine: 22, EndLine: 32}}},
@@ -13637,6 +13636,7 @@ var (
 		{ID: "form-data@2.3.3", Name: "form-data", Version: "2.3.3", Indirect: true, Locations: []types.Location{{StartLine: 586, EndLine: 595}}},
 		{ID: "fs-minipass@2.1.0", Name: "fs-minipass", Version: "2.1.0", Indirect: true, Locations: []types.Location{{StartLine: 597, EndLine: 604}}},
 		{ID: "fs.realpath@1.0.0", Name: "fs.realpath", Version: "1.0.0", Indirect: true, Locations: []types.Location{{StartLine: 606, EndLine: 611}}},
+		{ID: "fsevents@2.1.3", Name: "fsevents", Version: "2.1.3", Indirect: true, Locations: []types.Location{{StartLine: 622, EndLine: 629}}},
 		{ID: "function-bind@1.1.1", Name: "function-bind", Version: "1.1.1", Indirect: true, Locations: []types.Location{{StartLine: 631, EndLine: 636}}},
 		{ID: "gauge@2.7.4", Name: "gauge", Version: "2.7.4", Indirect: true, Locations: []types.Location{{StartLine: 638, EndLine: 652}}},
 		{ID: "get-caller-file@2.0.5", Name: "get-caller-file", Version: "2.0.5", Indirect: true, Locations: []types.Location{{StartLine: 654, EndLine: 659}}},
@@ -14594,7 +14594,6 @@ var (
 	// yarn add lodash request chalk commander express async axios vue
 	// node test_deps_generator/libs_generator.js yarn.lock
 	yarnV2Many = []types.Library{
-		{ID: "fsevents@2.1.3", Name: "fsevents", Version: "2.1.3", Indirect: true, Locations: []types.Location{{StartLine: 850, EndLine: 857}}},
 		{ID: "@types/color-name@1.1.1", Name: "@types/color-name", Version: "1.1.1", Indirect: true, Locations: []types.Location{{StartLine: 8, EndLine: 13}}},
 		{ID: "abbrev@1.1.1", Name: "abbrev", Version: "1.1.1", Indirect: true, Locations: []types.Location{{StartLine: 15, EndLine: 20}}},
 		{ID: "accepts@1.3.7", Name: "accepts", Version: "1.3.7", Indirect: true, Locations: []types.Location{{StartLine: 22, EndLine: 30}}},
@@ -14687,6 +14686,7 @@ var (
 		{ID: "fresh@0.5.2", Name: "fresh", Version: "0.5.2", Indirect: true, Locations: []types.Location{{StartLine: 818, EndLine: 823}}},
 		{ID: "fs-minipass@2.1.0", Name: "fs-minipass", Version: "2.1.0", Indirect: true, Locations: []types.Location{{StartLine: 825, EndLine: 832}}},
 		{ID: "fs.realpath@1.0.0", Name: "fs.realpath", Version: "1.0.0", Indirect: true, Locations: []types.Location{{StartLine: 834, EndLine: 839}}},
+		{ID: "fsevents@2.1.3", Name: "fsevents", Version: "2.1.3", Indirect: true, Locations: []types.Location{{StartLine: 850, EndLine: 857}}},
 		{ID: "function-bind@1.1.1", Name: "function-bind", Version: "1.1.1", Indirect: true, Locations: []types.Location{{StartLine: 859, EndLine: 864}}},
 		{ID: "gauge@2.7.4", Name: "gauge", Version: "2.7.4", Indirect: true, Locations: []types.Location{{StartLine: 866, EndLine: 880}}},
 		{ID: "get-caller-file@2.0.5", Name: "get-caller-file", Version: "2.0.5", Indirect: true, Locations: []types.Location{{StartLine: 882, EndLine: 887}}},
