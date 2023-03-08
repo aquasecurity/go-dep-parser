@@ -122,8 +122,8 @@ func ignoreProtocol(protocol string) bool {
 	return false
 }
 
-func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (deps []types.Dependency, indirectMap map[string]bool) {
-	indirectMap = make(map[string]bool)
+func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (deps []types.Dependency, uniqIndirectDeps map[string]bool) {
+	uniqIndirectDeps = make(map[string]bool)
 
 	// find dependencies by patterns
 	for libID, depPatterns := range dependsOn {
@@ -135,14 +135,13 @@ func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (
 			DependsOn: depIDs,
 		})
 
-		// check if libId in indirectMap
 		for _, depID := range depIDs {
-			if _, ok := indirectMap[depID]; !ok {
-				indirectMap[depID] = true
+			if _, ok := uniqIndirectDeps[depID]; !ok {
+				uniqIndirectDeps[depID] = true
 			}
 		}
 	}
-	return deps, indirectMap
+	return deps, uniqIndirectDeps
 }
 
 type Parser struct{}

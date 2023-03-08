@@ -92,8 +92,6 @@ const createResultObj = (yarnObj) => {
     }
   }
 
-  //console.log(Object.entries(result).filter(([a,d]) => a.includes("parse5") || d.suffix.includes("parse5") ));
-
   for (const [key, value] of Object.entries(result)) {
     for (const [name, version] of Object.entries(value.dependencies)) {
       let foundChild = Object.keys(result).find(
