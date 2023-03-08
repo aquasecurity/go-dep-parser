@@ -171,7 +171,7 @@ func (d pomDependency) Name() string {
 }
 
 // Resolve evaluates variables in the dependency and inherit some fields from dependencyManagement to the dependency.
-func (d pomDependency) Resolve(props map[string]string, depManagement, depManagementFromUpperPoms []pomDependency) pomDependency {
+func (d pomDependency) Resolve(props map[string]string, depManagement, rootDepManagement []pomDependency) pomDependency {
 	// Evaluate variables
 	dep := pomDependency{
 		Text:       d.Text,
@@ -183,9 +183,9 @@ func (d pomDependency) Resolve(props map[string]string, depManagement, depManage
 		Exclusions: d.Exclusions,
 	}
 
-	// if this dependency is in the upper pom.xml in `dependencyManagement`
-	// then we need to take non-empty fields from the upper pom.xml
-	if managed, found := findDep(d.Name(), depManagementFromUpperPoms); found { // dependencyManagement from upper pom.xml
+	// If this dependency is managed in the root POM,
+	// we need to overwrite fields according to the managed dependency.
+	if managed, found := findDep(d.Name(), rootDepManagement); found { // dependencyManagement from the root POM
 		if managed.Version != "" {
 			dep.Version = evaluateVariable(managed.Version, props, nil)
 		}
@@ -201,7 +201,7 @@ func (d pomDependency) Resolve(props map[string]string, depManagement, depManage
 		return dep
 	}
 
-	// Inherit version, scope and optional from dependencyManagement
+	// Inherit version, scope and optional from dependencyManagement if empty
 	if managed, found := findDep(d.Name(), depManagement); found { // dependencyManagement from parent
 		if dep.Version == "" {
 			dep.Version = evaluateVariable(managed.Version, props, nil)
@@ -222,7 +222,7 @@ func (d pomDependency) Resolve(props map[string]string, depManagement, depManage
 
 // ToArtifact converts dependency to artifact.
 // It should be called after calling Resolve() so that variables can be evaluated.
-func (d pomDependency) ToArtifact(exclusions map[string]struct{}, depManagement []pomDependency) artifact {
+func (d pomDependency) ToArtifact(exclusions map[string]struct{}) artifact {
 	if exclusions == nil {
 		exclusions = map[string]struct{}{}
 	}
@@ -230,11 +230,10 @@ func (d pomDependency) ToArtifact(exclusions map[string]struct{}, depManagement 
 		exclusions[fmt.Sprintf("%s:%s", e.GroupID, e.ArtifactID)] = struct{}{}
 	}
 	return artifact{
-		GroupID:              d.GroupID,
-		ArtifactID:           d.ArtifactID,
-		Version:              newVersion(d.Version),
-		Exclusions:           exclusions,
-		DependencyManagement: depManagement,
+		GroupID:    d.GroupID,
+		ArtifactID: d.ArtifactID,
+		Version:    newVersion(d.Version),
+		Exclusions: exclusions,
 	}
 }
 
