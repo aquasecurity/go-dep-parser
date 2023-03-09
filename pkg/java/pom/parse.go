@@ -149,7 +149,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 
 		if art.Root {
 			// Managed dependencies in the root POM affect transitive dependencies
-			rootDepManagement = result.dependencyManagement
+			rootDepManagement = p.resolveDepManagement(result.properties, result.dependencyManagement)
 		}
 
 		// Parse, cache, and enqueue modules.
