@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>upper-pom-dep-management</artifactId>
+    <artifactId>root-pom-dep-management</artifactId>
     <version>1.0.0</version>
 
     <dependencyManagement>

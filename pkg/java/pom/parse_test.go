@@ -362,19 +362,19 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
-			name:      "overwrite artifact version from upper pom dependencyManagement",
-			inputFile: filepath.Join("testdata", "upper-pom-dep-management", "pom.xml"),
+			name:      "overwrite artifact version from dependencyManagement in the root POM",
+			inputFile: filepath.Join("testdata", "root-pom-dep-management", "pom.xml"),
 			local:     true,
 			want: []types.Library{
 				{
-					Name:    "com.example:upper-pom-dep-management",
+					Name:    "com.example:root-pom-dep-management",
 					Version: "1.0.0",
 				},
 				{
 					Name:    "org.example:example-api",
 					Version: "2.0.0",
 				},
-				// dependency version is taken from `com.example:upper-pom-dep-management` from dependencyManagement
+				// dependency version is taken from `com.example:root-pom-dep-management` from dependencyManagement
 				// not from `com.example:example-nested` from `com.example:example-nested`
 				{
 					Name:    "org.example:example-dependency",
