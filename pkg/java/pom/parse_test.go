@@ -107,7 +107,11 @@ func TestPom_Parse(t *testing.T) {
 				},
 				{
 					Name:    "org.example:example-api",
-					Version: "2.2.2",
+					Version: "4.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
 				},
 			},
 		},

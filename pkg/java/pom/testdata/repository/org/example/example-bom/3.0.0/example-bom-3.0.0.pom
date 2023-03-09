@@ -2,26 +2,24 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
-    <artifactId>parent</artifactId>
-    <version>1.0.0</version>
+    <groupId>org.example</groupId>
+    <artifactId>example-bom</artifactId>
+    <version>3.0.0</version>
 
     <packaging>pom</packaging>
-    <name>parent</name>
-    <description>Parent</description>
+    <name>example-bom</name>
+    <description>Example Bom</description>
 
     <properties>
-        <bom.version>3.0.0</bom.version>
+        <api.version>3.0.0</api.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.example</groupId>
-                <artifactId>example-bom</artifactId>
-                <version>${bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <artifactId>example-api</artifactId>
+                <version>${api.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

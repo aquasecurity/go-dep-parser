@@ -14,13 +14,14 @@
     </parent>
 
     <properties>
-        <api.version>2.2.2</api.version>
+        <bom.version>4.0.0</bom.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.example</groupId>
-            <artifactId>example-api</artifactId>
+            <artifactId>example-dependency</artifactId>
+            <version>1.2.3</version>
         </dependency>
     </dependencies>
 </project>
