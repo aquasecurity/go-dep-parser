@@ -79,3 +79,34 @@ func sortLibs(libs []types.Library) {
 		return ret < 0
 	})
 }
+
+func TestGetPackageNameAndVersion(t *testing.T) {
+	tests := []struct {
+		name        string
+		pkg         string
+		wantName    string
+		wantVersion string
+	}{
+		{
+			name:        "relative path",
+			pkg:         "/lodash/4.17.10",
+			wantName:    "lodash",
+			wantVersion: "4.17.10",
+		},
+		{
+			name:        "private registry",
+			pkg:         "registry.npmjs.org/lodash/4.17.10",
+			wantName:    "lodash",
+			wantVersion: "4.17.10",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotName, gotVersion := getPackageNameAndVersion(tt.pkg)
+			assert.Equal(t, tt.wantName, gotName)
+			assert.Equal(t, tt.wantVersion, gotVersion)
+		})
+
+	}
+}

@@ -101,9 +101,13 @@ func isIndirectLib(name string, directDeps map[string]string) bool {
 }
 
 func getPackageNameAndVersion(pkg string) (string, string) {
-	idx := strings.LastIndex(pkg, "/")
-	name := pkg[1:idx]
-	version := pkg[idx+1:]
+	// possible 2 package formats:
+	// relative path: `/<pkg_name>/<pkg_version>` e.g. /foo/1.0.0
+	// absolute path: `<registry_url>/<pkg_name>/<pkg_version>` e.g. registry.node-modules.io/foo/1.0.0
+	// https://github.com/pnpm/spec/blob/master/lockfile/5.2.md#packages
+	s := strings.Split(pkg, "/")
+	name := s[len(s)-2]
+	version := s[len(s)-1]
 
 	return name, version
 }
