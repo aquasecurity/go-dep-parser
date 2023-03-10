@@ -3,6 +3,7 @@ package npm
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -17,9 +18,12 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
+const nodeModulesFolder = "node_modules"
+
 type LockFile struct {
-	Dependencies map[string]Dependency `json:"dependencies"`
-	Packages     map[string]Package    `json:"packages"`
+	Dependencies    map[string]Dependency `json:"dependencies"`
+	Packages        map[string]Package    `json:"packages"`
+	LockfileVersion int                   `json:"lockfileVersion"`
 }
 type Dependency struct {
 	Version      string                `json:"version"`
@@ -35,6 +39,10 @@ type Package struct {
 	Name         string            `json:"name"`
 	Version      string            `json:"version"`
 	Dependencies map[string]string `json:"dependencies"`
+	Resolved     string            `json:"resolved"`
+	Dev          bool              `json:"dev"`
+	StartLine    int
+	EndLine      int
 }
 
 type Parser struct{}
@@ -53,13 +61,96 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		return nil, nil, xerrors.Errorf("decode error: %w", err)
 	}
 
-	dircetDeps := lockFile.Packages[""].Dependencies
-	libs, deps := p.parse(lockFile.Dependencies, dircetDeps, map[string]string{})
+	var libs []types.Library
+	var deps []types.Dependency
+	if lockFile.LockfileVersion == 1 {
+		directDeps := lockFile.Packages[""].Dependencies
+		libs, deps = p.parseV1(lockFile.Dependencies, directDeps, map[string]string{})
+	} else {
+		libs, deps = p.parseV2(lockFile.Packages)
+	}
 
 	return utils.UniqueLibraries(libs), uniqueDeps(deps), nil
 }
 
-func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string]string, versions map[string]string) ([]types.Library, []types.Dependency) {
+func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.Dependency) {
+	libs := make(map[string]types.Library, len(packages)-1)
+	var deps []types.Dependency
+
+	directDeps := map[string]string{}
+	for name, version := range packages[""].Dependencies {
+		pkgPath := filepath.Join(nodeModulesFolder, name)
+		pkg, ok := packages[pkgPath]
+		if !ok {
+			log.Logger.Debugf("unable to find %s@%s", name, version)
+			continue
+		}
+		directDeps[name] = pkg.Version
+	}
+
+	for pkgPath, pkg := range packages {
+		if pkg.Dev || pkgPath == "" {
+			continue
+		}
+
+		pkgName := pkgNameFromPath(pkgPath)
+		pkgID := utils.PackageID(pkgName, pkg.Version)
+
+		if savedLib, ok := libs[pkgID]; ok {
+			savedLib.Locations = append(savedLib.Locations, types.Location{StartLine: pkg.StartLine, EndLine: pkg.EndLine})
+			continue
+		}
+
+		lib := types.Library{
+			ID:                 pkgID,
+			Name:               pkgName,
+			Version:            pkg.Version,
+			Indirect:           isIndirectLib(pkgName, directDeps),
+			ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: pkg.Resolved}},
+			Locations: []types.Location{
+				{
+					StartLine: pkg.StartLine,
+					EndLine:   pkg.EndLine,
+				},
+			},
+		}
+		libs[pkgID] = lib
+
+		dependsOn := make([]string, 0, len(pkg.Dependencies))
+		for depName, depVersion := range pkg.Dependencies {
+			// Try to resolve the version with nested dependencies first
+			depPath := filepath.Join(pkgPath, nodeModulesFolder, depName)
+			if dep, ok := packages[depPath]; ok {
+				depID := utils.PackageID(depName, dep.Version)
+				dependsOn = append(dependsOn, depID)
+				continue
+			}
+
+			// Try to resolve the version with the higher level dependencies
+			depPath = filepath.Join(nodeModulesFolder, depName)
+			if dep, ok := packages[depPath]; ok {
+				depID := utils.PackageID(depName, dep.Version)
+				dependsOn = append(dependsOn, depID)
+				continue
+			}
+
+			// It should not reach here.
+			log.Logger.Warnf("Cannot resolve the version: %s@%s", depName, depVersion)
+		}
+
+		if len(dependsOn) > 0 {
+			dep := types.Dependency{
+				ID:        lib.ID,
+				DependsOn: dependsOn,
+			}
+			deps = append(deps, dep)
+		}
+
+	}
+	return maps.Values(libs), deps
+}
+
+func (p *Parser) parseV1(dependencies map[string]Dependency, directDeps map[string]string, versions map[string]string) ([]types.Library, []types.Dependency) {
 	// Update package name and version mapping.
 	for pkgName, dep := range dependencies {
 		// Overwrite the existing package version so that the nested version can take precedence.
@@ -77,7 +168,7 @@ func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string
 			ID:                 utils.PackageID(pkgName, dependency.Version),
 			Name:               pkgName,
 			Version:            dependency.Version,
-			Indirect:           isIndirectLib(pkgName, dircetDeps),
+			Indirect:           isIndirectLib(pkgName, directDeps),
 			ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: dependency.Resolved}},
 			Locations: []types.Location{
 				{
@@ -113,7 +204,7 @@ func (p *Parser) parse(dependencies map[string]Dependency, dircetDeps map[string
 
 		if dependency.Dependencies != nil {
 			// Recursion
-			childLibs, childDeps := p.parse(dependency.Dependencies, dircetDeps, maps.Clone(versions))
+			childLibs, childDeps := p.parseV1(dependency.Dependencies, directDeps, maps.Clone(versions))
 			libs = append(libs, childLibs...)
 			deps = append(deps, childDeps...)
 		}
@@ -142,8 +233,23 @@ func isIndirectLib(libName string, dircetDeps map[string]string) bool {
 	return !ok
 }
 
-// UnmarshalJSONWithMetadata needed to detect start and end lines of deps
+func pkgNameFromPath(path string) string {
+	return filepath.Base(path)
+}
+
+// UnmarshalJSONWithMetadata needed to detect start and end lines of deps for v1
 func (t *Dependency) UnmarshalJSONWithMetadata(node jfather.Node) error {
+	if err := node.Decode(&t); err != nil {
+		return err
+	}
+	// Decode func will overwrite line numbers if we save them first
+	t.StartLine = node.Range().Start.Line
+	t.EndLine = node.Range().End.Line
+	return nil
+}
+
+// UnmarshalJSONWithMetadata needed to detect start and end lines of deps for v2 or newer
+func (t *Package) UnmarshalJSONWithMetadata(node jfather.Node) error {
 	if err := node.Decode(&t); err != nil {
 		return err
 	}
