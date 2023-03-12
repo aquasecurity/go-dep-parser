@@ -122,9 +122,7 @@ func ignoreProtocol(protocol string) bool {
 	return false
 }
 
-func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (deps []types.Dependency, indirectMap map[string]bool) {
-	indirectMap = make(map[string]bool)
-
+func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (deps []types.Dependency) {
 	// find dependencies by patterns
 	for libID, depPatterns := range dependsOn {
 		depIDs := lo.Map(depPatterns, func(pattern string, index int) string {
@@ -134,15 +132,8 @@ func parseResults(patternIDs map[string]string, dependsOn map[string][]string) (
 			ID:        libID,
 			DependsOn: depIDs,
 		})
-
-		// check if libId in indirectMap
-		for _, depID := range depIDs {
-			if _, ok := indirectMap[depID]; !ok {
-				indirectMap[depID] = true
-			}
-		}
 	}
-	return deps, indirectMap
+	return deps
 }
 
 type Parser struct{}
@@ -270,7 +261,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	scanner := bufio.NewScanner(r)
 	scanner.Split(scanBlocks)
 	dependsOn := map[string][]string{}
-
 	for scanner.Scan() {
 		block := scanner.Bytes()
 		lib, deps, newLine, err := parseBlock(block, lineNumber)
@@ -306,12 +296,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	// Replace dependency patterns with library IDs
 	// e.g. ajv@^6.5.5 => ajv@6.10.0
-	deps, indirectMap := parseResults(patternIDs, dependsOn)
-
-	for i, lib := range libs {
-		_, ok := indirectMap[lib.ID]
-		libs[i].Indirect = ok
-	}
-
+	deps := parseResults(patternIDs, dependsOn)
 	return libs, deps, nil
 }
