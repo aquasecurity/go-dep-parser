@@ -20,10 +20,22 @@ func TestParse(t *testing.T) {
 		wantDeps []types.Dependency
 	}{
 		{
-			name:     "new v3",
+			name:     "lock version v1",
+			file:     "testdata/package-lock_v1.json",
+			want:     npmV1Libs,
+			wantDeps: npmDeps,
+		},
+		{
+			name:     "lock version v2",
+			file:     "testdata/package-lock_v2.json",
+			want:     npmV2Libs,
+			wantDeps: npmDeps,
+		},
+		{
+			name:     "lock version v3",
 			file:     "testdata/package-lock_v3.json",
-			want:     npmNormal,
-			wantDeps: npmNormalDeps,
+			want:     npmV2Libs,
+			wantDeps: npmDeps,
 		},
 		//{
 		//	name:     "normal",
@@ -101,16 +113,12 @@ func sortDeps(deps []types.Dependency) {
 }
 
 func sortLibs(libs []types.Library) {
-	sort.Slice(libs, func(i, j int) bool {
-		ret := strings.Compare(libs[i].Name, libs[j].Name)
-		if ret == 0 {
-			return libs[i].Version < libs[j].Version
-		}
-		return ret < 0
-	})
 	for _, lib := range libs {
 		sortLocations(lib.Locations)
 	}
+	sort.Slice(libs, func(i, j int) bool {
+		return strings.Compare(libs[i].ID, libs[j].ID) < 0
+	})
 }
 
 func sortLocations(locs []types.Location) {
