@@ -78,12 +78,13 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 	directDeps := map[string]struct{}{}
 	for name, version := range packages[""].Dependencies {
 		pkgPath := joinPaths(nodeModulesFolder, name)
-		_, ok := packages[pkgPath]
-		if !ok {
-			log.Logger.Debugf("unable to find %s@%s", name, version)
+		if _, ok := packages[pkgPath]; !ok {
+			log.Logger.Debugf("Unable to find the direct dependency: '%s@%s'", name, version)
 			continue
 		}
-		directDeps[name] = struct{}{}
+		// Store the package paths of direct dependencies
+		// e.g. node_modules/body-parser
+		directDeps[pkgPath] = struct{}{}
 	}
 
 	for pkgPath, pkg := range packages {
@@ -106,7 +107,7 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 			ID:                 pkgID,
 			Name:               pkgName,
 			Version:            pkg.Version,
-			Indirect:           isIndirectLib(pkgName, pkgPath, directDeps),
+			Indirect:           isIndirectLib(pkgPath, directDeps),
 			ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: pkg.Resolved}},
 			Locations: []types.Location{
 				{
@@ -121,7 +122,7 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 		for depName, depVersion := range pkg.Dependencies {
 			depID, err := findDependsOn(pkgPath, depName, packages)
 			if err != nil {
-				log.Logger.Warnf("Cannot resolve the version: %s@%s", depName, depVersion)
+				log.Logger.Warnf("Cannot resolve the version: '%s@%s'", depName, depVersion)
 				continue
 			}
 			dependsOn = append(dependsOn, depID)
@@ -240,16 +241,12 @@ func uniqueDeps(deps []types.Dependency) []types.Dependency {
 	return uniqDeps
 }
 
-func isIndirectLib(libName, path string, directDeps map[string]struct{}) bool {
-	if _, ok := directDeps[libName]; ok {
-		// project can contain 2 different version of dependency
-		// e.g. `node_modules/string-width/node_modules/strip-ansi` and `node_modules/string-ansi`
-		// direct dependencies always have root path (`node_modules/<lib_name>`)
-		if len(strings.Split(path, "/")) == 2 {
-			return false
-		}
-	}
-	return true
+func isIndirectLib(pkgPath string, directDeps map[string]struct{}) bool {
+	// A project can contain 2 different versions of the same dependency.
+	// e.g. `node_modules/string-width/node_modules/strip-ansi` and `node_modules/string-ansi`
+	// direct dependencies always have root path (`node_modules/<lib_name>`)
+	_, ok := directDeps[pkgPath]
+	return !ok
 }
 
 func pkgNameFromPath(path string) string {
