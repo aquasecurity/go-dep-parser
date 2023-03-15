@@ -1,11 +1,8 @@
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
-github.com/aquasecurity/go-npm-version v0.0.0-20201110091526-0b796d180798 h1:eveqE9ivrt30CJ7dOajOfBavhZ4zPqHcZe/4tKp0alc=
-github.com/aquasecurity/go-npm-version v0.0.0-20201110091526-0b796d180798/go.mod h1:hxbJZtKlO4P8sZ9nztizR6XLoE33O+BkPmuYQ4ACyz0=
 github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46 h1:vmXNl+HDfqqXgr0uY1UgK1GAhps8nbAAtqHNBcgyf+4=
 github.com/aquasecurity/go-pep440-version v0.0.0-20210121094942-22b2f8951d46/go.mod h1:olhPNdiiAAMiSujemd1O/sc6GcyePr23f/6uGKtthNg=
-github.com/aquasecurity/go-version v0.0.0-20201107203531-5e48ac5d022a/go.mod h1:9Beu8XsUNNfzml7WBf3QmyPToP1wm1Gj/Vc5UJKqTzU=
 github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492 h1:rcEG5HI490FF0a7zuvxOxen52ddygCfNVjP0XOCMl+M=
 github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492/go.mod h1:9Beu8XsUNNfzml7WBf3QmyPToP1wm1Gj/Vc5UJKqTzU=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=

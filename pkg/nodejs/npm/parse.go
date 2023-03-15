@@ -14,7 +14,6 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
-	npm "github.com/aquasecurity/go-npm-version/pkg"
 )
 
 const nodeModulesFolder = "node_modules"
@@ -281,19 +280,4 @@ func (t *Package) UnmarshalJSONWithMetadata(node jfather.Node) error {
 	t.StartLine = node.Range().Start.Line
 	t.EndLine = node.Range().End.Line
 	return nil
-}
-
-// matchVersion checks if the package version satisfies the given constraint.
-func matchVersion(currentVersion, constraint string) (bool, error) {
-	v, err := npm.NewVersion(currentVersion)
-	if err != nil {
-		return false, xerrors.Errorf("npm version error (%s): %s", currentVersion, err)
-	}
-
-	c, err := npm.NewConstraints(constraint)
-	if err != nil {
-		return false, xerrors.Errorf("npm constraint error (%s): %s", constraint, err)
-	}
-
-	return c.Check(v), nil
 }
