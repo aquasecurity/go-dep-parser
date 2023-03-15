@@ -3,7 +3,6 @@ package npm
 import (
 	"fmt"
 	"io"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -76,15 +75,15 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 	libs := make(map[string]types.Library, len(packages)-1)
 	var deps []types.Dependency
 
-	directDeps := map[string]string{}
+	directDeps := map[string]struct{}{}
 	for name, version := range packages[""].Dependencies {
-		pkgPath := filepath.Join(nodeModulesFolder, name)
-		pkg, ok := packages[pkgPath]
+		pkgPath := joinPaths(nodeModulesFolder, name)
+		_, ok := packages[pkgPath]
 		if !ok {
 			log.Logger.Debugf("unable to find %s@%s", name, version)
 			continue
 		}
-		directDeps[name] = pkg.Version
+		directDeps[name] = struct{}{}
 	}
 
 	for pkgPath, pkg := range packages {
@@ -107,7 +106,7 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 			ID:                 pkgID,
 			Name:               pkgName,
 			Version:            pkg.Version,
-			Indirect:           isIndirectLib(pkgName, pkg.Version, directDeps),
+			Indirect:           isIndirectLib(pkgName, pkgPath, directDeps),
 			ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: pkg.Resolved}},
 			Locations: []types.Location{
 				{
@@ -120,32 +119,12 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 
 		dependsOn := make([]string, 0, len(pkg.Dependencies))
 		for depName, depVersion := range pkg.Dependencies {
-			// Try to resolve the version with nested dependencies first
-			depPath := filepath.Join(pkgPath, nodeModulesFolder, depName)
-			if dep, ok := packages[depPath]; ok {
-				depID := utils.PackageID(depName, dep.Version)
-				dependsOn = append(dependsOn, depID)
+			depID, err := findDependsOn(pkgPath, depName, packages)
+			if err != nil {
+				log.Logger.Warnf("Cannot resolve the version: %s@%s", depName, depVersion)
 				continue
 			}
-
-			// Try to resolve the version with dependencies same folder
-			depPath = filepath.Join(filepath.Dir(pkgPath), depName)
-			if dep, ok := packages[depPath]; ok {
-				depID := utils.PackageID(depName, dep.Version)
-				dependsOn = append(dependsOn, depID)
-				continue
-			}
-
-			// Try to resolve the version with the higher level dependencies
-			depPath = filepath.Join(nodeModulesFolder, depName)
-			if dep, ok := packages[depPath]; ok {
-				depID := utils.PackageID(depName, dep.Version)
-				dependsOn = append(dependsOn, depID)
-				continue
-			}
-
-			// It should not reach here.
-			log.Logger.Warnf("Cannot resolve the version: %s@%s", depName, depVersion)
+			dependsOn = append(dependsOn, depID)
 		}
 
 		if len(dependsOn) > 0 {
@@ -158,6 +137,29 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 
 	}
 	return maps.Values(libs), deps
+}
+
+func findDependsOn(pkgPath, depName string, packages map[string]Package) (string, error) {
+	depPath := joinPaths(pkgPath, nodeModulesFolder)
+	paths := strings.Split(depPath, "/")
+	// Try to resolve the version with the nearest directory
+	// e.g. for pkgPath == `node_modules/body-parser/node_modules/debug`, depName == `ms`:
+	//    - "node_modules/body-parser/node_modules/debug/node_modules/ms"
+	//    - "node_modules/body-parser/node_modules/ms"
+	//    - "node_modules/ms"
+	for i := len(paths) - 1; i >= 0; i-- {
+		if paths[i] != nodeModulesFolder {
+			continue
+		}
+		path := joinPaths(paths[:i+1]...)
+		path = joinPaths(path, depName)
+
+		if dep, ok := packages[path]; ok {
+			return utils.PackageID(depName, dep.Version), nil
+		}
+	}
+	// It should not reach here.
+	return "", xerrors.Errorf("can't find dependsOn for %s", depName)
 }
 
 func (p *Parser) parseV1(dependencies map[string]Dependency, versions map[string]string) ([]types.Library, []types.Dependency) {
@@ -238,18 +240,14 @@ func uniqueDeps(deps []types.Dependency) []types.Dependency {
 	return uniqDeps
 }
 
-func isIndirectLib(libName, libVersionRange string, directDeps map[string]string) bool {
-	if directVersion, ok := directDeps[libName]; ok {
+func isIndirectLib(libName, path string, directDeps map[string]struct{}) bool {
+	if _, ok := directDeps[libName]; ok {
 		// project can contain 2 different version of dependency
-		// we need to check that we choose version for direct dependency
-		// also the direct dependency version can use range
-		// e.g. "body-parser": "^1.18.3"
-		// we need to compare versions using npm comparator
-		match, err := matchVersion(directVersion, libVersionRange)
-		if err != nil {
-			log.Logger.Warnf("unable to compare version for %s@%s", libName, libVersionRange)
+		// e.g. `node_modules/string-width/node_modules/strip-ansi` and `node_modules/string-ansi`
+		// direct dependencies always have root path (`node_modules/<lib_name>`)
+		if len(strings.Split(path, "/")) == 2 {
+			return false
 		}
-		return !match
 	}
 	return true
 }
@@ -258,7 +256,12 @@ func pkgNameFromPath(path string) string {
 	// lock file contains path to dependency in `node_modules` folder. e.g.:
 	// node_modules/string-width
 	// node_modules/string-width/node_modules/strip-ansi
-	return filepath.Base(path)
+	paths := strings.Split(path, "/")
+	return paths[len(paths)-1]
+}
+
+func joinPaths(paths ...string) string {
+	return strings.Join(paths, "/")
 }
 
 // UnmarshalJSONWithMetadata needed to detect start and end lines of deps for v1
