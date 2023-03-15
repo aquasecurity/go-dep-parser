@@ -37,48 +37,6 @@ func TestParse(t *testing.T) {
 			want:     npmV2Libs,
 			wantDeps: npmDeps,
 		},
-		//{
-		//	name:     "normal",
-		//	file:     "testdata/package-lock_normal.json",
-		//	want:     npmNormal,
-		//	wantDeps: npmNormalDeps,
-		//},
-		//{
-		//	name:     "react",
-		//	file:     "testdata/package-lock_react.json",
-		//	want:     npmReact,
-		//	wantDeps: npmReactDeps,
-		//},
-		//{
-		//	name:     "with devDependencies",
-		//	file:     "testdata/package-lock_with_dev.json",
-		//	want:     npmWithDev,
-		//	wantDeps: npmWithDevDeps,
-		//},
-		//{
-		//	name:     "many packages",
-		//	file:     "testdata/package-lock_many.json",
-		//	want:     npmMany,
-		//	wantDeps: npmManyDeps,
-		//},
-		//{
-		//	name:     "nested packages",
-		//	file:     "testdata/package-lock_nested.json",
-		//	want:     npmNested,
-		//	wantDeps: npmNestedDeps,
-		//},
-		//{
-		//	name:     "deep nested packages",
-		//	file:     "testdata/package-lock_deep-nested.json",
-		//	want:     npmDeepNested,
-		//	wantDeps: npmDeepNestedDeps,
-		//},
-		//{
-		//	name:     "direct libraries",
-		//	file:     "testdata/package-lock_with_packages.json",
-		//	want:     npmWithPkgs,
-		//	wantDeps: npmWithPkgsDeps,
-		//},
 	}
 
 	for _, tt := range tests {
