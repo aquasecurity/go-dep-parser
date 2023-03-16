@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"regexp"
 	"strings"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
@@ -30,11 +29,6 @@ type naivePkgParser struct {
 	r io.Reader
 }
 
-var pkgDelimiterRegexp = regexp.MustCompile(`^\s*\[`)
-var pkgNameRegexp = regexp.MustCompile(`^\s*name\s=`)
-var pkgVersionRegexp = regexp.MustCompile(`^\s*version\s=`)
-var emptyLineRegexp = regexp.MustCompile(`^\s*$`)
-
 func (parser *naivePkgParser) parse() map[string]pkgPosition {
 	var currentPkg minPkg = minPkg{}
 	var idx = make(map[string]pkgPosition, 0)
@@ -43,7 +37,7 @@ func (parser *naivePkgParser) parse() map[string]pkgPosition {
 	lineNum := 1
 	for scanner.Scan() {
 		line := scanner.Text()
-		if matched := pkgDelimiterRegexp.MatchString(line); matched {
+		if strings.HasPrefix(strings.TrimSpace(line), "[") {
 			if currentPkg.name != "" {
 				pkgId := utils.PackageID(currentPkg.name, currentPkg.version)
 				currentPkg.setEndPositionIfEmpty(lineNum - 1)
@@ -52,11 +46,11 @@ func (parser *naivePkgParser) parse() map[string]pkgPosition {
 			currentPkg = minPkg{}
 			currentPkg.position.start = lineNum
 
-		} else if matched := pkgNameRegexp.MatchString(line); matched {
+		} else if strings.HasPrefix(strings.TrimSpace(line), "name =") {
 			currentPkg.name = propertyValue(line)
-		} else if matched := pkgVersionRegexp.MatchString(line); matched {
+		} else if strings.HasPrefix(strings.TrimSpace(line), "version =") {
 			currentPkg.version = propertyValue(line)
-		} else if matched := emptyLineRegexp.MatchString(line); matched {
+		} else if strings.TrimSpace(line) == "" {
 			currentPkg.setEndPositionIfEmpty(lineNum - 1)
 		}
 

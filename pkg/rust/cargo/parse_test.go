@@ -96,11 +96,7 @@ func TestParse(t *testing.T) {
 
 func sortLibs(libs []types.Library) {
 	sort.Slice(libs, func(i, j int) bool {
-		ret := strings.Compare(libs[i].Name, libs[j].Name)
-		if ret == 0 {
-			return libs[i].Version < libs[j].Version
-		}
-		return ret < 0
+		return strings.Compare(libs[i].ID, libs[j].ID) < 0
 	})
 }
 

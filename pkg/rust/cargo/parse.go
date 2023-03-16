@@ -20,7 +20,6 @@ type cargoPkg struct {
 }
 type Lockfile struct {
 	Packages []cargoPkg `toml:"package"`
-	Metadata interface{}
 }
 
 type Parser struct{}
@@ -68,6 +67,11 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 func parseDependencies(pkgId string, pkg cargoPkg) *types.Dependency {
 	dependOn := []string{}
 	for _, pkgDep := range pkg.Dependencies {
+		/*
+			Dependency entries look like:
+			"unsafe-any 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)"
+		*/
+
 		fields := strings.Fields(pkgDep)
 		if len(fields) != 3 {
 			continue
