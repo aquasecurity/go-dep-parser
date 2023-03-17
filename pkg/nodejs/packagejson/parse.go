@@ -10,14 +10,12 @@ import (
 )
 
 type packageJSON struct {
-	Name    string      `json:"name"`
-	Version string      `json:"version"`
-	License interface{} `json:"license"`
-}
-
-type dependencies struct {
+	Name         string            `json:"name"`
+	Version      string            `json:"version"`
+	License      interface{}       `json:"license"`
 	Dependencies map[string]string `json:"dependencies"`
 }
+
 type Parser struct{}
 
 func NewParser() types.Parser {
@@ -26,21 +24,35 @@ func NewParser() types.Parser {
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var data packageJSON
+	var libs []types.Library
 	err := json.NewDecoder(r).Decode(&data)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
+	// root library
 	if data.Name == "" || data.Version == "" {
 		return nil, nil, xerrors.Errorf("unable to parse package.json")
 	}
-
-	return []types.Library{{
+	rootLib := types.Library{
 		ID:      utils.PackageID(data.Name, data.Version),
 		Name:    data.Name,
 		Version: data.Version,
 		License: parseLicense(data.License),
-	}}, nil, nil
+		Root:    true,
+	}
+	libs = append(libs, rootLib)
+
+	// dependencies
+	for depName, depVersion := range data.Dependencies {
+		lib := types.Library{
+			Name:    depName,
+			Version: depVersion,
+		}
+		libs = append(libs, lib)
+	}
+
+	return libs, nil, nil
 }
 
 func parseLicense(val interface{}) string {
@@ -54,15 +66,4 @@ func parseLicense(val interface{}) string {
 		}
 	}
 	return ""
-}
-
-func (p *Parser) ParseProdDependencies(r dio.ReadSeekerAt) (map[string]string, error) {
-	deps := dependencies{}
-	if err := json.NewDecoder(r).Decode(&deps); err != nil {
-		return nil, xerrors.Errorf("JSON decode error: %w", err)
-	}
-	if len(deps.Dependencies) > 0 {
-		return deps.Dependencies, nil
-	}
-	return nil, nil
 }

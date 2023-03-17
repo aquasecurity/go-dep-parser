@@ -27,12 +27,20 @@ func TestParse(t *testing.T) {
 			// npm init --force
 			// npm install --save promise jquery
 			// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\"},\n")}'
-			want: []types.Library{{
-				ID:      "bootstrap@5.0.2",
-				Name:    "bootstrap",
-				Version: "5.0.2",
-				License: "MIT",
-			}},
+			want: []types.Library{
+				{
+					ID:      "bootstrap@5.0.2",
+					Name:    "bootstrap",
+					Version: "5.0.2",
+					License: "MIT",
+					Root:    true,
+				},
+				{
+					Name:    "js-tokens",
+					Version: "^4.0.0",
+					Root:    false,
+				},
+			},
 			wantErr: "",
 		},
 		{
@@ -43,6 +51,7 @@ func TestParse(t *testing.T) {
 				Name:    "angular",
 				Version: "4.1.2",
 				License: "ISC",
+				Root:    true,
 			}},
 			wantErr: "",
 		},
@@ -73,50 +82,6 @@ func TestParse(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.Equal(t, v.want, got)
-		})
-	}
-}
-
-func TestParseDependencies(t *testing.T) {
-	tests := []struct {
-		name      string
-		inputFile string
-		want      map[string]string
-		wantErr   string
-	}{
-		{
-			name:      "happy path",
-			inputFile: "testdata/package.json",
-			want: map[string]string{
-				"js-tokens": "4.0.0",
-			},
-		},
-		{
-			name:      "no deps",
-			inputFile: "testdata/legacy_package.json",
-		},
-		{
-			name:      "sad path",
-			inputFile: "testdata/invalid_package.json",
-			wantErr:   "JSON decode error",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			f, err := os.Open(tt.inputFile)
-			require.NoError(t, err)
-
-			p := packagejson.Parser{}
-			got, err := p.ParseProdDependencies(f)
-			if tt.wantErr != "" {
-				require.Error(t, err)
-				assert.Contains(t, err.Error(), tt.wantErr)
-				return
-			}
-
-			require.NoError(t, err)
-			assert.Equal(t, tt.want, got)
 		})
 	}
 }

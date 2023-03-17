@@ -97,7 +97,7 @@
     "url": "https://opencollective.com/bootstrap"
   },
   "dependencies": {
-    "js-tokens": "4.0.0"
+    "js-tokens": "^4.0.0"
   },
   "peerDependencies": {
     "@popperjs/core": "^2.9.2"
