@@ -15,20 +15,20 @@ var (
 	// apk add jq
 	// composer require laravel/installer
 	// composer require pear/log --dev
-	// composer show -i --no-dev -f json | jq --sort-keys -rc '.installed[] | "{ID: \"\(.name)@\(.version)\", Name: \"\(.name)\", Version: \"\(.version)\", Indirect: true, License: \"\", Locations: []types.Location{{StartLine: , EndLine: }}},"'
+	// composer show -i --no-dev -f json | jq --sort-keys -rc '.installed[] | "{ID: \"\(.name)@\(.version)\", Name: \"\(.name)\", Version: \"\(.version)\", License: \"\", Locations: []types.Location{{StartLine: , EndLine: }}},"'
 	// locations are filled manually
 	composerLibs = []types.Library{
-		{ID: "laravel/installer@v4.4.3", Name: "laravel/installer", Version: "v4.4.3", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 9, EndLine: 65}}},
-		{ID: "psr/container@2.0.2", Name: "psr/container", Version: "2.0.2", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 66, EndLine: 118}}},
-		{ID: "symfony/console@v6.2.7", Name: "symfony/console", Version: "v6.2.7", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 119, EndLine: 214}}},
-		{ID: "symfony/deprecation-contracts@v3.2.1", Name: "symfony/deprecation-contracts", Version: "v3.2.1", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 215, EndLine: 281}}},
-		{ID: "symfony/polyfill-ctype@v1.27.0", Name: "symfony/polyfill-ctype", Version: "v1.27.0", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 282, EndLine: 363}}},
-		{ID: "symfony/polyfill-intl-grapheme@v1.27.0", Name: "symfony/polyfill-intl-grapheme", Version: "v1.27.0", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 364, EndLine: 444}}},
-		{ID: "symfony/polyfill-intl-normalizer@v1.27.0", Name: "symfony/polyfill-intl-normalizer", Version: "v1.27.0", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 445, EndLine: 528}}},
-		{ID: "symfony/polyfill-mbstring@v1.27.0", Name: "symfony/polyfill-mbstring", Version: "v1.27.0", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 529, EndLine: 611}}},
-		{ID: "symfony/process@v6.2.7", Name: "symfony/process", Version: "v6.2.7", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 612, EndLine: 672}}},
-		{ID: "symfony/service-contracts@v3.2.1", Name: "symfony/service-contracts", Version: "v3.2.1", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 673, EndLine: 757}}},
-		{ID: "symfony/string@v6.2.7", Name: "symfony/string", Version: "v6.2.7", Indirect: true, License: "MIT", Locations: []types.Location{{StartLine: 758, EndLine: 843}}},
+		{ID: "laravel/installer@v4.4.3", Name: "laravel/installer", Version: "v4.4.3", License: "MIT", Locations: []types.Location{{StartLine: 9, EndLine: 65}}},
+		{ID: "psr/container@2.0.2", Name: "psr/container", Version: "2.0.2", License: "MIT", Locations: []types.Location{{StartLine: 66, EndLine: 118}}},
+		{ID: "symfony/console@v6.2.7", Name: "symfony/console", Version: "v6.2.7", License: "MIT", Locations: []types.Location{{StartLine: 119, EndLine: 214}}},
+		{ID: "symfony/deprecation-contracts@v3.2.1", Name: "symfony/deprecation-contracts", Version: "v3.2.1", License: "MIT", Locations: []types.Location{{StartLine: 215, EndLine: 281}}},
+		{ID: "symfony/polyfill-ctype@v1.27.0", Name: "symfony/polyfill-ctype", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 282, EndLine: 363}}},
+		{ID: "symfony/polyfill-intl-grapheme@v1.27.0", Name: "symfony/polyfill-intl-grapheme", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 364, EndLine: 444}}},
+		{ID: "symfony/polyfill-intl-normalizer@v1.27.0", Name: "symfony/polyfill-intl-normalizer", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 445, EndLine: 528}}},
+		{ID: "symfony/polyfill-mbstring@v1.27.0", Name: "symfony/polyfill-mbstring", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 529, EndLine: 611}}},
+		{ID: "symfony/process@v6.2.7", Name: "symfony/process", Version: "v6.2.7", License: "MIT", Locations: []types.Location{{StartLine: 612, EndLine: 672}}},
+		{ID: "symfony/service-contracts@v3.2.1", Name: "symfony/service-contracts", Version: "v3.2.1", License: "MIT", Locations: []types.Location{{StartLine: 673, EndLine: 757}}},
+		{ID: "symfony/string@v6.2.7", Name: "symfony/string", Version: "v6.2.7", License: "MIT", Locations: []types.Location{{StartLine: 758, EndLine: 843}}},
 	}
 	// dependencies are filled manually
 	composerDeps = []types.Dependency{
