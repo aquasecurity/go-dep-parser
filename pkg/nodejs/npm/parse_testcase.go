@@ -60,7 +60,7 @@ var (
 
 	// ... and
 	// npm i --lockfile-version 2
-	// same as npmV1Libs but change `Indirect` field to false for `body-parser@1.18.3`, `finalhandler@1.1.1`, `@babel/helper-string-parser@7.19.4` and `ms@1.0.0`  libraries.
+	// same as npmV1Libs but change `Indirect` field to false for `body-parser@1.18.3`, `finalhandler@1.1.1`, `@babel/helper-string-parser@7.19.4`, `promise@8.3.0` and `ms@1.0.0`  libraries.
 	// also need to get locations from `packages` struct
 	// --- lockfile version 3 ---
 	// npm i --lockfile-version 3
