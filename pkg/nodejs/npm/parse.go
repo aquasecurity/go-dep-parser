@@ -77,7 +77,7 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 	var deps []types.Dependency
 
 	directDeps := map[string]struct{}{}
-	for name, version := range packages[""].Dependencies {
+	for name, version := range lo.Assign(packages[""].Dependencies, packages[""].OptionalDependencies) {
 		pkgPath := joinPaths(nodeModulesFolder, name)
 		if _, ok := packages[pkgPath]; !ok {
 			log.Logger.Debugf("Unable to find the direct dependency: '%s@%s'", name, version)
@@ -262,7 +262,7 @@ func pkgNameFromPath(path string) string {
 	paths := strings.Split(path, "/")
 	// deps starting from `@` have pgkName with one `/`
 	// e.g. path == `node_modules/@babel/plugin-transform-classes` => pkgName == `@babel/plugin-transform-classes`
-	if strings.HasPrefix(paths[len(paths)-2], "@") {
+	if len(paths) >= 2 && strings.HasPrefix(paths[len(paths)-2], "@") {
 		return strings.Join(paths[len(paths)-2:], "/")
 	}
 	return paths[len(paths)-1]
