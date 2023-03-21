@@ -10,7 +10,6 @@ type Library struct {
 	License            string        `json:",omitempty"`
 	ExternalReferences []ExternalRef `json:",omitempty"`
 	Locations          []Location    `json:",omitempty"`
-	Root               bool          // if true - it is information about project
 }
 
 // Location in lock file
