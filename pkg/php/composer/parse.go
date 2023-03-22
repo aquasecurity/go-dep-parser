@@ -57,7 +57,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 		var dependsOn []string
 		for depName := range pkg.Require {
-			if depName != "php" { // Require field includes required php version, skip this
+			// Require field includes required php version, skip this
+			// Also skip PHP extensions
+			if depName != "php" || strings.HasPrefix(depName, "ext") {
 				dependsOn = append(dependsOn, depName) // field uses range of versions, so later we will fill in the versions from the libraries
 			}
 		}
