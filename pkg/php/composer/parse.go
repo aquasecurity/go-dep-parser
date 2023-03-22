@@ -6,6 +6,7 @@ import (
 	"github.com/liamg/jfather"
 	"golang.org/x/exp/maps"
 	"io"
+	"sort"
 	"strings"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
@@ -81,6 +82,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			log.Logger.Debugf("unable to find version of %s", depName)
 		}
 		if len(dependsOn) > 0 {
+			dependsOn = sortDependsOn(dependsOn)
 			deps = append(deps, types.Dependency{
 				ID:        dep.ID,
 				DependsOn: dependsOn,
@@ -100,4 +102,11 @@ func (t *packageInfo) UnmarshalJSONWithMetadata(node jfather.Node) error {
 	t.StartLine = node.Range().Start.Line
 	t.EndLine = node.Range().End.Line
 	return nil
+}
+
+func sortDependsOn(dependsOn []string) []string {
+	sort.Slice(dependsOn, func(i, j int) bool {
+		return dependsOn[i] < dependsOn[j]
+	})
+	return dependsOn
 }

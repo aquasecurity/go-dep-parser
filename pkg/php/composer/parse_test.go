@@ -71,10 +71,6 @@ func sortDeps(deps []types.Dependency) {
 	sort.Slice(deps, func(i, j int) bool {
 		return strings.Compare(deps[i].ID, deps[j].ID) < 0
 	})
-
-	for i := range deps {
-		sort.Strings(deps[i].DependsOn)
-	}
 }
 
 func sortLibs(libs []types.Library) {
