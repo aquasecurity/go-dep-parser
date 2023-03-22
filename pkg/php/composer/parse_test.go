@@ -13,29 +13,25 @@ import (
 var (
 	// docker run --name composer --rm -it composer@sha256:082ed124b68e7e880721772a6bf22ad809e3bc87db8bbee9f0ec7127bb21ccad bash
 	// apk add jq
-	// composer require laravel/installer
-	// composer require pear/log --dev
-	// composer show -i --no-dev -f json | jq --sort-keys -rc '.installed[] | "{ID: \"\(.name)@\(.version)\", Name: \"\(.name)\", Version: \"\(.version)\", License: \"\", Locations: []types.Location{{StartLine: , EndLine: }}},"'
+	// composer require guzzlehttp/guzzle:6.5.8
+	// composer require pear/log:1.13.3 --dev
+	// composer show -i --no-dev -f json | jq --sort-keys -rc '.installed[] | "{ID: \"\(.name)@\(.version)\", Name: \"\(.name)\", Version: \"\(.version)\", License: \"MIT\", Locations: []types.Location{{StartLine: , EndLine: }}},"'
 	// locations are filled manually
 	composerLibs = []types.Library{
-		{ID: "laravel/installer@v4.4.3", Name: "laravel/installer", Version: "v4.4.3", License: "MIT", Locations: []types.Location{{StartLine: 9, EndLine: 65}}},
-		{ID: "psr/container@2.0.2", Name: "psr/container", Version: "2.0.2", License: "MIT", Locations: []types.Location{{StartLine: 66, EndLine: 118}}},
-		{ID: "symfony/console@v6.2.7", Name: "symfony/console", Version: "v6.2.7", License: "MIT", Locations: []types.Location{{StartLine: 119, EndLine: 214}}},
-		{ID: "symfony/deprecation-contracts@v3.2.1", Name: "symfony/deprecation-contracts", Version: "v3.2.1", License: "MIT", Locations: []types.Location{{StartLine: 215, EndLine: 281}}},
-		{ID: "symfony/polyfill-ctype@v1.27.0", Name: "symfony/polyfill-ctype", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 282, EndLine: 363}}},
-		{ID: "symfony/polyfill-intl-grapheme@v1.27.0", Name: "symfony/polyfill-intl-grapheme", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 364, EndLine: 444}}},
-		{ID: "symfony/polyfill-intl-normalizer@v1.27.0", Name: "symfony/polyfill-intl-normalizer", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 445, EndLine: 528}}},
-		{ID: "symfony/polyfill-mbstring@v1.27.0", Name: "symfony/polyfill-mbstring", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 529, EndLine: 611}}},
-		{ID: "symfony/process@v6.2.7", Name: "symfony/process", Version: "v6.2.7", License: "MIT", Locations: []types.Location{{StartLine: 612, EndLine: 672}}},
-		{ID: "symfony/service-contracts@v3.2.1", Name: "symfony/service-contracts", Version: "v3.2.1", License: "MIT", Locations: []types.Location{{StartLine: 673, EndLine: 757}}},
-		{ID: "symfony/string@v6.2.7", Name: "symfony/string", Version: "v6.2.7", License: "MIT", Locations: []types.Location{{StartLine: 758, EndLine: 843}}},
+		{ID: "guzzlehttp/guzzle@6.5.8", Name: "guzzlehttp/guzzle", Version: "6.5.8", License: "MIT", Locations: []types.Location{{StartLine: 9, EndLine: 123}}},
+		{ID: "guzzlehttp/promises@1.5.2", Name: "guzzlehttp/promises", Version: "1.5.2", License: "MIT", Locations: []types.Location{{StartLine: 124, EndLine: 207}}},
+		{ID: "guzzlehttp/psr7@1.9.0", Name: "guzzlehttp/psr7", Version: "1.9.0", License: "MIT", Locations: []types.Location{{StartLine: 208, EndLine: 317}}},
+		{ID: "psr/http-message@1.0.1", Name: "psr/http-message", Version: "1.0.1", License: "MIT", Locations: []types.Location{{StartLine: 318, EndLine: 370}}},
+		{ID: "ralouphie/getallheaders@3.0.3", Name: "ralouphie/getallheaders", Version: "3.0.3", License: "MIT", Locations: []types.Location{{StartLine: 371, EndLine: 414}}},
+		{ID: "symfony/polyfill-intl-idn@v1.27.0", Name: "symfony/polyfill-intl-idn", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 415, EndLine: 501}}},
+		{ID: "symfony/polyfill-intl-normalizer@v1.27.0", Name: "symfony/polyfill-intl-normalizer", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 502, EndLine: 585}}},
+		{ID: "symfony/polyfill-php72@v1.27.0", Name: "symfony/polyfill-php72", Version: "v1.27.0", License: "MIT", Locations: []types.Location{{StartLine: 586, EndLine: 661}}},
 	}
 	// dependencies are filled manually
 	composerDeps = []types.Dependency{
-		{ID: "laravel/installer@v4.4.3", DependsOn: []string{"symfony/console@v6.2.7", "symfony/process@v6.2.7"}},
-		{ID: "symfony/console@v6.2.7", DependsOn: []string{"symfony/deprecation-contracts@v3.2.1", "symfony/polyfill-mbstring@v1.27.0", "symfony/service-contracts@v3.2.1", "symfony/string@v6.2.7"}},
-		{ID: "symfony/service-contracts@v3.2.1", DependsOn: []string{"psr/container@2.0.2"}},
-		{ID: "symfony/string@v6.2.7", DependsOn: []string{"symfony/polyfill-ctype@v1.27.0", "symfony/polyfill-intl-grapheme@v1.27.0", "symfony/polyfill-intl-normalizer@v1.27.0", "symfony/polyfill-mbstring@v1.27.0"}},
+		{ID: "guzzlehttp/guzzle@6.5.8", DependsOn: []string{"guzzlehttp/promises@1.5.2", "guzzlehttp/psr7@1.9.0", "symfony/polyfill-intl-idn@v1.27.0"}},
+		{ID: "guzzlehttp/psr7@1.9.0", DependsOn: []string{"psr/http-message@1.0.1", "ralouphie/getallheaders@3.0.3"}},
+		{ID: "symfony/polyfill-intl-idn@v1.27.0", DependsOn: []string{"symfony/polyfill-intl-normalizer@v1.27.0", "symfony/polyfill-php72@v1.27.0"}},
 	}
 )
 

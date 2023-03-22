@@ -42,7 +42,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	libs := map[string]types.Library{}
-	var deps []types.Dependency
+	var foundDeps []types.Dependency
 	for _, pkg := range lockFile.Packages {
 		lib := types.Library{
 			ID:        utils.PackageID(pkg.Name, pkg.Version),
@@ -65,18 +65,26 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 				ID:        lib.ID,
 				DependsOn: dependsOn,
 			}
-			deps = append(deps, dep)
+			foundDeps = append(foundDeps, dep)
 		}
 	}
 
 	// fill deps versions
-	for i, dep := range deps {
-		for j, depName := range dep.DependsOn {
+	var deps []types.Dependency
+	for _, dep := range foundDeps {
+		var dependsOn []string
+		for _, depName := range dep.DependsOn {
 			if lib, ok := libs[depName]; ok {
-				deps[i].DependsOn[j] = lib.ID
+				dependsOn = append(dependsOn, lib.ID)
 				continue
 			}
 			log.Logger.Debugf("unable to find version of %s", depName)
+		}
+		if len(dependsOn) > 0 {
+			deps = append(deps, types.Dependency{
+				ID:        dep.ID,
+				DependsOn: dependsOn,
+			})
 		}
 	}
 
