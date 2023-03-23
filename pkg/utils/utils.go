@@ -2,8 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"golang.org/x/exp/maps"
 )
 
 func UniqueStrings(ss []string) []string {
@@ -20,16 +22,24 @@ func UniqueStrings(ss []string) []string {
 }
 
 func UniqueLibraries(libs []types.Library) []types.Library {
-	var uniqLibs []types.Library
-	unique := map[string]struct{}{}
+	if len(libs) == 0 {
+		return nil
+	}
+	unique := map[string]types.Library{}
 	for _, lib := range libs {
 		identifier := fmt.Sprintf("%s@%s", lib.Name, lib.Version)
-		if _, ok := unique[identifier]; !ok {
-			unique[identifier] = struct{}{}
-			uniqLibs = append(uniqLibs, lib)
+		if l, ok := unique[identifier]; !ok {
+			unique[identifier] = lib
+		} else if len(lib.Locations) > 0 {
+			// merge locations
+			l.Locations = append(l.Locations, lib.Locations...)
+			sort.Slice(l.Locations, func(i, j int) bool {
+				return l.Locations[i].StartLine < l.Locations[j].StartLine
+			})
+			unique[identifier] = l
 		}
 	}
-	return uniqLibs
+	return maps.Values(unique)
 }
 
 func MergeMaps(parent, child map[string]string) map[string]string {
