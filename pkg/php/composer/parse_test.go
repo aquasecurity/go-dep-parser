@@ -5,8 +5,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
-	"sort"
-	"strings"
 	"testing"
 )
 
@@ -55,26 +53,11 @@ func TestParse(t *testing.T) {
 			f, err := os.Open(tt.file)
 			require.NoError(t, err)
 
-			got, deps, err := NewParser().Parse(f)
+			gotLibs, gotDeps, err := NewParser().Parse(f)
 			require.NoError(t, err)
 
-			sortLibs(got)
-			sortDeps(deps)
-
-			assert.Equal(t, tt.wantLibs, got)
-			assert.Equal(t, tt.wantDeps, deps)
+			assert.Equal(t, tt.wantLibs, gotLibs)
+			assert.Equal(t, tt.wantDeps, gotDeps)
 		})
 	}
-}
-
-func sortDeps(deps []types.Dependency) {
-	sort.Slice(deps, func(i, j int) bool {
-		return strings.Compare(deps[i].ID, deps[j].ID) < 0
-	})
-}
-
-func sortLibs(libs []types.Library) {
-	sort.Slice(libs, func(i, j int) bool {
-		return strings.Compare(libs[i].ID, libs[j].ID) < 0
-	})
 }

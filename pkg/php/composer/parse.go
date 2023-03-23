@@ -6,7 +6,6 @@ import (
 	"github.com/liamg/jfather"
 	"golang.org/x/exp/maps"
 	"io"
-	"sort"
 	"strings"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
@@ -59,9 +58,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		for depName := range pkg.Require {
 			// Require field includes required php version, skip this
 			// Also skip PHP extensions
-			if depName != "php" || strings.HasPrefix(depName, "ext") {
-				dependsOn = append(dependsOn, depName) // field uses range of versions, so later we will fill in the versions from the libraries
+			if depName == "php" || strings.HasPrefix(depName, "ext") {
+				continue
 			}
+			dependsOn = append(dependsOn, depName) // field uses range of versions, so later we will fill in the versions from the libraries
 		}
 		if len(dependsOn) > 0 {
 			foundDeps[lib.ID] = dependsOn
@@ -79,14 +79,14 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			}
 			log.Logger.Debugf("unable to find version of %s", depName)
 		}
-		dependsOn = sortDependsOn(dependsOn)
+		dependsOn = utils.SortDependsOn(dependsOn)
 		deps = append(deps, types.Dependency{
 			ID:        libID,
 			DependsOn: dependsOn,
 		})
 	}
 
-	return maps.Values(libs), deps, nil
+	return utils.SortLibs(maps.Values(libs)), utils.SortDeps(deps), nil
 }
 
 // UnmarshalJSONWithMetadata needed to detect start and end lines of deps
@@ -98,11 +98,4 @@ func (t *packageInfo) UnmarshalJSONWithMetadata(node jfather.Node) error {
 	t.StartLine = node.Range().Start.Line
 	t.EndLine = node.Range().End.Line
 	return nil
-}
-
-func sortDependsOn(dependsOn []string) []string {
-	sort.Slice(dependsOn, func(i, j int) bool {
-		return dependsOn[i] < dependsOn[j]
-	})
-	return dependsOn
 }

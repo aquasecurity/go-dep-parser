@@ -55,3 +55,24 @@ func MergeMaps(parent, child map[string]string) map[string]string {
 func PackageID(name, version string) string {
 	return fmt.Sprintf("%s@%s", name, version)
 }
+
+func SortLibs(libs []types.Library) []types.Library {
+	sort.Slice(libs, func(i, j int) bool {
+		return libs[i].ID < libs[j].ID
+	})
+	return libs
+}
+
+func SortDeps(deps []types.Dependency) []types.Dependency {
+	sort.Slice(deps, func(i, j int) bool {
+		return deps[i].ID < deps[j].ID
+	})
+	return deps
+}
+
+func SortDependsOn(dependsOn []string) []string {
+	sort.Slice(dependsOn, func(i, j int) bool {
+		return dependsOn[i] < dependsOn[j]
+	})
+	return dependsOn
+}
