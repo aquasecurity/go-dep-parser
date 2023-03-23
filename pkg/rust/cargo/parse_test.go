@@ -18,8 +18,12 @@ var (
 	cargoNormalLibs = []types.Library{
 		{ID: "normal@0.1.0", Name: "normal", Version: "0.1.0", Locations: []types.Location{{StartLine: 8, EndLine: 13}}},
 		{ID: "libc@0.2.54", Name: "libc", Version: "0.2.54", Locations: []types.Location{{StartLine: 3, EndLine: 6}}},
-		{ID: "typemap@0.3.3", Name: "typemap", Version: "0.3.3", Locations: []types.Location{{StartLine: 15, EndLine: 21}}},
-		{ID: "url@1.7.2", Name: "url", Version: "1.7.2", Locations: []types.Location{{StartLine: 23, EndLine: 31}}},
+		{ID: "typemap@0.3.3", Name: "typemap", Version: "0.3.3", Locations: []types.Location{{StartLine: 20, EndLine: 26}}},
+		{ID: "url@1.7.2", Name: "url", Version: "1.7.2", Locations: []types.Location{{StartLine: 43, EndLine: 51}}},
+		{ID: "unsafe-any@0.4.2", Name: "unsafe-any", Version: "0.4.2", Locations: []types.Location{{StartLine: 15, EndLine: 18}}},
+		{ID: "matches@0.1.8", Name: "matches", Version: "0.1.8", Locations: []types.Location{{StartLine: 33, EndLine: 36}}},
+		{ID: "idna@0.1.5", Name: "idna", Version: "0.1.5", Locations: []types.Location{{StartLine: 28, EndLine: 31}}},
+		{ID: "percent-encoding@1.0.1", Name: "percent-encoding", Version: "1.0.1", Locations: []types.Location{{StartLine: 38, EndLine: 41}}},
 	}
 	cargoNormalDeps = []types.Dependency{
 		{
@@ -35,10 +39,14 @@ var (
 		},
 	}
 	cargoMixedLibs = []types.Library{
-		{ID: "normal@0.1.0", Name: "normal", Version: "0.1.0", Locations: []types.Location{{StartLine: 10, EndLine: 15}}},
+		{ID: "normal@0.1.0", Name: "normal", Version: "0.1.0", Locations: []types.Location{{StartLine: 17, EndLine: 22}}},
 		{ID: "libc@0.2.54", Name: "libc", Version: "0.2.54", Locations: []types.Location{{StartLine: 3, EndLine: 6}}},
-		{ID: "typemap@0.3.3", Name: "typemap", Version: "0.3.3", Locations: []types.Location{{StartLine: 32, EndLine: 38}}},
-		{ID: "url@1.7.2", Name: "url", Version: "1.7.2", Locations: []types.Location{{StartLine: 19, EndLine: 27}}},
+		{ID: "typemap@0.3.3", Name: "typemap", Version: "0.3.3", Locations: []types.Location{{StartLine: 55, EndLine: 61}}},
+		{ID: "url@1.7.2", Name: "url", Version: "1.7.2", Locations: []types.Location{{StartLine: 26, EndLine: 34}}},
+		{ID: "unsafe-any@0.4.2", Name: "unsafe-any", Version: "0.4.2", Locations: []types.Location{{StartLine: 9, EndLine: 12}}},
+		{ID: "matches@0.1.8", Name: "matches", Version: "0.1.8", Locations: []types.Location{{StartLine: 41, EndLine: 44}}},
+		{ID: "idna@0.1.5", Name: "idna", Version: "0.1.5", Locations: []types.Location{{StartLine: 36, EndLine: 39}}},
+		{ID: "percent-encoding@1.0.1", Name: "percent-encoding", Version: "1.0.1", Locations: []types.Location{{StartLine: 46, EndLine: 49}}},
 	}
 )
 
