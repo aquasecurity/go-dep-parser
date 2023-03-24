@@ -7,7 +7,7 @@ import (
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
-	rustaudit "github.com/microsoft/go-rustaudit"
+	rustaudit "github.com/Microsoft/go-rustaudit"
 )
 
 var (
