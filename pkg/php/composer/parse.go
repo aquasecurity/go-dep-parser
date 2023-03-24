@@ -1,16 +1,18 @@
 package composer
 
 import (
-	"github.com/aquasecurity/go-dep-parser/pkg/log"
-	"github.com/aquasecurity/go-dep-parser/pkg/utils"
-	"github.com/liamg/jfather"
-	"golang.org/x/exp/maps"
 	"io"
+	"sort"
 	"strings"
 
-	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/liamg/jfather"
+	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
+
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
 
 type lockFile struct {
@@ -45,12 +47,17 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	foundDeps := map[string][]string{}
 	for _, pkg := range lockFile.Packages {
 		lib := types.Library{
-			ID:        utils.PackageID(pkg.Name, pkg.Version),
-			Name:      pkg.Name,
-			Version:   pkg.Version,
-			Indirect:  false, // composer.lock file doesn't have info about Direct/Indirect deps. Will think that all dependencies are Direct
-			License:   strings.Join(pkg.License, ", "),
-			Locations: []types.Location{{StartLine: pkg.StartLine, EndLine: pkg.EndLine}},
+			ID:       utils.PackageID(pkg.Name, pkg.Version),
+			Name:     pkg.Name,
+			Version:  pkg.Version,
+			Indirect: false, // composer.lock file doesn't have info about Direct/Indirect deps. Will think that all dependencies are Direct
+			License:  strings.Join(pkg.License, ", "),
+			Locations: []types.Location{
+				{
+					StartLine: pkg.StartLine,
+					EndLine:   pkg.EndLine,
+				},
+			},
 		}
 		libs[lib.Name] = lib
 
@@ -79,14 +86,18 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			}
 			log.Logger.Debugf("unable to find version of %s", depName)
 		}
-		dependsOn = utils.SortDependsOn(dependsOn)
+		sort.Strings(dependsOn)
 		deps = append(deps, types.Dependency{
 			ID:        libID,
 			DependsOn: dependsOn,
 		})
 	}
 
-	return utils.SortLibs(maps.Values(libs)), utils.SortDeps(deps), nil
+	libSlice := maps.Values(libs)
+	sort.Sort(types.Libraries(libSlice))
+	sort.Sort(types.Dependencies(deps))
+
+	return libSlice, deps, nil
 }
 
 // UnmarshalJSONWithMetadata needed to detect start and end lines of deps
