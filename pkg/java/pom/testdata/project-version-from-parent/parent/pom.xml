@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>com.example</groupId>
-        <artifactId>parent</artifactId>
+        <artifactId>top-parent</artifactId>
         <version>3.0.0</version>
         <relativePath>../top-parent</relativePath>
     </parent>
