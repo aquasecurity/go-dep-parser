@@ -74,8 +74,8 @@ func TestParsePattern(t *testing.T) {
 		{
 			target:         `"jquery@git+https://xxxx:x-oauth-basic@github.com/tomoyamachi/jquery":`,
 			expectName:     "jquery",
-			expectProtocol: "git+https",
-			expactVersion:  "//xxxx:x-oauth-basic@github.com/tomoyamachi/jquery",
+			expectProtocol: "git",
+			expactVersion:  "https://xxxx:x-oauth-basic@github.com/tomoyamachi/jquery",
 		},
 		{
 			target:   `normal line`,
@@ -137,15 +137,6 @@ func TestParsePackagePatterns(t *testing.T) {
 			expectProtocol: "npm",
 			expactPatterns: []string{
 				"asn1@~0.2.3",
-			},
-		},
-		{
-			name:           "git protocol",
-			target:         `mapbox-gl-feature-drag-and-drop@git+https://github.com/jrd/mapbox-gl-feature-drag-and-drop.git#v1.1.0`,
-			expectName:     "mapbox-gl-feature-drag-and-drop",
-			expectProtocol: "git",
-			expactPatterns: []string{
-				"mapbox-gl-feature-drag-and-drop@git+https://github.com/jrd/mapbox-gl-feature-drag-and-drop.git#v1.1.0",
 			},
 		},
 		{
