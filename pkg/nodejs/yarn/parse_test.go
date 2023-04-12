@@ -140,6 +140,15 @@ func TestParsePackagePatterns(t *testing.T) {
 			},
 		},
 		{
+			name:           "git protocol",
+			target:         `mapbox-gl-feature-drag-and-drop@git+https://github.com/jrd/mapbox-gl-feature-drag-and-drop.git#v1.1.0`,
+			expectName:     "mapbox-gl-feature-drag-and-drop",
+			expectProtocol: "git",
+			expactPatterns: []string{
+				"mapbox-gl-feature-drag-and-drop@git+https://github.com/jrd/mapbox-gl-feature-drag-and-drop.git#v1.1.0",
+			},
+		},
+		{
 			name:       "multiple patterns",
 			target:     `loose-envify@^1.1.0, loose-envify@^1.4.0:`,
 			expectName: "loose-envify",
@@ -316,6 +325,10 @@ func TestParse(t *testing.T) {
 			file:     "testdata/yarn_with_local.lock",
 			want:     yarnNormal,
 			wantDeps: yarnNormalDeps,
+		},
+		{
+			name: "yarn with git dependency",
+			file: "testdata/yarn_with_git.lock",
 		},
 		{
 			name:     "bad yarn file",
