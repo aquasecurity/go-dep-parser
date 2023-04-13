@@ -74,8 +74,8 @@ func TestParsePattern(t *testing.T) {
 		{
 			target:         `"jquery@git+https://xxxx:x-oauth-basic@github.com/tomoyamachi/jquery":`,
 			expectName:     "jquery",
-			expectProtocol: "git",
-			expactVersion:  "https://xxxx:x-oauth-basic@github.com/tomoyamachi/jquery",
+			expectProtocol: "git+https",
+			expactVersion:  "//xxxx:x-oauth-basic@github.com/tomoyamachi/jquery",
 		},
 		{
 			target:   `normal line`,

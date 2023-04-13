@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	yarnPatternRegexp    = regexp.MustCompile(`^\s?\\?"?(?P<package>\S+?)@(?:(?P<protocol>\S+?)[:+])?(?P<version>.+?)\\?"?:?$`)
+	yarnPatternRegexp    = regexp.MustCompile(`^\s?\\?"?(?P<package>\S+?)@(?:(?P<protocol>\S+?):)?(?P<version>.+?)\\?"?:?$`)
 	yarnVersionRegexp    = regexp.MustCompile(`^"?version:?"?\s+"?(?P<version>[^"]+)"?`)
 	yarnDependencyRegexp = regexp.MustCompile(`\s{4,}"?(?P<package>.+?)"?:?\s"?(?P<version>[^"]+)"?`)
 )
@@ -116,7 +116,7 @@ func validProtocol(protocol string) bool {
 
 func ignoreProtocol(protocol string) bool {
 	switch protocol {
-	case "workspace", "patch", "file", "link", "portal", "github", "git":
+	case "workspace", "patch", "file", "link", "portal", "github", "git", "git+ssh", "git+http", "git+https", "git+file":
 		return true
 	}
 	return false
