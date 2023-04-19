@@ -37,6 +37,12 @@ func TestParse(t *testing.T) {
 			want:     npmV2Libs,
 			wantDeps: npmDeps,
 		},
+		{
+			name:     "lock version v3 with workspace",
+			file:     "testdata/package-lock_v3_with_workspace.json",
+			want:     npmV3WithWorkspaceLibs,
+			wantDeps: npmV3WithWorkspaceDeps,
+		},
 	}
 
 	for _, tt := range tests {

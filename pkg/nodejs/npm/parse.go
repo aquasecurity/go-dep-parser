@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/samber/lo"
 	"io"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -41,8 +42,9 @@ type Package struct {
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
 	Resolved             string            `json:"resolved"`
 	Dev                  bool              `json:"dev"`
-	StartLine            int
-	EndLine              int
+	Link                 bool              `json:"link"`
+	Workspaces           []string          `json:"workspaces"`
+	Locations            []types.Location
 }
 
 type Parser struct{}
@@ -77,6 +79,7 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 	var deps []types.Dependency
 
 	directDeps := map[string]struct{}{}
+	workspaces := packages[""].Workspaces
 	for name, version := range lo.Assign(packages[""].Dependencies, packages[""].OptionalDependencies) {
 		pkgPath := joinPaths(nodeModulesFolder, name)
 		if _, ok := packages[pkgPath]; !ok {
@@ -88,18 +91,50 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 		directDeps[pkgPath] = struct{}{}
 	}
 
+	// links have no version, but have the correct package name
+	// combine link and target for next time use
+	for pkgPath, pkg := range packages {
+		if pkg.Link {
+			// add name and resolved fields to target package
+			// to fill dependsOn and libs
+			targetPkg := packages[pkg.Resolved]
+			if targetPkg.Name == "" {
+				targetPkg.Name = pkgNameFromPath(pkgPath)
+			}
+			targetPkg.Resolved = pkg.Resolved
+			targetPkg.Locations = append(targetPkg.Locations, pkg.Locations...)
+			packages[pkg.Resolved] = targetPkg
+
+			// add version to link
+			// to fill dependsOn when there are nested links
+			pkg.Name = targetPkg.Name
+			pkg.Version = targetPkg.Version
+			packages[pkgPath] = pkg
+		}
+	}
+
 	for pkgPath, pkg := range packages {
 		if pkg.Dev || pkgPath == "" {
 			continue
 		}
 
-		pkgName := pkgNameFromPath(pkgPath)
+		// we will take package from target
+		if pkg.Link {
+			continue
+		}
+
+		// pkg.Name exists when package name != folder name
+		// also we wrote package name from links
+		pkgName := pkg.Name
+		if pkgName == "" {
+			pkgName = pkgNameFromPath(pkgPath)
+		}
 		pkgID := utils.PackageID(pkgName, pkg.Version)
 
 		// There are cases when similar libraries use same dependencies
 		// we need to add location for each these dependencies
 		if savedLib, ok := libs[pkgID]; ok {
-			savedLib.Locations = append(savedLib.Locations, types.Location{StartLine: pkg.StartLine, EndLine: pkg.EndLine})
+			savedLib.Locations = append(savedLib.Locations, pkg.Locations...)
 			libs[pkgID] = savedLib
 			continue
 		}
@@ -108,14 +143,9 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 			ID:                 pkgID,
 			Name:               pkgName,
 			Version:            pkg.Version,
-			Indirect:           isIndirectLib(pkgPath, directDeps),
+			Indirect:           isIndirectLib(pkgPath, directDeps, workspaces),
 			ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: pkg.Resolved}},
-			Locations: []types.Location{
-				{
-					StartLine: pkg.StartLine,
-					EndLine:   pkg.EndLine,
-				},
-			},
+			Locations:          pkg.Locations,
 		}
 		libs[pkgID] = lib
 
@@ -162,6 +192,20 @@ func findDependsOn(pkgPath, depName string, packages map[string]Package) (string
 		path = joinPaths(path, depName)
 
 		if dep, ok := packages[path]; ok {
+			return utils.PackageID(depName, dep.Version), nil
+		}
+	}
+
+	// for dependencies from workspaces(local folders) there are 2 cases:
+	// 1 - when there are more than one version of dependency
+	// => depPath == <path_to_workspace>/node_modules/<dep_name>
+	// we checked this case in previous loop
+	// 2 - when there is one version of dependency from workspace
+	// => depPath == node_modules/<dep_name>
+	// check this here:
+	if !strings.HasPrefix(pkgPath, nodeModulesFolder) {
+		depPath = joinPaths(nodeModulesFolder, depName)
+		if dep, ok := packages[depPath]; ok {
 			return utils.PackageID(depName, dep.Version), nil
 		}
 	}
@@ -247,12 +291,24 @@ func uniqueDeps(deps []types.Dependency) []types.Dependency {
 	return uniqDeps
 }
 
-func isIndirectLib(pkgPath string, directDeps map[string]struct{}) bool {
+func isIndirectLib(pkgPath string, directDeps map[string]struct{}, workspaces []string) bool {
 	// A project can contain 2 different versions of the same dependency.
 	// e.g. `node_modules/string-width/node_modules/strip-ansi` and `node_modules/string-ansi`
 	// direct dependencies always have root path (`node_modules/<lib_name>`)
-	_, ok := directDeps[pkgPath]
-	return !ok
+	if _, ok := directDeps[pkgPath]; ok {
+		return false
+	}
+	for _, workspace := range workspaces {
+		match, err := filepath.Match(workspace, pkgPath)
+		if err != nil {
+			log.Logger.Debugf("unable to parse workspace %q for %s", workspace, pkgPath)
+			return true
+		}
+		if match {
+			return false
+		}
+	}
+	return true
 }
 
 func pkgNameFromPath(path string) string {
@@ -289,7 +345,6 @@ func (t *Package) UnmarshalJSONWithMetadata(node jfather.Node) error {
 		return err
 	}
 	// Decode func will overwrite line numbers if we save them first
-	t.StartLine = node.Range().Start.Line
-	t.EndLine = node.Range().End.Line
+	t.Locations = append(t.Locations, types.Location{StartLine: node.Range().Start.Line, EndLine: node.Range().End.Line})
 	return nil
 }
