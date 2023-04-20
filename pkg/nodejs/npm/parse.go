@@ -76,7 +76,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.Dependency) {
 	libs := make(map[string]types.Library, len(packages)-1)
-	var deps []types.Dependency
+	deps := map[string]types.Dependency{}
+	var targetsOfLinks []string
 
 	directDeps := map[string]struct{}{}
 	workspaces := packages[""].Workspaces
@@ -91,44 +92,44 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 		directDeps[pkgPath] = struct{}{}
 	}
 
-	// links have no version, but have the correct package name
-	// combine link and target for next time use
-	for pkgPath, pkg := range packages {
-		if pkg.Link {
-			// add name and resolved fields to target package
-			// to fill dependsOn and libs
-			targetPkg := packages[pkg.Resolved]
-			if targetPkg.Name == "" {
-				targetPkg.Name = pkgNameFromPath(pkgPath)
-			}
-			targetPkg.Resolved = pkg.Resolved
-			targetPkg.Locations = append(targetPkg.Locations, pkg.Locations...)
-			packages[pkg.Resolved] = targetPkg
-
-			// add version to link
-			// to fill dependsOn when there are nested links
-			pkg.Name = targetPkg.Name
-			pkg.Version = targetPkg.Version
-			packages[pkgPath] = pkg
-		}
-	}
-
 	for pkgPath, pkg := range packages {
 		if pkg.Dev || pkgPath == "" {
 			continue
 		}
 
-		// we will take package from target
-		if pkg.Link {
-			continue
-		}
-
 		// pkg.Name exists when package name != folder name
-		// also we wrote package name from links
 		pkgName := pkg.Name
 		if pkgName == "" {
 			pkgName = pkgNameFromPath(pkgPath)
 		}
+
+		// for local package npm uses links. e.g.:
+		// function/func1 -> target of package
+		// node_modules/func1 -> lint to target
+		// see `package-lock_v3_with_workspace.json` to better understanding
+		if pkg.Link {
+			// links have only links to targets
+			// https://docs.npmjs.com/cli/v9/configuring-npm/package-lock-json#packages
+			// we will add some information to target and use it
+			targetPkg, ok := packages[pkg.Resolved]
+			if !ok {
+				log.Logger.Debugf("unable to find target of link %s", pkgPath)
+				continue
+			}
+			// target doesn't use `Resolved` field. Use it from link
+			targetPkg.Resolved = pkg.Resolved
+			// add location of link
+			targetPkg.Locations = append(targetPkg.Locations, pkg.Locations...)
+			// We use pkgPath to detect Indirect deps and find DependsOn
+			// use pkgPath of target
+			pkgPath = pkg.Resolved
+
+			// use target instead of link
+			pkg = targetPkg
+			// save targets to remove duplicates after loop
+			targetsOfLinks = append(targetsOfLinks, utils.PackageID(pkg.Resolved, pkg.Version))
+		}
+
 		pkgID := utils.PackageID(pkgName, pkg.Version)
 
 		// There are cases when similar libraries use same dependencies
@@ -169,11 +170,18 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 				ID:        lib.ID,
 				DependsOn: dependsOn,
 			}
-			deps = append(deps, dep)
+			deps[lib.ID] = dep
 		}
 
 	}
-	return maps.Values(libs), deps
+
+	// we got duplicates - link and target
+	// remove targets, because they have incorrect name
+	for _, target := range targetsOfLinks {
+		delete(libs, target)
+		delete(deps, target)
+	}
+	return maps.Values(libs), maps.Values(deps)
 }
 
 func findDependsOn(pkgPath, depName string, packages map[string]Package) (string, error) {
@@ -196,19 +204,25 @@ func findDependsOn(pkgPath, depName string, packages map[string]Package) (string
 		}
 	}
 
-	// for dependencies from workspaces(local folders) there are 2 cases:
-	// 1 - when there are more than one version of dependency
-	// => depPath == <path_to_workspace>/node_modules/<dep_name>
-	// we checked this case in previous loop
-	// 2 - when there is one version of dependency from workspace
-	// => depPath == node_modules/<dep_name>
-	// check this here:
-	if !strings.HasPrefix(pkgPath, nodeModulesFolder) {
-		depPath = joinPaths(nodeModulesFolder, depName)
-		if dep, ok := packages[depPath]; ok {
-			return utils.PackageID(depName, dep.Version), nil
+	// There are cases when pkgPath doesn't have `node_modules` suffix (e.g. when it is local package)
+	// add `node_modules` and try to find dep
+	// e.g. for pkgPath == `function/func1`, depName == "debug`:
+	// `node_modules/debug`
+	// case when `function/func1/node_modules_debug` exists resolved in loop
+	depPath = joinPaths(nodeModulesFolder, depName)
+	if dep, ok := packages[depPath]; ok {
+		depVersion := dep.Version
+		// when dep is local package npm uses link
+		if dep.Link {
+			targetDep, ok := packages[dep.Resolved]
+			if !ok {
+				return "", xerrors.Errorf("can't find dependsOn for link %s", dep.Resolved)
+			}
+			depVersion = targetDep.Version
 		}
+		return utils.PackageID(depName, depVersion), nil
 	}
+
 	// It should not reach here.
 	return "", xerrors.Errorf("can't find dependsOn for %s", depName)
 }
@@ -312,16 +326,17 @@ func isIndirectLib(pkgPath string, directDeps map[string]struct{}, workspaces []
 }
 
 func pkgNameFromPath(path string) string {
-	// lock file contains path to dependency in `node_modules` folder. e.g.:
+	// lock file contains path to dependency in `node_modules` or workspace folder. e.g.:
 	// node_modules/string-width
 	// node_modules/string-width/node_modules/strip-ansi
-	paths := strings.Split(path, "/")
-	// deps starting from `@` have pgkName with one `/`
-	// e.g. path == `node_modules/@babel/plugin-transform-classes` => pkgName == `@babel/plugin-transform-classes`
-	if len(paths) >= 2 && strings.HasPrefix(paths[len(paths)-2], "@") {
-		return strings.Join(paths[len(paths)-2:], "/")
+	// functions/func1
+	// functions/nested_func/node_modules/debug
+	if index := strings.LastIndex(path, nodeModulesFolder); index != -1 {
+		return path[index+len(nodeModulesFolder)+1:]
 	}
-	return paths[len(paths)-1]
+	// for case when path doesn't have node_modules folder
+	// we will resolve this package with link later
+	return path
 }
 
 func joinPaths(paths ...string) string {
