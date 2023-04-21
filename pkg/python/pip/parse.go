@@ -2,6 +2,7 @@ package pip
 
 import (
 	"bufio"
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"strings"
 	"unicode"
 
@@ -62,6 +63,7 @@ func removeExtras(line string) string {
 	startIndex := strings.Index(line, startExtras)
 	endIndex := strings.Index(line, endExtras) + 1
 	if startIndex != -1 && endIndex != -1 {
+		log.Logger.Debugf("unable to get name and version for extras of %q. Run `pip3 freeze > requirements.txt` to update file and get this dependency", line)
 		line = line[:startIndex] + line[endIndex:]
 	}
 	return line
