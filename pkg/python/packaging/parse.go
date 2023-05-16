@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"net/textproto"
+	"strings"
 
 	"golang.org/x/xerrors"
 
@@ -26,11 +27,26 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 		return nil, nil, xerrors.Errorf("read MIME error: %w", err)
 	}
 
+	license := h.Get("License-Expression")
+	if license == "" {
+		license = h.Get("License")
+	}
+	if license == "" {
+		for _, classifier := range h.Values("Classifier") {
+			if strings.HasPrefix(classifier, "License ::") {
+				if values := strings.Split(classifier, " :: "); len(values) > 1 {
+					license = values[len(values)-1]
+				}
+			}
+		}
+	}
+
 	return []types.Library{
 		{
-			Name:    h.Get("Name"),
-			Version: h.Get("Version"),
-			License: h.Get("License"),
+			Name:        h.Get("Name"),
+			Version:     h.Get("Version"),
+			License:     license,
+			LicenseFile: h.Get(""),
 		},
 	}, nil, nil
 }

@@ -10,6 +10,7 @@ type Library struct {
 	Version            string
 	Indirect           bool          `json:",omitempty"`
 	License            string        `json:",omitempty"`
+	LicenseFile        string        `json:",omitempty"`
 	ExternalReferences []ExternalRef `json:",omitempty"`
 	Locations          []Location    `json:",omitempty"`
 	FilePath           string        `json:",omitempty"` // Required to show nested jars
