@@ -36,6 +36,7 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 			if strings.HasPrefix(classifier, "License ::") {
 				if values := strings.Split(classifier, " :: "); len(values) > 1 {
 					license = values[len(values)-1]
+					break
 				}
 			}
 		}
