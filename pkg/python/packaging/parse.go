@@ -46,7 +46,7 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 			Name:        h.Get("Name"),
 			Version:     h.Get("Version"),
 			License:     license,
-			LicenseFile: h.Get(""),
+			LicenseFile: h.Get("License-File"),
 		},
 	}, nil, nil
 }
