@@ -33,11 +33,10 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 	}
 	if license == "" {
 		for _, classifier := range h.Values("Classifier") {
-			if strings.HasPrefix(classifier, "License ::") {
-				if values := strings.Split(classifier, " :: "); len(values) > 1 {
-					license = values[len(values)-1]
-					break
-				}
+			if strings.HasPrefix(classifier, "License :: ") {
+				values := strings.Split(classifier, " :: ")
+				license = values[len(values)-1]
+				break
 			}
 		}
 	}
