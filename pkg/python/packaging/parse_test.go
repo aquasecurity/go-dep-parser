@@ -96,6 +96,18 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:  "with another file name and license in Classifier",
+			input: "testdata/networkx-3.0.METADATA",
+			want: []types.Library{
+				{
+					Name:        "networkx",
+					Version:     "3.0",
+					License:     "BSD License",
+					LicenseFile: "LICENSE.txt",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
