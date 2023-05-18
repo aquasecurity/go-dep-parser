@@ -27,11 +27,14 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 		return nil, nil, xerrors.Errorf("read MIME error: %w", err)
 	}
 
-	license := h.Get("License-Expression")
-	if license == "" {
-		license = h.Get("License")
-	}
-	if license == "" {
+	// "License-Expression" takes precedence as "License" is deprecated.
+	// cf. https://peps.python.org/pep-0639/#deprecate-license-field
+	var license string
+	if l := h.Get("License-Expression"); l != "" {
+		license = l
+	} else if l := h.Get("License"); l != "" {
+		license = l
+	} else {
 		for _, classifier := range h.Values("Classifier") {
 			if strings.HasPrefix(classifier, "License :: ") {
 				values := strings.Split(classifier, " :: ")
@@ -40,13 +43,15 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 			}
 		}
 	}
+	if license == "" && h.Get("License-File") != "" {
+		license = "file://" + h.Get("License-File")
+	}
 
 	return []types.Library{
 		{
-			Name:        h.Get("Name"),
-			Version:     h.Get("Version"),
-			License:     license,
-			LicenseFile: h.Get("License-File"),
+			Name:    h.Get("Name"),
+			Version: h.Get("Version"),
+			License: license,
 		},
 	}, nil, nil
 }

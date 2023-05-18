@@ -77,10 +77,9 @@ func TestParse(t *testing.T) {
 			input: "testdata/iniconfig-2.0.0.METADATA",
 			want: []types.Library{
 				{
-					Name:        "iniconfig",
-					Version:     "2.0.0",
-					License:     "MIT",
-					LicenseFile: "LICENSE",
+					Name:    "iniconfig",
+					Version: "2.0.0",
+					License: "MIT",
 				},
 			},
 		},
@@ -89,22 +88,20 @@ func TestParse(t *testing.T) {
 			input: "testdata/zipp-3.12.1.METADATA",
 			want: []types.Library{
 				{
-					Name:        "zipp",
-					Version:     "3.12.1",
-					License:     "MIT License",
-					LicenseFile: "LICENSE",
+					Name:    "zipp",
+					Version: "3.12.1",
+					License: "MIT License",
 				},
 			},
 		},
 		{
-			name:  "with another file name and license in Classifier",
+			name:  "without licenses, but with a license file (a license in Classifier was removed)",
 			input: "testdata/networkx-3.0.METADATA",
 			want: []types.Library{
 				{
-					Name:        "networkx",
-					Version:     "3.0",
-					License:     "BSD License",
-					LicenseFile: "LICENSE.txt",
+					Name:    "networkx",
+					Version: "3.0",
+					License: "file://LICENSE.txt",
 				},
 			},
 		},
