@@ -56,4 +56,8 @@ var (
 		{ID: "fa267f1f-6049-4f14-aa54-33bafae1ed76@1.0.0", DependsOn: []string{"ade2ca70-3891-5945-98fb-dc099432e06a@1.8.5"}},
 		{ID: "cf7118a7-6976-5b1a-9a39-7adc72f591a4@1.8.5", DependsOn: []string{"9a3f8284-a2c9-5f02-9a11-845980a1fd5c@1.8.5", "ea8e919c-243c-51af-8825-aaa63cd721ce@0.7.0"}},
 	}
+
+	juliaV1_9DepExtLibs = []types.Library{
+		{ID: "621f4979-c628-5d54-868e-fcf4e3e8185c@1.3.1", Name: "AbstractFFTs", Version: "1.3.1", Locations: []types.Location{{StartLine: 7, EndLine: 10}}},
+	}
 )
