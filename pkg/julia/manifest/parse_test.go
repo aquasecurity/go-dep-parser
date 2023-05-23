@@ -21,15 +21,27 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			name:     "Manifest v1.6",
-			file:     "testdata/Manifest_v1.6.toml",
+			file:     "testdata/primary/Manifest_v1.6.toml",
 			want:     juliaV1_6Libs,
 			wantDeps: juliaV1_6Deps,
 		},
 		{
 			name:     "Manifest v1.8",
-			file:     "testdata/Manifest_v1.8.toml",
+			file:     "testdata/primary/Manifest_v1.8.toml",
 			want:     juliaV1_8Libs,
 			wantDeps: juliaV1_8Deps,
+		},
+		{
+			name:     "no deps v1.6",
+			file:     "testdata/no_deps_v1.6/Manifest.toml",
+			want:     nil,
+			wantDeps: nil,
+		},
+		{
+			name:     "no deps v1.9",
+			file:     "testdata/no_deps_v1.9/Manifest.toml",
+			want:     nil,
+			wantDeps: nil,
 		},
 	}
 
