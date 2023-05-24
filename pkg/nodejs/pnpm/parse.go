@@ -70,7 +70,7 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 		}
 
 		dependencies := make([]string, 0)
-		name, version := getPackageNameAndVersion(pkg)
+		name, version := getPackageNameAndVersion(pkg, lockFile.LockfileVersion)
 		id := p.ID(name, version)
 
 		for depName, depVer := range info.Dependencies {
@@ -100,10 +100,73 @@ func isIndirectLib(name string, directDeps map[string]string) bool {
 	return !ok
 }
 
-func getPackageNameAndVersion(pkg string) (string, string) {
-	idx := strings.LastIndex(pkg, "/")
-	name := pkg[1:idx]
-	version := pkg[idx+1:]
+func getPackageNameAndVersion(pkg string, lockFileVersion int8) (string, string) {
+	if lockFileVersion < 6 {
+		return getPackageNameAndVersionV5(pkg)
+	}
+	return getPackageNameAndVersionV6(pkg)
+}
+
+// 2 package formats are possible:
+// relative path: `/<pkg_name>/<pkg_version>` e.g. /foo/1.0.0
+// registry: `<registry_url>/<pkg_name>/<pkg_version>` e.g. registry.node-modules.io/foo/1.0.0
+// https://github.com/pnpm/spec/blob/master/lockfile/5.2.md#packages
+//
+// `pkg_name` has 2 formats:
+// with slash - @<author>/<name>. e.g. `/@babel/generator/7.21.9`
+// without slash - <name>. e.g. `/lodash/4.17.10`
+//
+// `pkg_version` can contain peer deps. <pkg_name>/<pkg_version>_<peer_deps>
+// e.g. /@babel/helper-compilation-targets/7.21.5_@babel+core@7.21.8
+func getPackageNameAndVersionV5(pkg string) (string, string) {
+	s := strings.Split(pkg, "/")
+	// take name as last element before version
+	name := s[len(s)-2]
+	// if previous element start from `@` => this is name with slash
+	if strings.HasPrefix(s[len(s)-3], "@") {
+		name = strings.Join(s[len(s)-3:len(s)-1], "/")
+	}
+
+	version := s[len(s)-1]
+	// trim peer deps
+	if strings.Contains(version, "_") {
+		version = version[:strings.Index(version, "_")]
+	}
+	return name, version
+}
+
+//	2 package formats are possible:
+//
+// relative path: `/<pkg_name>@<pkg_version>` e.g. /foo@1.0.0
+// registry: `<registry_url>/<pkg_name>@<pkg_version>` e.g. registry.node-modules.io/foo@1.0.0
+// https://github.com/pnpm/pnpm/pull/5810
+// https://github.com/pnpm/spec/issues/4#issuecomment-1558891433
+//
+// `pkg_name` has 2 formats:
+// with slash - @<author>@<name>. e.g. `/@babel/generator@7.21.9`
+// without slash - <name>. e.g. `/lodash@4.17.10`
+//
+// `pkg_version` can contain peer deps. <pkg_name>@<pkg_version>(<peer_deps>)
+// e.g. /@babel/helper-compilation-targets@7.21.5(@babel+core@7.21.8)
+func getPackageNameAndVersionV6(pkg string) (string, string) {
+	// trim peer deps to avoid false splitting by `@`
+	if strings.Contains(pkg, "(") {
+		pkg = pkg[:strings.Index(pkg, "(")]
+	}
+	// remove first `/`
+	pkg = strings.TrimLeft(pkg, "/")
+
+	name := pkg[:strings.LastIndex(pkg, "@")]
+	version := pkg[strings.LastIndex(pkg, "@")+1:]
+
+	s := strings.Split(name, "/")
+	if len(s) >= 2 {
+		name = s[len(s)-1]
+		// if previous element start from `@` => this is name with slash
+		if strings.HasPrefix(s[len(s)-2], "@") {
+			name = strings.Join(s[len(s)-2:], "/")
+		}
+	}
 
 	return name, version
 }
