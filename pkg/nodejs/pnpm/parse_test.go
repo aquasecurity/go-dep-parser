@@ -103,6 +103,20 @@ func TestGetPackageNameAndVersion(t *testing.T) {
 			wantVersion: "4.17.10",
 		},
 		{
+			name:        "v5 - registry",
+			lockFileVer: 5.0,
+			pkg:         "registry.npmjs.org/test/lodash/4.17.10",
+			wantName:    "lodash",
+			wantVersion: "4.17.10",
+		},
+		{
+			name:        "v5 - long registry name",
+			lockFileVer: 5.0,
+			pkg:         "repo.fury.io/account/lodash/4.17.10",
+			wantName:    "lodash",
+			wantVersion: "4.17.10",
+		},
+		{
 			name:        "v5 - relative path with slash",
 			lockFileVer: 5.0,
 			pkg:         "/@babel/generator/7.21.9",
