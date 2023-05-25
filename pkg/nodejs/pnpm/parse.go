@@ -101,72 +101,42 @@ func isIndirectLib(name string, directDeps map[string]string) bool {
 }
 
 func getPackageNameAndVersion(pkg string, lockFileVersion int8) (string, string) {
+	versionSep := "@"
 	if lockFileVersion < 6 {
-		return getPackageNameAndVersionV5(pkg)
+		versionSep = "/"
 	}
-	return getPackageNameAndVersionV6(pkg)
+	return parsePackage(pkg, versionSep)
 }
-
-// 2 package formats are possible:
-// relative path: `/<pkg_name>/<pkg_version>` e.g. /foo/1.0.0
-// registry: `<registry_url>/<pkg_name>/<pkg_version>` e.g. registry.node-modules.io/foo/1.0.0
-// https://github.com/pnpm/spec/blob/ad27a225f81d9215becadfa540ef05fa4ad6dd60/lockfile/5.2.md#packages
-//
-// `pkg_name` has 2 formats:
-// with slash - @<author>/<name>. e.g. `/@babel/generator/7.21.9`
-// without slash - <name>. e.g. `/lodash/4.17.10`
-//
-// `pkg_version` can contain peer deps. <pkg_name>/<pkg_version>_<peer_deps>
-// e.g. /@babel/helper-compilation-targets/7.21.5_@babel+core@7.21.8
-func getPackageNameAndVersionV5(pkg string) (string, string) {
-	s := strings.Split(pkg, "/")
-	// take name as last element before version
-	name := s[len(s)-2]
-	// if previous element start from `@` => this is name with slash
-	if strings.HasPrefix(s[len(s)-3], "@") {
-		name = strings.Join(s[len(s)-3:len(s)-1], "/")
+func parsePackage(pkg, versionSep string) (string, string) {
+	// Skip registry
+	// e.g.
+	//    - "registry.npmjs.org/lodash/4.17.10" => "lodash/4.17.10"
+	//    - "registry.npmjs.org/@babel/generator/7.21.9" => "@babel/generator/7.21.9"
+	//    - "/lodash/4.17.10" => "lodash/4.17.10"
+	_, pkg, _ = strings.Cut(pkg, "/")
+	// Parse namespace(?)
+	// e.g.
+	//    - v5:  "@babel/generator/7.21.9" => {"babel", "generator/7.21.9"}
+	//    - v6+: "@babel/helper-annotate-as-pure@7.18.6" => "{"babel", "helper-annotate-as-pure@7.18.6"}
+	var namespace string
+	if strings.HasPrefix(pkg, "@") {
+		namespace, pkg, _ = strings.Cut(pkg, "/")
 	}
-
-	version := s[len(s)-1]
-	// trim peer deps
-	if strings.Contains(version, "_") {
-		version = version[:strings.Index(version, "_")]
+	// Parse package name
+	// e.g.
+	//    - v5:  "generator/7.21.9" => {"generator", "7.21.9"}
+	//    - v6+: "helper-annotate-as-pure@7.18.6" => {"helper-annotate-as-pure", "7.18.6"}
+	var name, version string
+	name, version, _ = strings.Cut(pkg, versionSep)
+	if namespace != "" {
+		name = fmt.Sprintf("%s/%s", namespace, name)
 	}
-	return name, version
-}
-
-//	2 package formats are possible:
-//
-// relative path: `/<pkg_name>@<pkg_version>` e.g. /foo@1.0.0
-// registry: `<registry_url>/<pkg_name>@<pkg_version>` e.g. registry.node-modules.io/foo@1.0.0
-// https://github.com/pnpm/pnpm/pull/5810
-// https://github.com/pnpm/spec/issues/4#issuecomment-1558891433
-//
-// `pkg_name` has 2 formats:
-// with slash - @<author>@<name>. e.g. `/@babel/generator@7.21.9`
-// without slash - <name>. e.g. `/lodash@4.17.10`
-//
-// `pkg_version` can contain peer deps. <pkg_name>@<pkg_version>(<peer_deps>)
-// e.g. /@babel/helper-compilation-targets@7.21.5(@babel+core@7.21.8)
-func getPackageNameAndVersionV6(pkg string) (string, string) {
-	// trim peer deps to avoid false splitting by `@`
-	if strings.Contains(pkg, "(") {
-		pkg = pkg[:strings.Index(pkg, "(")]
+	// Trim peer deps
+	// e.g.
+	//    - v5:  "7.21.5_@babel+core@7.21.8" => "7.21.5"
+	//    - v6+: "7.21.5(@babel/core@7.20.7)" => "7.21.5"
+	if idx := strings.IndexAny(version, "_("); idx != -1 {
+		version = version[:idx]
 	}
-	// remove first `/`
-	pkg = strings.TrimLeft(pkg, "/")
-
-	name := pkg[:strings.LastIndex(pkg, "@")]
-	version := pkg[strings.LastIndex(pkg, "@")+1:]
-
-	s := strings.Split(name, "/")
-	if len(s) >= 2 {
-		name = s[len(s)-1]
-		// if previous element start from `@` => this is name with slash
-		if strings.HasPrefix(s[len(s)-2], "@") {
-			name = strings.Join(s[len(s)-2:], "/")
-		}
-	}
-
 	return name, version
 }
