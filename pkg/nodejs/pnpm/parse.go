@@ -110,7 +110,7 @@ func getPackageNameAndVersion(pkg string, lockFileVersion int8) (string, string)
 // 2 package formats are possible:
 // relative path: `/<pkg_name>/<pkg_version>` e.g. /foo/1.0.0
 // registry: `<registry_url>/<pkg_name>/<pkg_version>` e.g. registry.node-modules.io/foo/1.0.0
-// https://github.com/pnpm/spec/blob/master/lockfile/5.2.md#packages
+// https://github.com/pnpm/spec/blob/ad27a225f81d9215becadfa540ef05fa4ad6dd60/lockfile/5.2.md#packages
 //
 // `pkg_name` has 2 formats:
 // with slash - @<author>/<name>. e.g. `/@babel/generator/7.21.9`
