@@ -138,4 +138,26 @@ var (
 		{ID: "uri-js@4.4.1", DependsOn: []string{"punycode@2.1.1"}},
 		{ID: "verror@1.10.0", DependsOn: []string{"assert-plus@1.0.0", "core-util-is@1.0.2", "extsprintf@1.3.0"}},
 	}
+
+	// docker run --name node --rm -it node@sha256:710a2c192ca426e03e4f3ec1869e5c29db855eb6969b74e6c50fd270ffccd3f1 sh
+	// npm install -g pnpm
+	// mkdir /temp && cd /temp
+	// npm install lodash@4.17.21
+	// cd ./node_modules/lodash/
+	// npm pack
+	// mkdir -p /app/foo/bar && cd /app
+	// cp /temp/node_modules/lodash/lodash-4.17.21.tgz /app/foo/bar/lodash-4.17.21.tgz
+	// npm install ./foo/bar/lodash-4.17.21.tgz
+	// pnpm update
+	// pnpm list --prod --depth 10 | grep -E -o "\S+\s+[0-9]+(\.[0-9]+)+$" | awk '{printf("{ID: \""$1"@"$2"\", Name: \""$1"\", Version: \""$2"\", Indirect: false},\n")}' | sort -u
+	pnpmLocal = []types.Library{
+		{ID: "lodash@4.17.21", Name: "lodash", Version: "4.17.21", Indirect: false},
+	}
+
+	// docker run --name node --rm -it node@sha256:710a2c192ca426e03e4f3ec1869e5c29db855eb6969b74e6c50fd270ffccd3f1 sh
+	// npm install -g pnpm@8.5.1
+	// pnpm add promise@8.1.0 jquery@3.6.0
+	// pnpm list --prod --depth 10 | grep -E -o "\S+\s+[0-9]+(\.[0-9]+)+$" | awk '{printf("{ID: \""$1"@"$2"\", Name: \""$1"\", Version: \""$2"\", Indirect: true},\n")}' | sort -u
+	pnpmV6     = pnpmNormal
+	pnpmV6Deps = pnpmNormalDeps
 )

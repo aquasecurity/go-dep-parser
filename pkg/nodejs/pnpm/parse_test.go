@@ -37,6 +37,17 @@ func TestParse(t *testing.T) {
 			want:     pnpmMany,
 			wantDeps: pnpmManyDeps,
 		},
+		{
+			name: "local archive",
+			file: "testdata/pnpm-lock_local_dep.yaml",
+			want: pnpmLocal,
+		},
+		{
+			name:     "v6e",
+			file:     "testdata/pnpm-lock_v6.yaml",
+			want:     pnpmV6,
+			wantDeps: pnpmV6Deps,
+		},
 	}
 
 	for _, tt := range tests {
@@ -83,8 +94,10 @@ func sortLibs(libs []types.Library) {
 func TestGetPackageNameAndVersion(t *testing.T) {
 	tests := []struct {
 		name        string
-		lockFileVer int8
+		lockFileVer float64
 		pkg         string
+		pkgName     string
+		pkgVersion  string
 		wantName    string
 		wantVersion string
 	}{
@@ -138,6 +151,13 @@ func TestGetPackageNameAndVersion(t *testing.T) {
 			wantVersion: "7.21.5",
 		},
 		{
+			name:        "v5 - relative path with wrong version",
+			lockFileVer: 5.0,
+			pkg:         "/lodash/4-wrong",
+			wantName:    "",
+			wantVersion: "",
+		},
+		{
 			name:        "v6 - relative path",
 			lockFileVer: 6.0,
 			pkg:         "/update-browserslist-db@1.0.11",
@@ -179,11 +199,36 @@ func TestGetPackageNameAndVersion(t *testing.T) {
 			wantName:    "@babel/helper-compilation-targets",
 			wantVersion: "7.21.5",
 		},
+		{
+			name:        "v6 - relative path with wrong version",
+			lockFileVer: 6.0,
+			pkg:         "/lodash@4-wrong",
+			wantName:    "",
+			wantVersion: "",
+		},
+		{
+			name:        "local archive",
+			lockFileVer: 6.0,
+			pkg:         "file:foo/bar/lodash.tgz",
+			pkgName:     "lodash",
+			pkgVersion:  "4.17.21",
+			wantName:    "lodash",
+			wantVersion: "4.17.21",
+		},
+		{
+			name:        "local archive with wrong version",
+			lockFileVer: 6.0,
+			pkg:         "file:foo/bar/lodash.tgz",
+			pkgName:     "lodash",
+			pkgVersion:  "wrong_ver",
+			wantName:    "",
+			wantVersion: "",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotName, gotVersion := getPackageNameAndVersion(tt.pkg, tt.lockFileVer)
+			gotName, gotVersion := getPackageNameAndVersion(tt.pkg, tt.pkgName, tt.pkgVersion, tt.lockFileVer)
 			assert.Equal(t, tt.wantName, gotName)
 			assert.Equal(t, tt.wantVersion, gotVersion)
 		})

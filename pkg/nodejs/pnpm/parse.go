@@ -2,14 +2,17 @@ package pnpm
 
 import (
 	"fmt"
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
+	"strconv"
+
 	"strings"
 
 	"golang.org/x/xerrors"
 	"gopkg.in/yaml.v3"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
-
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/aquasecurity/go-version/pkg/semver"
 )
 
 type PackageResolution struct {
@@ -25,13 +28,15 @@ type PackageInfo struct {
 	DevDependencies      map[string]string `yaml:"devDependencies,omitempty"`
 	IsDev                bool              `yaml:"dev,omitempty"`
 	IsOptional           bool              `yaml:"optional,omitempty"`
+	Name                 string            `yaml:"name,omitempty"`
+	Version              string            `yaml:"version,omitempty"`
 }
 
 type LockFile struct {
-	LockfileVersion      int8                   `yaml:"lockfileVersion"`
+	LockfileVersion      interface{}            `yaml:"lockfileVersion"`
 	Importers            map[string]PackageInfo `yaml:"importers,omitempty"`
 	Specifiers           map[string]string      `yaml:"specifiers,omitempty"`
-	Dependencies         map[string]string      `yaml:"dependencies,omitempty"`
+	Dependencies         map[string]interface{} `yaml:"dependencies,omitempty"`
 	OptionalDependencies map[string]string      `yaml:"optionalDependencies,omitempty"`
 	DevDependencies      map[string]string      `yaml:"devDependencies,omitempty"`
 	Packages             map[string]PackageInfo `yaml:"packages,omitempty"`
@@ -64,13 +69,29 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 	var libs []types.Library
 	var deps []types.Dependency
 
+	var lockVer float64
+	switch v := lockFile.LockfileVersion.(type) {
+	// lock
+	case float64:
+		lockVer = v
+	case string:
+		var err error
+		if lockVer, err = strconv.ParseFloat(v, 64); err != nil {
+			log.Logger.Debugf("unable to convert lock file version: %s", err)
+			return nil, nil
+		}
+	default:
+		log.Logger.Debugf("unable to convert lock file version: %s", lockFile.LockfileVersion)
+		return nil, nil
+	}
+
 	for pkg, info := range lockFile.Packages {
 		if info.IsDev {
 			continue
 		}
 
 		dependencies := make([]string, 0)
-		name, version := getPackageNameAndVersion(pkg, lockFile.LockfileVersion)
+		name, version := getPackageNameAndVersion(pkg, info.Name, info.Version, lockVer)
 		id := p.ID(name, version)
 
 		for depName, depVer := range info.Dependencies {
@@ -95,12 +116,21 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 	return libs, deps
 }
 
-func isIndirectLib(name string, directDeps map[string]string) bool {
+func isIndirectLib(name string, directDeps map[string]interface{}) bool {
 	_, ok := directDeps[name]
 	return !ok
 }
 
-func getPackageNameAndVersion(pkg string, lockFileVersion int8) (string, string) {
+func getPackageNameAndVersion(pkg, name, version string, lockFileVersion float64) (string, string) {
+	// local archives have `name` and `version` fields
+	// https://github.com/pnpm/spec/blob/ad27a225f81d9215becadfa540ef05fa4ad6dd60/lockfile/5.2.md#packagesdependencypathname
+	if strings.HasPrefix(pkg, "file:") {
+		if _, err := semver.Parse(version); err != nil {
+			log.Logger.Debugf("Skip %q package. %q doesn't match semver: %s", pkg, version, err)
+			return "", ""
+		}
+		return name, version
+	}
 	versionSep := "@"
 	if lockFileVersion < 6 {
 		versionSep = "/"
@@ -137,6 +167,10 @@ func parsePackage(pkg, versionSep string) (string, string) {
 	//    - v6+: "7.21.5(@babel/core@7.20.7)" => "7.21.5"
 	if idx := strings.IndexAny(version, "_("); idx != -1 {
 		version = version[:idx]
+	}
+	if _, err := semver.Parse(version); err != nil {
+		log.Logger.Debugf("Skip %q package. %q doesn't match semver: %s", pkg, version, err)
+		return "", ""
 	}
 	return name, version
 }
