@@ -77,11 +77,11 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 	case string:
 		var err error
 		if lockVer, err = strconv.ParseFloat(v, 64); err != nil {
-			log.Logger.Debugf("unable to convert lock file version: %s", err)
+			log.Logger.Debugf("Unable to convert lock file version: %s", err)
 			return nil, nil
 		}
 	default:
-		log.Logger.Debugf("unable to convert lock file version: %s", lockFile.LockfileVersion)
+		log.Logger.Debugf("Unable to convert lock file version: %s", lockFile.LockfileVersion)
 		return nil, nil
 	}
 
@@ -121,6 +121,7 @@ func isIndirectLib(name string, directDeps map[string]interface{}) bool {
 	return !ok
 }
 
+// cf. https://github.com/pnpm/pnpm/blob/ce61f8d3c29eee46cee38d56ced45aea8a439a53/packages/dependency-path/src/index.ts#L112-L163
 func getPackageNameAndVersion(pkg, name, version string, lockFileVersion float64) (string, string) {
 	// local archives have `name` and `version` fields
 	// https://github.com/pnpm/spec/blob/ad27a225f81d9215becadfa540ef05fa4ad6dd60/lockfile/5.2.md#packagesdependencypathname
