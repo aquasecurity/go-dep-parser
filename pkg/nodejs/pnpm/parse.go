@@ -122,12 +122,12 @@ func isIndirectLib(name string, directDeps map[string]interface{}) bool {
 }
 
 // cf. https://github.com/pnpm/pnpm/blob/ce61f8d3c29eee46cee38d56ced45aea8a439a53/packages/dependency-path/src/index.ts#L112-L163
-func getPackageNameAndVersion(pkg, name, version string, lockFileVersion float64) (string, string) {
+func getPackageNameAndVersion(depPath, name, version string, lockFileVersion float64) (string, string) {
 	// local archives have `name` and `version` fields
 	// https://github.com/pnpm/spec/blob/ad27a225f81d9215becadfa540ef05fa4ad6dd60/lockfile/5.2.md#packagesdependencypathname
-	if strings.HasPrefix(pkg, "file:") {
+	if strings.HasPrefix(depPath, "file:") {
 		if _, err := semver.Parse(version); err != nil {
-			log.Logger.Debugf("Skip %q package. %q doesn't match semver: %s", pkg, version, err)
+			log.Logger.Debugf("Skip %q package. %q doesn't match semver: %s", depPath, version, err)
 			return "", ""
 		}
 		return name, version
@@ -136,7 +136,7 @@ func getPackageNameAndVersion(pkg, name, version string, lockFileVersion float64
 	if lockFileVersion < 6 {
 		versionSep = "/"
 	}
-	return parsePackage(pkg, versionSep)
+	return parsePackage(depPath, versionSep)
 }
 func parsePackage(pkg, versionSep string) (string, string) {
 	// Skip registry
