@@ -17,6 +17,7 @@ import (
 
 type PackageResolution struct {
 	Integrity string `yaml:"integrity"`
+	Tarball   string `yaml:"tarball,omitempty"`
 }
 
 type PackageInfo struct {
@@ -91,7 +92,11 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 		}
 
 		dependencies := make([]string, 0)
-		name, version := getPackageNameAndVersion(pkg, info.Name, info.Version, lockVer)
+		name := info.Name
+		version := info.Version
+		if info.Resolution.Tarball == "" {
+			name, version = getPackageNameAndVersion(pkg, lockVer)
+		}
 		id := p.ID(name, version)
 
 		for depName, depVer := range info.Dependencies {
@@ -122,16 +127,7 @@ func isIndirectLib(name string, directDeps map[string]interface{}) bool {
 }
 
 // cf. https://github.com/pnpm/pnpm/blob/ce61f8d3c29eee46cee38d56ced45aea8a439a53/packages/dependency-path/src/index.ts#L112-L163
-func getPackageNameAndVersion(depPath, name, version string, lockFileVersion float64) (string, string) {
-	// local archives have `name` and `version` fields
-	// https://github.com/pnpm/spec/blob/ad27a225f81d9215becadfa540ef05fa4ad6dd60/lockfile/5.2.md#packagesdependencypathname
-	if strings.HasPrefix(depPath, "file:") {
-		if _, err := semver.Parse(version); err != nil {
-			log.Logger.Debugf("Skip %q package. %q doesn't match semver: %s", depPath, version, err)
-			return "", ""
-		}
-		return name, version
-	}
+func getPackageNameAndVersion(depPath string, lockFileVersion float64) (string, string) {
 	versionSep := "@"
 	if lockFileVersion < 6 {
 		versionSep = "/"

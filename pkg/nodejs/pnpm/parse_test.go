@@ -38,12 +38,13 @@ func TestParse(t *testing.T) {
 			wantDeps: pnpmManyDeps,
 		},
 		{
-			name: "local archive",
-			file: "testdata/pnpm-lock_local_dep.yaml",
-			want: pnpmLocal,
+			name:     "archives",
+			file:     "testdata/pnpm-lock_archives.yaml",
+			want:     pnpmArchives,
+			wantDeps: pnpmArchivesDeps,
 		},
 		{
-			name:     "v6e",
+			name:     "v6",
 			file:     "testdata/pnpm-lock_v6.yaml",
 			want:     pnpmV6,
 			wantDeps: pnpmV6Deps,
@@ -96,8 +97,6 @@ func TestGetPackageNameAndVersion(t *testing.T) {
 		name        string
 		lockFileVer float64
 		pkg         string
-		pkgName     string
-		pkgVersion  string
 		wantName    string
 		wantVersion string
 	}{
@@ -206,29 +205,11 @@ func TestGetPackageNameAndVersion(t *testing.T) {
 			wantName:    "",
 			wantVersion: "",
 		},
-		{
-			name:        "local archive",
-			lockFileVer: 6.0,
-			pkg:         "file:foo/bar/lodash.tgz",
-			pkgName:     "lodash",
-			pkgVersion:  "4.17.21",
-			wantName:    "lodash",
-			wantVersion: "4.17.21",
-		},
-		{
-			name:        "local archive with wrong version",
-			lockFileVer: 6.0,
-			pkg:         "file:foo/bar/lodash.tgz",
-			pkgName:     "lodash",
-			pkgVersion:  "wrong_ver",
-			wantName:    "",
-			wantVersion: "",
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotName, gotVersion := getPackageNameAndVersion(tt.pkg, tt.pkgName, tt.pkgVersion, tt.lockFileVer)
+			gotName, gotVersion := getPackageNameAndVersion(tt.pkg, tt.lockFileVer)
 			assert.Equal(t, tt.wantName, gotName)
 			assert.Equal(t, tt.wantVersion, gotVersion)
 		})
