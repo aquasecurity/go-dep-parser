@@ -72,9 +72,10 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 
 	var lockVer float64
 	switch v := lockFile.LockfileVersion.(type) {
-	// lock
+	// v5
 	case float64:
 		lockVer = v
+	// v6+
 	case string:
 		var err error
 		if lockVer, err = strconv.ParseFloat(v, 64); err != nil {
@@ -92,8 +93,10 @@ func (p *Parser) parse(lockFile *LockFile) ([]types.Library, []types.Dependency)
 		}
 
 		dependencies := make([]string, 0)
+		// packages from tarball have `name` and `version` fields
 		name := info.Name
 		version := info.Version
+		// for other packages, these fields do not exist. Parse depPath to determine name and version
 		if info.Resolution.Tarball == "" {
 			name, version = getPackageNameAndVersion(pkg, lockVer)
 		}
