@@ -3,7 +3,6 @@ package pom
 import (
 	"encoding/xml"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"io"
 	"reflect"
 	"strings"
@@ -38,6 +37,11 @@ func (p pom) projectProperties() map[string]string {
 	val := reflect.ValueOf(p.content).Elem()
 	props := p.listProperties(val)
 
+	// "version" and "groupId" elements could be inherited from parent.
+	// https://maven.apache.org/pom.html#inheritance
+	props["groupId"] = p.content.GroupId
+	props["version"] = p.content.Version
+
 	// https://maven.apache.org/pom.html#properties
 	projectProperties := map[string]string{}
 	for k, v := range props {
@@ -45,18 +49,13 @@ func (p pom) projectProperties() map[string]string {
 		key := fmt.Sprintf("project.%s", k)
 		projectProperties[key] = v
 
-		// skip `project.*` to avoid overwriting these props with values from the parent
-		if !strings.HasPrefix(k, "project.") {
-			// It is deprecated, but still available.
-			// e.g. ${groupId}
-			projectProperties[k] = v
-		}
+		// It is deprecated, but still available.
+		// e.g. ${groupId}
+		projectProperties[k] = v
 	}
 
 	return projectProperties
 }
-
-var projectBaseProps = []string{"version", "groupId", "basedir", "baseUri"}
 
 func (p pom) listProperties(val reflect.Value) map[string]string {
 	props := map[string]string{}
@@ -75,12 +74,6 @@ func (p pom) listProperties(val reflect.Value) map[string]string {
 		case reflect.Map:
 			m := val.Field(i)
 			for _, e := range m.MapKeys() {
-				// we don't need to overwrite project props.
-				// for case "parent or child props" - child props are always used
-				// https://maven.apache.org/guides/introduction/introduction-to-the-pom.html#project-interpolation-and-variables
-				if slices.Contains(projectBaseProps, e.String()) {
-					continue
-				}
 				v := m.MapIndex(e)
 				props[e.String()] = v.String()
 			}
