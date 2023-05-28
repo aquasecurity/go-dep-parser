@@ -92,7 +92,7 @@ func sortLibs(libs []types.Library) {
 	})
 }
 
-func TestGetPackageNameAndVersion(t *testing.T) {
+func Test_parsePackage(t *testing.T) {
 	tests := []struct {
 		name        string
 		lockFileVer float64
@@ -209,7 +209,7 @@ func TestGetPackageNameAndVersion(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotName, gotVersion := getPackageNameAndVersion(tt.pkg, tt.lockFileVer)
+			gotName, gotVersion := parsePackage(tt.pkg, tt.lockFileVer)
 			assert.Equal(t, tt.wantName, gotName)
 			assert.Equal(t, tt.wantVersion, gotVersion)
 		})
