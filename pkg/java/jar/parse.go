@@ -5,20 +5,19 @@ import (
 	"bufio"
 	"crypto/sha1"
 	"encoding/hex"
+	"fmt"
+	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/samber/lo"
 	"go.uber.org/zap"
-	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strings"
-
-	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
-	"github.com/aquasecurity/go-dep-parser/pkg/log"
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 var (
@@ -76,7 +75,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	if err != nil {
 		return nil, nil, xerrors.Errorf("unable to parse %s: %w", p.rootFilePath, err)
 	}
-	return removeLibraryDuplicates(libs), deps, nil
+	return RemoveLibraryDuplicates(libs), deps, nil
 }
 
 func (p *Parser) parseArtifact(filePath string, size int64, r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
@@ -418,18 +417,14 @@ func (m manifest) determineVersion() (string, error) {
 	return strings.TrimSpace(version), nil
 }
 
-func removeLibraryDuplicates(libs []types.Library) []types.Library {
-	uniqLibs := map[string]types.Library{}
-	for _, lib := range libs {
-		// comparing ArtifactID and GroupID
-		l, ok := uniqLibs[lib.Name]
-		// comparing Version and FilePath
-		if ok && lib.Version == l.Version && lib.FilePath == l.FilePath {
-			continue
-		}
-		uniqLibs[lib.Name] = lib
-	}
-	libSlice := maps.Values(uniqLibs)
-	sort.Sort(types.Libraries(libSlice))
-	return libSlice
+func RemoveLibraryDuplicates(libs []types.Library) []types.Library {
+	// takes all uniq libs
+	uniqLibs := lo.FindUniquesBy(libs, func(lib types.Library) string {
+		return fmt.Sprintf("%s::%s::%s", lib.Name, lib.Version, lib.FilePath)
+	})
+	// take one lib for each duplicate
+	duplicateLibs := lo.FindDuplicatesBy(libs, func(lib types.Library) string {
+		return fmt.Sprintf("%s::%s::%s", lib.Name, lib.Version, lib.FilePath)
+	})
+	return append(uniqLibs, duplicateLibs...)
 }
