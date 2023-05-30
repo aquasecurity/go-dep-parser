@@ -421,9 +421,9 @@ func (m manifest) determineVersion() (string, error) {
 func removeLibraryDuplicates(libs []types.Library) []types.Library {
 	uniqLibs := map[string]types.Library{}
 	for _, lib := range libs {
-		// compare ArtifactID and GroupID
+		// comparing ArtifactID and GroupID
 		l, ok := uniqLibs[lib.Name]
-		// compare Version and FilePath
+		// comparing Version and FilePath
 		if ok && lib.Version == l.Version && lib.FilePath == l.FilePath {
 			continue
 		}

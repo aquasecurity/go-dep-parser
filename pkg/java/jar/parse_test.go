@@ -254,7 +254,7 @@ func TestParse(t *testing.T) {
 		}
 
 		switch {
-		case strings.Contains(r.URL.Query().Get("q"), "Gizmo"):
+		case strings.Contains(r.URL.Query().Get("q"), "springframework"):
 			res.Response.NumFound = 0
 		case strings.Contains(r.URL.Query().Get("q"), "c666f5bc47eb64ed3bbd13505a26f58be71f33f0"):
 			res.Response.Docs = []doc{
@@ -265,7 +265,7 @@ func TestParse(t *testing.T) {
 					Version:    "5.3.3",
 				},
 			}
-		case strings.Contains(r.URL.Query().Get("q"), "springframework"):
+		case strings.Contains(r.URL.Query().Get("q"), "Gizmo"):
 			res.Response.NumFound = 0
 		case strings.Contains(r.URL.Query().Get("q"), "85d30c06026afd9f5be26da3194d4698c447a904"):
 			res.Response.Docs = []doc{
