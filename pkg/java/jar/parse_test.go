@@ -175,6 +175,16 @@ var (
 			Version:  "1.1.1.Final",
 			FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
 		},
+		{
+			Name:     "log4j:log4j",
+			Version:  "1.2.16",
+			FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar/jars/log4j-1.2.16.jar",
+		},
+		{
+			Name:     "log4j:log4j",
+			Version:  "1.2.17",
+			FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar/jars/log4j-1.2.17.jar",
+		},
 	}
 )
 
@@ -317,88 +327,6 @@ func TestParse(t *testing.T) {
 			})
 
 			assert.Equal(t, v.want, got)
-		})
-	}
-}
-
-func TestRemoveLibraryDuplicates(t *testing.T) {
-	tests := []struct {
-		name string
-		libs []types.Library
-		want []types.Library
-	}{
-		{
-			name: "one library",
-			libs: []types.Library{
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "1.1.1.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-			},
-			want: []types.Library{
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "1.1.1.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-			},
-		},
-		{
-			name: "two libraries with different versions",
-			libs: []types.Library{
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "1.1.1.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "2.2.2.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-			},
-			want: []types.Library{
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "1.1.1.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "2.2.2.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-			},
-		},
-		{
-			name: "duplicates",
-			libs: []types.Library{
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "1.1.1.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "1.1.1.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-			},
-			want: []types.Library{
-				{
-					Name:     "io.quarkus.gizmo:gizmo",
-					Version:  "1.1.1.Final",
-					FilePath: "testdata/io.quarkus.gizmo.gizmo-1.1.1.Final.jar",
-				},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := jar.RemoveLibraryDuplicates(tt.libs)
-			assert.Equal(t, tt.want, got)
 		})
 	}
 }

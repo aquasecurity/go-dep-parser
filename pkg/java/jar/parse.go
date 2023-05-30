@@ -75,7 +75,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	if err != nil {
 		return nil, nil, xerrors.Errorf("unable to parse %s: %w", p.rootFilePath, err)
 	}
-	return RemoveLibraryDuplicates(libs), deps, nil
+	return removeLibraryDuplicates(libs), deps, nil
 }
 
 func (p *Parser) parseArtifact(filePath string, size int64, r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
@@ -417,7 +417,7 @@ func (m manifest) determineVersion() (string, error) {
 	return strings.TrimSpace(version), nil
 }
 
-func RemoveLibraryDuplicates(libs []types.Library) []types.Library {
+func removeLibraryDuplicates(libs []types.Library) []types.Library {
 	// takes all uniq libs
 	uniqLibs := lo.FindUniquesBy(libs, func(lib types.Library) string {
 		return fmt.Sprintf("%s::%s::%s", lib.Name, lib.Version, lib.FilePath)
