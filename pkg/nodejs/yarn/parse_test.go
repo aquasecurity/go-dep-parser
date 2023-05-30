@@ -251,7 +251,6 @@ func TestParse(t *testing.T) {
 		file     string // Test input file
 		want     []types.Library
 		wantDeps []types.Dependency
-		wantErr  bool
 	}{
 		{
 			name:     "normal",
@@ -318,10 +317,13 @@ func TestParse(t *testing.T) {
 			wantDeps: yarnNormalDeps,
 		},
 		{
-			name:     "bad yarn file",
-			file:     "testdata/bad_yarn.lock",
-			wantErr:  true,
-			wantDeps: nil,
+			name: "yarn with git dependency",
+			file: "testdata/yarn_with_git.lock",
+		},
+		{
+			name: "yarn file with bad protocol",
+			file: "testdata/yarn_with_bad_protocol.lock",
+			want: yarnBadProtocol,
 		},
 	}
 
@@ -331,12 +333,6 @@ func TestParse(t *testing.T) {
 			require.NoError(t, err)
 
 			got, deps, err := NewParser().Parse(f)
-
-			if tt.wantErr {
-				require.NotNil(t, err)
-				return
-			}
-
 			require.NoError(t, err)
 
 			sortLibs(got)

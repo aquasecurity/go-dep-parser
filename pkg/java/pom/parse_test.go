@@ -331,6 +331,29 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
+			name:      "exclusions with wildcards",
+			inputFile: filepath.Join("testdata", "wildcard-exclusions", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:wildcard-exclusions",
+					Version: "4.0.0",
+				},
+				{
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
+				{
+					Name:    "org.example:example-dependency2",
+					Version: "2.3.4",
+				},
+				{
+					Name:    "org.example:example-nested",
+					Version: "3.3.3",
+				},
+			},
+		},
+		{
 			name:      "multi module",
 			inputFile: filepath.Join("testdata", "multi-module", "pom.xml"),
 			local:     true,
@@ -457,10 +480,15 @@ func TestPom_Parse(t *testing.T) {
 			},
 		},
 		{
-			name:      "module not found",
+			name:      "module not found - unable to parse module",
 			inputFile: filepath.Join("testdata", "not-found-module", "pom.xml"),
 			local:     true,
-			wantErr:   "stat testdata/not-found-module/module: no such file or directory",
+			want: []types.Library{
+				{
+					Name:    "com.example:aggregation",
+					Version: "1.0.0",
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
