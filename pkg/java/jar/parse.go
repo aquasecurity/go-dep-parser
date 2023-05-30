@@ -6,20 +6,20 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"go.uber.org/zap"
+	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
-
-const ()
 
 var (
 	jarFileRegEx = regexp.MustCompile(`^([a-zA-Z0-9\._-]*[^-*])-(\d\S*(?:-SNAPSHOT)?).jar$`)
@@ -72,7 +72,11 @@ func NewParser(c Client, opts ...Option) types.Parser {
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
-	return p.parseArtifact(p.rootFilePath, p.size, r)
+	libs, deps, err := p.parseArtifact(p.rootFilePath, p.size, r)
+	if err != nil {
+		return nil, nil, xerrors.Errorf("unable to parse %s: %w", p.rootFilePath, err)
+	}
+	return removeLibraryDuplicates(libs), deps, nil
 }
 
 func (p *Parser) parseArtifact(filePath string, size int64, r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
@@ -412,4 +416,20 @@ func (m manifest) determineVersion() (string, error) {
 		return "", xerrors.New("no version found")
 	}
 	return strings.TrimSpace(version), nil
+}
+
+func removeLibraryDuplicates(libs []types.Library) []types.Library {
+	uniqLibs := map[string]types.Library{}
+	for _, lib := range libs {
+		// compare ArtifactID and GroupID
+		l, ok := uniqLibs[lib.Name]
+		// compare Version and FilePath
+		if ok && lib.Version == l.Version && lib.FilePath == l.FilePath {
+			continue
+		}
+		uniqLibs[lib.Name] = lib
+	}
+	libSlice := maps.Values(uniqLibs)
+	sort.Sort(types.Libraries(libSlice))
+	return libSlice
 }
