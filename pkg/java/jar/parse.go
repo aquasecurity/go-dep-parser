@@ -418,13 +418,7 @@ func (m manifest) determineVersion() (string, error) {
 }
 
 func removeLibraryDuplicates(libs []types.Library) []types.Library {
-	// takes all uniq libs
-	uniqLibs := lo.FindUniquesBy(libs, func(lib types.Library) string {
+	return lo.UniqBy(libs, func(lib types.Library) string {
 		return fmt.Sprintf("%s::%s::%s", lib.Name, lib.Version, lib.FilePath)
 	})
-	// take one lib for each duplicate
-	duplicateLibs := lo.FindDuplicatesBy(libs, func(lib types.Library) string {
-		return fmt.Sprintf("%s::%s::%s", lib.Name, lib.Version, lib.FilePath)
-	})
-	return append(uniqLibs, duplicateLibs...)
 }
