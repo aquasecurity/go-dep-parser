@@ -100,7 +100,12 @@ func TestParse(t *testing.T) {
 		{
 			name:      "happy path - version doesn't exist",
 			inputFile: "testdata/without_version_package.json",
-			want:      packagejson.Package{},
+			want: packagejson.Package{
+				Library: types.Library{
+					ID:   "angular@",
+					Name: "angular",
+				},
+			},
 		},
 		{
 			name:      "sad path",
@@ -111,6 +116,24 @@ func TestParse(t *testing.T) {
 			// npm install --save promise jquery
 			// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\"},\n")}'
 			wantErr: "JSON decode error",
+		},
+		{
+			name:      "engines",
+			inputFile: "testdata/engines_package.json",
+			want: packagejson.Package{
+				Library: types.Library{
+					ID:      "lodash@5.0.0",
+					Name:    "lodash",
+					Version: "5.0.0",
+					License: "MIT",
+				},
+				DevDependencies: map[string]string{
+					"mocha": "^5.2.0", "eslint": "^7.16.0",
+					"eslint-plugin-import": "^2.22.1",
+					"lodash":               "4.17.20", "esm": "^3.2.25",
+				},
+				Engines: map[string]string{"node": ">=4.0.0"},
+			},
 		},
 	}
 
