@@ -14,6 +14,7 @@ type packageJSON struct {
 	Name                 string            `json:"name"`
 	Version              string            `json:"version"`
 	License              interface{}       `json:"license"`
+	Engines              map[string]string `json:"engines"`
 	Dependencies         map[string]string `json:"dependencies"`
 	DevDependencies      map[string]string `json:"devDependencies"`
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
@@ -24,6 +25,7 @@ type Package struct {
 	Dependencies         map[string]string
 	OptionalDependencies map[string]string
 	DevDependencies      map[string]string
+	Engines              map[string]string
 }
 
 type Parser struct{}
@@ -38,12 +40,6 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		return Package{}, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
-	// Name and version fields are optional
-	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
-	if pkgJSON.Name == "" || pkgJSON.Version == "" {
-		return Package{}, nil
-	}
-
 	return Package{
 		Library: types.Library{
 			ID:      utils.PackageID(pkgJSON.Name, pkgJSON.Version),
@@ -54,6 +50,7 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		Dependencies:         pkgJSON.Dependencies,
 		OptionalDependencies: pkgJSON.OptionalDependencies,
 		DevDependencies:      pkgJSON.DevDependencies,
+		Engines:              pkgJSON.Engines,
 	}, nil
 }
 
