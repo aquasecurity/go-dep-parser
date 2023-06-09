@@ -49,6 +49,7 @@ func (p pom) projectProperties() map[string]string {
 			continue
 		}
 
+		// e.g. ${project.groupId}
 		key := fmt.Sprintf("project.%s", k)
 		projectProperties[key] = v
 
