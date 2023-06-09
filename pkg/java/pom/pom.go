@@ -45,7 +45,10 @@ func (p pom) projectProperties() map[string]string {
 	// https://maven.apache.org/pom.html#properties
 	projectProperties := map[string]string{}
 	for k, v := range props {
-		// e.g. ${project.groupId}
+		if strings.HasPrefix(k, "project.") {
+			continue
+		}
+
 		key := fmt.Sprintf("project.%s", k)
 		projectProperties[key] = v
 
