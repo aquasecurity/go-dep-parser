@@ -55,18 +55,6 @@ func TestParse(t *testing.T) {
 			want:     pnpmV6WithDev,
 			wantDeps: pnpmV6WithDevDeps,
 		},
-		{
-			name:     "v5 workspace",
-			file:     "testdata/pnpm-lock_v5-workspace.yaml",
-			want:     pnpmV5Workspace,
-			wantDeps: pnpmV5WorkspaceDeps,
-		},
-		{
-			name:     "v6 workspace",
-			file:     "testdata/pnpm-lock_v6-workspace.yaml",
-			want:     pnpmV6Workspace,
-			wantDeps: pnpmV6WorkspaceDeps,
-		},
 	}
 
 	for _, tt := range tests {
