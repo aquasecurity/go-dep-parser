@@ -204,4 +204,94 @@ var (
 			DependsOn: []string{"@babel/runtime@7.22.3"},
 		},
 	}
+
+	// docker run --name node --rm -it node@sha256:710a2c192ca426e03e4f3ec1869e5c29db855eb6969b74e6c50fd270ffccd3f1 sh
+	// npm install -g pnpm@7.0.0
+	/*
+cat > pnpm-workspace.yaml <<EOF
+packages:
+  - 'frontend'
+EOF
+	*/
+
+	// pnpm add -D -w prettier@2.8.8
+	// pnpm add -O -w loglevel@1.8.1
+
+	// mkdir frontend && cd frontend
+	// pnpm add react@18.1.0 redux@4.2.0
+	// cd ..
+	// pnpm recursive list --prod --depth 10 | grep -E -o "\S+\s+[0-9]+(\.[0-9]+)+$" | awk '{printf("{ID: \""$1"@"$2"\", Name: \""$1"\", Version: \""$2"\", Indirect: true},\n")}' | sort -u
+
+	pnpmV5Workspace = []types.Library{
+		{ID: "@babel/runtime@7.22.5", Name: "@babel/runtime", Version: "7.22.5", Indirect: true},
+		{ID: "js-tokens@4.0.0", Name: "js-tokens", Version: "4.0.0", Indirect: true},
+		{ID: "loglevel@1.8.1", Name: "loglevel", Version: "1.8.1", Indirect: true},
+		{ID: "loose-envify@1.4.0", Name: "loose-envify", Version: "1.4.0", Indirect: true},
+		{ID: "react@18.1.0", Name: "react", Version: "18.1.0", Indirect: true},
+		{ID: "redux@4.2.0", Name: "redux", Version: "4.2.0", Indirect: true},
+		{ID: "regenerator-runtime@0.13.11", Name: "regenerator-runtime", Version: "0.13.11", Indirect: true},
+	}
+	pnpmV5WorkspaceDeps = []types.Dependency{
+		{
+			ID:        "@babel/runtime@7.22.5",
+			DependsOn: []string{"regenerator-runtime@0.13.11"},
+		},
+		{
+			ID:        "loose-envify@1.4.0",
+			DependsOn: []string{"js-tokens@4.0.0"},
+		},
+		{
+			ID:        "react@18.1.0",
+			DependsOn: []string{"loose-envify@1.4.0"},
+		},
+		{
+			ID:        "redux@4.2.0",
+			DependsOn: []string{"@babel/runtime@7.22.5"},
+		},
+	}
+
+	// docker run --name node --rm -it node@sha256:710a2c192ca426e03e4f3ec1869e5c29db855eb6969b74e6c50fd270ffccd3f1 sh
+	// npm install -g pnpm@8.6.2
+	/*
+cat > pnpm-workspace.yaml <<EOF
+packages:
+  - 'frontend'
+EOF
+	*/
+
+	// pnpm add -D -w prettier@2.8.8
+	// pnpm add -O -w loglevel@1.8.1
+
+	// mkdir frontend && cd frontend
+	// pnpm add react@18.1.0 redux@4.2.0
+	// cd ..
+	// pnpm recursive list --prod --depth 10 | grep -E -o "\S+\s+[0-9]+(\.[0-9]+)+$" | awk '{printf("{ID: \""$1"@"$2"\", Name: \""$1"\", Version: \""$2"\", Indirect: true},\n")}' | sort -u
+
+	pnpmV6Workspace = []types.Library{
+		{ID: "@babel/runtime@7.22.5", Name: "@babel/runtime", Version: "7.22.5", Indirect: true},
+		{ID: "js-tokens@4.0.0", Name: "js-tokens", Version: "4.0.0", Indirect: true},
+		{ID: "loglevel@1.8.1", Name: "loglevel", Version: "1.8.1", Indirect: true},
+		{ID: "loose-envify@1.4.0", Name: "loose-envify", Version: "1.4.0", Indirect: true},
+		{ID: "react@18.1.0", Name: "react", Version: "18.1.0", Indirect: true},
+		{ID: "redux@4.2.0", Name: "redux", Version: "4.2.0", Indirect: true},
+		{ID: "regenerator-runtime@0.13.11", Name: "regenerator-runtime", Version: "0.13.11", Indirect: true},
+	}
+	pnpmV6WorkspaceDeps = []types.Dependency{
+		{
+			ID:        "@babel/runtime@7.22.5",
+			DependsOn: []string{"regenerator-runtime@0.13.11"},
+		},
+		{
+			ID:        "loose-envify@1.4.0",
+			DependsOn: []string{"js-tokens@4.0.0"},
+		},
+		{
+			ID:        "react@18.1.0",
+			DependsOn: []string{"loose-envify@1.4.0"},
+		},
+		{
+			ID:        "redux@4.2.0",
+			DependsOn: []string{"@babel/runtime@7.22.5"},
+		},
+	}
 )

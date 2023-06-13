@@ -19,6 +19,13 @@ type PackageResolution struct {
 	Tarball   string `yaml:"tarball,omitempty"`
 }
 
+type Importer struct {
+	Specifiers           map[string]string `yaml:"specifiers,omitempty"`
+	Dependencies         map[string]any    `yaml:"dependencies,omitempty"`
+	OptionalDependencies map[string]any    `yaml:"optionalDependencies,omitempty"`
+	DevDependencies      map[string]any    `yaml:"devDependencies,omitempty"`
+}
+
 type PackageInfo struct {
 	Resolution           PackageResolution `yaml:"resolution"`
 	Engines              map[string]string `yaml:"engines,omitempty"`
@@ -34,10 +41,10 @@ type PackageInfo struct {
 
 type LockFile struct {
 	LockfileVersion      any                    `yaml:"lockfileVersion"`
-	Importers            map[string]PackageInfo `yaml:"importers,omitempty"`
+	Importers            map[string]Importer    `yaml:"importers,omitempty"`
 	Specifiers           map[string]string      `yaml:"specifiers,omitempty"`
 	Dependencies         map[string]any         `yaml:"dependencies,omitempty"`
-	OptionalDependencies map[string]string      `yaml:"optionalDependencies,omitempty"`
+	OptionalDependencies map[string]any         `yaml:"optionalDependencies,omitempty"`
 	DevDependencies      map[string]any         `yaml:"devDependencies,omitempty"`
 	Packages             map[string]PackageInfo `yaml:"packages,omitempty"`
 }
