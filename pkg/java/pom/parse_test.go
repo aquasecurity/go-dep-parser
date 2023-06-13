@@ -32,7 +32,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:happy",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					License: "BSD-3-Clause",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -48,7 +48,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:happy",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					License: "BSD-3-Clause",
 				},
 				{
 					Name:    "org.example:example-api",
