@@ -19,16 +19,18 @@ type PackageResolution struct {
 }
 
 type PackageInfo struct {
-	Resolution   PackageResolution `yaml:"resolution"`
-	Dependencies map[string]string `yaml:"dependencies,omitempty"`
-	IsDev        bool              `yaml:"dev,omitempty"`
-	Name         string            `yaml:"name,omitempty"`
-	Version      string            `yaml:"version,omitempty"`
+	Resolution      PackageResolution `yaml:"resolution"`
+	Dependencies    map[string]string `yaml:"dependencies,omitempty"`
+	DevDependencies map[string]string `yaml:"devDependencies,omitempty"`
+	IsDev           bool              `yaml:"dev,omitempty"`
+	Name            string            `yaml:"name,omitempty"`
+	Version         string            `yaml:"version,omitempty"`
 }
 
 type LockFile struct {
 	LockfileVersion any                    `yaml:"lockfileVersion"`
 	Dependencies    map[string]any         `yaml:"dependencies,omitempty"`
+	DevDependencies map[string]any         `yaml:"devDependencies,omitempty"`
 	Packages        map[string]PackageInfo `yaml:"packages,omitempty"`
 }
 
