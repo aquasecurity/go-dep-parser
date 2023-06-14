@@ -58,7 +58,11 @@ func TestParse(t *testing.T) {
 		{
 			name:      "happy path - version doesn't exist",
 			inputFile: "testdata/without_version_package.json",
-			want:      packagejson.Package{},
+			want: packagejson.Package{
+				Library: types.Library{
+					Name: "angular",
+				},
+			},
 		},
 		{
 			name:      "sad path",

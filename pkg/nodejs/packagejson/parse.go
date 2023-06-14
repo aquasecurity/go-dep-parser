@@ -2,10 +2,10 @@ package packagejson
 
 import (
 	"encoding/json"
-	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 	"io"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 	"golang.org/x/xerrors"
 )
 
@@ -37,13 +37,14 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 
 	// Name and version fields are optional
 	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
-	if pkgJSON.Name == "" || pkgJSON.Version == "" {
-		return Package{}, nil
+	var id string
+	if pkgJSON.Name != "" && pkgJSON.Version != "" {
+		id = utils.PackageID(pkgJSON.Name, pkgJSON.Version)
 	}
 
 	return Package{
 		Library: types.Library{
-			ID:      utils.PackageID(pkgJSON.Name, pkgJSON.Version),
+			ID:      id,
 			Name:    pkgJSON.Name,
 			Version: pkgJSON.Version,
 			License: parseLicense(pkgJSON.License),
