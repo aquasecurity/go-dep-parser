@@ -18,7 +18,7 @@ type packageJSON struct {
 }
 
 func (p packageJSON) hasContent() bool {
-	return parseLicense(p.License) != "" || p.Dependencies != nil || p.OptionalDependencies != nil
+	return parseLicense(p.License) != "" || len(p.Dependencies) > 0 || len(p.OptionalDependencies) > 0
 }
 
 type Package struct {
@@ -44,6 +44,9 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 	}
 
 	name := pkgJSON.Name
+	// Name and version fields are optional
+	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
+	// if the name is missing, a dummy constant is used to identify this package.
 	if name == "" {
 		name = "no-package-name"
 	}
