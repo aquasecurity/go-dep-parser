@@ -2,9 +2,7 @@ package packagejson
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
-	"time"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
@@ -29,26 +27,10 @@ type Package struct {
 	OptionalDependencies map[string]string
 }
 
-type Now func() time.Time
+type Parser struct{}
 
-type Option func(p *Parser)
-
-func WithNow(now Now) Option {
-	return func(p *Parser) {
-		p.now = now
-	}
-}
-
-type Parser struct {
-	now Now
-}
-
-func NewParser(opts ...Option) *Parser {
-	p := &Parser{}
-	for _, opt := range opts {
-		opt(p)
-	}
-	return p
+func NewParser() *Parser {
+	return &Parser{}
 }
 
 func (p *Parser) Parse(r io.Reader) (Package, error) {
@@ -63,7 +45,7 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 
 	name := pkgJSON.Name
 	if name == "" {
-		name = fmt.Sprintf("mypackage-%s", p.now().UTC().Format(time.RFC3339))
+		name = "no-package-name"
 	}
 
 	return Package{
