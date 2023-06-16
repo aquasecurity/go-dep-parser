@@ -46,7 +46,8 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 	name := pkgJSON.Name
 	// Name and version fields are optional
 	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
-	// if the name is missing, a dummy constant is used to identify this package.
+	// In cases where the name is not provided, but there is valuable content present,
+	// we utilize a placeholder constant to identify this package.
 	if name == "" {
 		name = "no-package-name"
 	}
