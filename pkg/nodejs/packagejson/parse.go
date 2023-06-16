@@ -17,10 +17,6 @@ type packageJSON struct {
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
 }
 
-func (p packageJSON) hasContent() bool {
-	return parseLicense(p.License) != "" || len(p.Dependencies) > 0 || len(p.OptionalDependencies) > 0
-}
-
 type Package struct {
 	types.Library
 	Dependencies         map[string]string
@@ -39,7 +35,10 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		return Package{}, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
-	if pkgJSON.Name == "" && pkgJSON.Version == "" && !pkgJSON.hasContent() {
+	license := parseLicense(pkgJSON.License)
+
+	hasContent := license != "" || len(pkgJSON.Dependencies) > 0 || len(pkgJSON.OptionalDependencies) > 0
+	if pkgJSON.Name == "" && pkgJSON.Version == "" && !hasContent {
 		return Package{}, nil
 	}
 
