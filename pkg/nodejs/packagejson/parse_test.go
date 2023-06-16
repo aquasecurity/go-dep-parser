@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -60,6 +61,7 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/without_version_package.json",
 			want: packagejson.Package{
 				Library: types.Library{
+					ID:   "angular@",
 					Name: "angular",
 				},
 			},
@@ -74,6 +76,21 @@ func TestParse(t *testing.T) {
 			// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\"},\n")}'
 			wantErr: "JSON decode error",
 		},
+		{
+			name:      "without name and version",
+			inputFile: "testdata/without_name_and_version_package.json",
+			want: packagejson.Package{
+				Library: types.Library{
+					ID:      "mypackage-2023-06-16T03:03:03Z@",
+					Name:    "mypackage-2023-06-16T03:03:03Z",
+					License: "MIT",
+				},
+			},
+		},
+		{
+			name:      "empty package",
+			inputFile: "testdata/empty_package.json",
+		},
 	}
 
 	for _, v := range vectors {
@@ -82,7 +99,11 @@ func TestParse(t *testing.T) {
 			require.NoError(t, err)
 			defer f.Close()
 
-			got, err := packagejson.NewParser().Parse(f)
+			now := func() time.Time {
+				return time.Date(2023, 06, 16, 3, 3, 3, 0, time.UTC)
+			}
+
+			got, err := packagejson.NewParser(packagejson.WithNow(now)).Parse(f)
 			if v.wantErr != "" {
 				assert.ErrorContains(t, err, v.wantErr)
 				return

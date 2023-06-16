@@ -2,7 +2,9 @@ package packagejson
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"time"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
@@ -17,16 +19,36 @@ type packageJSON struct {
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
 }
 
+func (p packageJSON) hasContent() bool {
+	return parseLicense(p.License) != "" || p.Dependencies != nil || p.OptionalDependencies != nil
+}
+
 type Package struct {
 	types.Library
 	Dependencies         map[string]string
 	OptionalDependencies map[string]string
 }
 
-type Parser struct{}
+type Now func() time.Time
 
-func NewParser() *Parser {
-	return &Parser{}
+type Option func(p *Parser)
+
+func WithNow(now Now) Option {
+	return func(p *Parser) {
+		p.now = now
+	}
+}
+
+type Parser struct {
+	now Now
+}
+
+func NewParser(opts ...Option) *Parser {
+	p := &Parser{}
+	for _, opt := range opts {
+		opt(p)
+	}
+	return p
 }
 
 func (p *Parser) Parse(r io.Reader) (Package, error) {
@@ -35,17 +57,19 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		return Package{}, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
-	// Name and version fields are optional
-	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
-	var id string
-	if pkgJSON.Name != "" && pkgJSON.Version != "" {
-		id = utils.PackageID(pkgJSON.Name, pkgJSON.Version)
+	if pkgJSON.Name == "" && pkgJSON.Version == "" && !pkgJSON.hasContent() {
+		return Package{}, nil
+	}
+
+	name := pkgJSON.Name
+	if name == "" {
+		name = fmt.Sprintf("mypackage-%s", p.now().UTC().Format(time.RFC3339))
 	}
 
 	return Package{
 		Library: types.Library{
-			ID:      id,
-			Name:    pkgJSON.Name,
+			ID:      utils.PackageID(name, pkgJSON.Version),
+			Name:    name,
 			Version: pkgJSON.Version,
 			License: parseLicense(pkgJSON.License),
 		},
