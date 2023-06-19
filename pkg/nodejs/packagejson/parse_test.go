@@ -60,7 +60,7 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/without_version_package.json",
 			want: packagejson.Package{
 				Library: types.Library{
-					ID:   "angular@",
+					ID:   "",
 					Name: "angular",
 				},
 			},
@@ -80,8 +80,6 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/without_name_and_version_package.json",
 			want: packagejson.Package{
 				Library: types.Library{
-					ID:      "no-package-name@",
-					Name:    "no-package-name",
 					License: "MIT",
 				},
 			},
