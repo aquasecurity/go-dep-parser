@@ -17,13 +17,6 @@ type packageJSON struct {
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
 }
 
-func (p packageJSON) hasContent(license string) bool {
-	return p.Name != "" ||
-		(license != "" ||
-			len(p.Dependencies) > 0 ||
-			len(p.OptionalDependencies) > 0)
-}
-
 type Package struct {
 	types.Library
 	Dependencies         map[string]string
@@ -42,11 +35,6 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		return Package{}, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
-	license := parseLicense(pkgJSON.License)
-	if !pkgJSON.hasContent(license) {
-		return Package{}, nil
-	}
-
 	var id string
 	// Name and version fields are optional
 	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
@@ -59,7 +47,7 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 			ID:      id,
 			Name:    pkgJSON.Name,
 			Version: pkgJSON.Version,
-			License: license,
+			License: parseLicense(pkgJSON.License),
 		},
 		Dependencies:         pkgJSON.Dependencies,
 		OptionalDependencies: pkgJSON.OptionalDependencies,

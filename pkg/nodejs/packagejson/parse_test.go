@@ -84,10 +84,6 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
-		{
-			name:      "empty package",
-			inputFile: "testdata/empty_package.json",
-		},
 	}
 
 	for _, v := range vectors {
