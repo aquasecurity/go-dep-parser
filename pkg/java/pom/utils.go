@@ -13,7 +13,7 @@ func isDirectory(path string) (bool, error) {
 	return fileInfo.IsDir(), err
 }
 
-func versionIsProperty(version string) bool {
+func isProperty(version string) bool {
 	if version != "" && strings.HasPrefix(version, "${") && strings.HasSuffix(version, "}") {
 		return true
 	}

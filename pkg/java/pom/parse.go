@@ -392,7 +392,7 @@ func (p *parser) parseParent(currentPath string, parent pomParent) (analysisResu
 	// Pass nil properties so that variables in <parent> are not evaluated.
 	target := newArtifact(parent.GroupId, parent.ArtifactId, parent.Version, "", nil)
 	// if version is property (e.g. ${revision}) - we still need to parse this pom
-	if target.IsEmpty() && !versionIsProperty(parent.Version) {
+	if target.IsEmpty() && !isProperty(parent.Version) {
 		return analysisResult{}, nil
 	}
 	log.Logger.Debugf("Start parent: %s", target.String())

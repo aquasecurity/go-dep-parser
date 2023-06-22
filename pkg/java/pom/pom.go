@@ -26,7 +26,7 @@ func (p *pom) inherit(result analysisResult) {
 	p.content.GroupId = art.GroupID
 	p.content.ArtifactId = art.ArtifactID
 
-	if versionIsProperty(art.Version.String()) {
+	if isProperty(art.Version.String()) {
 		p.content.Version = evaluateVariable(art.Version.String(), p.content.Properties, nil)
 	} else {
 		p.content.Version = art.Version.String()
