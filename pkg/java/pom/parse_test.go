@@ -32,6 +32,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:happy",
 					Version: "1.0.0",
+					License: "BSD-3-Clause",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -47,6 +48,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:happy",
 					Version: "1.0.0",
+					License: "BSD-3-Clause",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -74,6 +76,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:child",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -138,6 +141,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:child",
 					Version: "1.0.0-SNAPSHOT",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -153,6 +157,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:child",
 					Version: "3.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -168,6 +173,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:base",
 					Version: "4.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -187,10 +193,26 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:child",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
+				},
+			},
+		},
+		{
+			name:      "parent version in property",
+			inputFile: filepath.Join("testdata", "parent-version-is-property", "child", "pom.xml"),
+			local:     false,
+			want: []types.Library{
+				{
+					Name:    "com.example:child",
+					Version: "1.0.0-SNAPSHOT",
+				},
+				{
+					Name:    "org.example:example-api",
+					Version: "1.1.1",
 				},
 			},
 		},
@@ -202,6 +224,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:child",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -217,6 +240,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:soft",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -259,6 +283,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:hard",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -278,6 +303,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:hard",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 			},
 		},
@@ -289,6 +315,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:import",
 					Version: "2.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -304,6 +331,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:import",
 					Version: "2.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -361,10 +389,12 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:aggregation",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "com.example:module",
 					Version: "1.1.1",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -457,6 +487,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:no-parent",
 					Version: "1.0-SNAPSHOT",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-api",
@@ -472,6 +503,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:not-found-dependency",
 					Version: "1.0.0",
+					License: "Apache 2.0",
 				},
 				{
 					Name:    "org.example:example-not-found",
@@ -487,6 +519,19 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "com.example:aggregation",
 					Version: "1.0.0",
+					License: "Apache 2.0",
+				},
+			},
+		},
+		{
+			name:      "multiply licenses",
+			inputFile: filepath.Join("testdata", "multiply-licenses", "pom.xml"),
+			local:     true,
+			want: []types.Library{
+				{
+					Name:    "com.example:multiply-licenses",
+					Version: "1.0.0",
+					License: "MIT, Apache 2.0",
 				},
 			},
 		},
