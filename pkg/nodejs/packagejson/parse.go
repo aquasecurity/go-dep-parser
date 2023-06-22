@@ -7,6 +7,7 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 	"golang.org/x/xerrors"
 )
 
@@ -18,6 +19,7 @@ type packageJSON struct {
 	Dependencies         map[string]string `json:"dependencies"`
 	DevDependencies      map[string]string `json:"devDependencies"`
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
+	Workspaces           []string          `json:"workspaces"`
 }
 
 type Package struct {
@@ -26,6 +28,7 @@ type Package struct {
 	OptionalDependencies map[string]string
 	DevDependencies      map[string]string
 	Engines              map[string]string
+	Workspaces           []string
 }
 
 type Parser struct{}
@@ -40,9 +43,16 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		return Package{}, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
+	var id string
+	// Name and version fields are optional
+	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
+	if pkgJSON.Name != "" && pkgJSON.Version != "" {
+		id = utils.PackageID(pkgJSON.Name, pkgJSON.Version)
+	}
+
 	return Package{
 		Library: types.Library{
-			ID:      utils.PackageID(pkgJSON.Name, pkgJSON.Version),
+			ID:      id,
 			Name:    pkgJSON.Name,
 			Version: pkgJSON.Version,
 			License: parseLicense(pkgJSON.License),
@@ -51,6 +61,7 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		OptionalDependencies: pkgJSON.OptionalDependencies,
 		DevDependencies:      pkgJSON.DevDependencies,
 		Engines:              pkgJSON.Engines,
+		Workspaces:           pkgJSON.Workspaces,
 	}, nil
 }
 

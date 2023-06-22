@@ -61,6 +61,10 @@ func TestParse(t *testing.T) {
 					"rollup-plugin-istanbul": "^3.0.0", "rtlcss": "^3.3.0", "sass": "^1.35.2",
 					"shelljs": "^0.8.4", "stylelint": "^13.13.1",
 					"stylelint-config-twbs-bootstrap": "^2.2.3", "terser": "5.1.0", "vnu-jar": "21.6.11"},
+				Workspaces: []string{
+					"packages/*",
+					"backend",
+				},
 			},
 		},
 		{
@@ -102,7 +106,7 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/without_version_package.json",
 			want: packagejson.Package{
 				Library: types.Library{
-					ID:   "angular@",
+					ID:   "",
 					Name: "angular",
 				},
 			},
@@ -133,6 +137,15 @@ func TestParse(t *testing.T) {
 					"lodash":               "4.17.20", "esm": "^3.2.25",
 				},
 				Engines: map[string]string{"node": ">=4.0.0"},
+			},
+			{
+				name:      "without name and version",
+				inputFile: "testdata/without_name_and_version_package.json",
+				want: packagejson.Package{
+					Library: types.Library{
+						License: "MIT",
+					},
+				},
 			},
 		},
 	}
