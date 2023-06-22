@@ -138,13 +138,13 @@ func TestParse(t *testing.T) {
 				},
 				Engines: map[string]string{"node": ">=4.0.0"},
 			},
-			{
-				name:      "without name and version",
-				inputFile: "testdata/without_name_and_version_package.json",
-				want: packagejson.Package{
-					Library: types.Library{
-						License: "MIT",
-					},
+		},
+		{
+			name:      "without name and version",
+			inputFile: "testdata/without_name_and_version_package.json",
+			want: packagejson.Package{
+				Library: types.Library{
+					License: "MIT",
 				},
 			},
 		},

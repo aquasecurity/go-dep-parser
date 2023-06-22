@@ -7,7 +7,6 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
-	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 	"golang.org/x/xerrors"
 )
 
