@@ -42,7 +42,7 @@ type ExternalRef struct {
 
 type Dependency struct {
 	ID        string
-	Root    bool
+	Root      bool
 	DependsOn []string
 }
 
