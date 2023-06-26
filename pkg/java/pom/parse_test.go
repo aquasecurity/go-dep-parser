@@ -22,6 +22,7 @@ func TestPom_Parse(t *testing.T) {
 		local     bool
 		offline   bool
 		want      []types.Library
+		wantDeps  []types.Dependency
 		wantErr   string
 	}{
 		{
@@ -37,6 +38,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:happy:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
 				},
 			},
 		},
@@ -55,6 +63,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:happy:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "offline mode",
@@ -65,6 +80,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-offline",
 					Version: "2.3.4",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        ":child:",
+					Root:      true,
+					DependsOn: []string{"org.example:example-offline:2.3.4"},
 				},
 			},
 		},
@@ -83,6 +105,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:child:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "inherit project properties from parent",
@@ -98,6 +127,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:child:2.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
+				},
+			},
 		},
 		{
 			name:      "inherit properties in parent depManagement with import scope",
@@ -111,6 +147,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "2.0.0",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:test:0.0.1-SNAPSHOT",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
 				},
 			},
 		},
@@ -132,6 +175,18 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.2.3",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:child:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-dependency:1.2.3"},
+				},
+				{
+					ID:        "org.example:example-dependency:1.2.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:4.0.0"},
+				},
+			},
 		},
 		{
 			name:      "inherit parent dependencies",
@@ -148,6 +203,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:child:1.0.0-SNAPSHOT",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "inherit parent dependencyManagement",
@@ -162,6 +224,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:child:3.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
 				},
 			},
 		},
@@ -184,6 +253,18 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:base:4.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-child:2.0.0"},
+				},
+				{
+					ID:        "org.example:example-child:2.0.0",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "parent relativePath",
@@ -198,6 +279,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:child:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
 				},
 			},
 		},
@@ -215,6 +303,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.1.1",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:child:1.0.0-SNAPSHOT",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.1.1"},
+				},
+			},
 		},
 		{
 			name:      "parent in a remote repository",
@@ -229,6 +324,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "org.example:child:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
 				},
 			},
 		},
@@ -249,6 +351,18 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-dependency",
 					Version: "1.2.3",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:soft:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30", "org.example:example-dependency:1.2.3"},
+				},
+				{
+					ID:        "org.example:example-dependency:1.2.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
 				},
 			},
 		},
@@ -274,6 +388,23 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.3.4",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:soft-transitive:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-dependency:1.2.3", "org.example:example-dependency2:2.3.4"},
+				},
+				{
+					ID:        "org.example:example-dependency:1.2.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
+				},
+				{
+					ID:        "org.example:example-dependency2:2.3.4",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "hard requirement for the specified version",
@@ -294,6 +425,18 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.2.4",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:hard:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30", "org.example:example-dependency:1.2.4"},
+				},
+				{
+					ID:        "org.example:example-dependency:1.2.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
+				},
+			},
 		},
 		{
 			name:      "version requirement",
@@ -304,6 +447,13 @@ func TestPom_Parse(t *testing.T) {
 					Name:    "com.example:hard",
 					Version: "1.0.0",
 					License: "Apache 2.0",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:hard:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:"},
 				},
 			},
 		},
@@ -322,6 +472,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:import:2.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "import multiple dependencyManagement",
@@ -336,6 +493,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:import:2.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
 				},
 			},
 		},
@@ -355,6 +519,18 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-nested",
 					Version: "3.3.3",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:exclusions:3.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-nested:3.3.3"},
+				},
+				{
+					ID:        "org.example:example-nested:3.3.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-dependency:1.2.3"},
 				},
 			},
 		},
@@ -378,6 +554,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-nested",
 					Version: "3.3.3",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:wildcard-exclusions:4.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-dependency:1.2.3", "org.example:example-dependency2:2.3.4", "org.example:example-nested:3.3.3"},
 				},
 			},
 		},
@@ -453,6 +636,23 @@ func TestPom_Parse(t *testing.T) {
 					Version: "3.3.3",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:root-pom-dep-management:1.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-nested:3.3.3"},
+				},
+				{
+					ID:        "org.example:example-nested:3.3.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-dependency:1.2.4"},
+				},
+				{
+					ID:        "org.example:example-dependency:1.2.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
+				},
+			},
 		},
 		{
 			name:      "transitive dependencyManagement should not be inherited",
@@ -478,6 +678,23 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "org.example:transitive-dependency-management:2.0.0",
+					Root:      true,
+					DependsOn: []string{"org.example:example-dependency-management3:1.1.1"},
+				},
+				{
+					ID:        "org.example:example-dependency-management3:1.1.1",
+					Root:      false,
+					DependsOn: []string{"org.example:example-dependency:1.2.3"},
+				},
+				{
+					ID:        "org.example:example-dependency:1.2.3",
+					Root:      false,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
+				},
+			},
 		},
 		{
 			name:      "parent not found",
@@ -494,6 +711,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:no-parent:1.0-SNAPSHOT",
+					Root: true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "dependency not found",
@@ -508,6 +732,13 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-not-found",
 					Version: "999",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:not-found-dependency:1.0.0",
+					Root: true,
+					DependsOn: []string{"org.example:example-not-found:999"},
 				},
 			},
 		},
@@ -555,7 +786,7 @@ func TestPom_Parse(t *testing.T) {
 
 			p := pom.NewParser(tt.inputFile, pom.WithRemoteRepos(remoteRepos), pom.WithOffline(tt.offline))
 
-			got, _, err := p.Parse(f)
+			libs, deps, err := p.Parse(f)
 			if tt.wantErr != "" {
 				require.NotNil(t, err)
 				assert.Contains(t, err.Error(), tt.wantErr)
@@ -563,11 +794,13 @@ func TestPom_Parse(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			sort.Slice(got, func(i, j int) bool {
-				return got[i].Name < got[j].Name
+			sort.Slice(libs, func(i, j int) bool {
+				return libs[i].Name < libs[j].Name
 			})
 
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want, libs)
+
+			assert.Equal(t, tt.wantDeps, deps)
 		})
 	}
 }

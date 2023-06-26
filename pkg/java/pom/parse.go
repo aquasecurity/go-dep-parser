@@ -26,8 +26,9 @@ const (
 )
 
 type options struct {
-	offline     bool
-	remoteRepos []string
+	offline      bool
+	remoteRepos  []string
+	onlyTestDeps bool
 }
 
 type option func(*options)
@@ -38,6 +39,11 @@ func WithOffline(offline bool) option {
 	}
 }
 
+func WithOnlyTestDeps(testDeps bool) option {
+	return func(opts *options) {
+		opts.onlyTestDeps = testDeps
+	}
+}
 func WithRemoteRepos(repos []string) option {
 	return func(opts *options) {
 		opts.remoteRepos = repos
@@ -50,6 +56,7 @@ type parser struct {
 	localRepository    string
 	remoteRepositories []string
 	offline            bool
+	scopeFunc          func(scope string) bool
 }
 
 func NewParser(filePath string, opts ...option) types.Parser {
@@ -61,7 +68,15 @@ func NewParser(filePath string, opts ...option) types.Parser {
 	for _, opt := range opts {
 		opt(o)
 	}
+	scopeFunc := func(scope string) bool {
+		return (scope != "" && !(scope == "compile" || scope == "test"))
+	}
 
+	if o.onlyTestDeps {
+		scopeFunc = func(scope string) bool {
+			return scope != "test"
+		}
+	}
 	s := readSettings()
 	localRepository := s.LocalRepository
 	if localRepository == "" {
@@ -75,6 +90,7 @@ func NewParser(filePath string, opts ...option) types.Parser {
 		localRepository:    localRepository,
 		remoteRepositories: o.remoteRepos,
 		offline:            o.offline,
+		scopeFunc:          scopeFunc,
 	}
 }
 
@@ -166,6 +182,12 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		// Resolve transitive dependencies later
 		queue.enqueue(result.dependencies...)
 
+		dependency := buildArtifactDependency(art, result)
+
+		if len(dependency.DependsOn) > 0 {
+			deps = append(deps, dependency)
+		}
+
 		// Offline mode may be missing some fields.
 		if !art.IsEmpty() {
 			// Override the version
@@ -184,8 +206,20 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			License: art.License,
 		})
 	}
-
 	return libs, deps, nil
+}
+
+func buildArtifactDependency(art artifact, result analysisResult) types.Dependency {
+	dependency := types.Dependency{
+		ID:   result.artifact.String(),
+		Root: art.Root,
+	}
+
+	for _, d := range result.dependencies {
+		dependency.DependsOn = append(dependency.DependsOn, d.String())
+	}
+
+	return dependency
 }
 
 func (p *parser) parseModule(currentPath, relativePath string) (artifact, error) {
@@ -317,7 +351,7 @@ func (p *parser) parseDependencies(deps []pomDependency, props map[string]string
 		// Resolve dependencies
 		d = d.Resolve(props, depManagement, rootDepManagement)
 
-		if (d.Scope != "" && d.Scope != "compile") || d.Optional {
+		if p.scopeFunc(d.Scope) || d.Optional {
 			continue
 		}
 		dependencies = append(dependencies, d.ToArtifact(exclusions))
