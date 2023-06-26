@@ -145,7 +145,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 				return nil, nil, err
 			}
 			libs = append(libs, moduleLibs...)
-			if deps != nil {
+			if moduleDeps != nil {
 				deps = append(deps, moduleDeps...)
 			}
 			continue

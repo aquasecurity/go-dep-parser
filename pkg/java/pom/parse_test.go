@@ -584,6 +584,13 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:module:1.1.1",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+			},
 		},
 		{
 			name:      "multi module soft requirement",
@@ -609,6 +616,18 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-api",
 					Version: "2.0.0",
+				},
+			},
+			wantDeps: []types.Dependency{
+				{
+					ID:        "com.example:module1:1.1.1",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:1.7.30"},
+				},
+				{
+					ID:        "com.example:module2:1.1.1",
+					Root:      true,
+					DependsOn: []string{"org.example:example-api:2.0.0"},
 				},
 			},
 		},
