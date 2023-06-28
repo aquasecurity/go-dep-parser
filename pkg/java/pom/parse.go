@@ -50,6 +50,43 @@ func WithRemoteRepos(repos []string) option {
 	}
 }
 
+type extendedParser struct {
+	*parser
+}
+
+// ExtendedParser extends the types.Parser and returns additional meta data
+type ExtendedParser interface {
+	types.Parser
+	// GetRemoteRepositories returns the remote repositories
+	GetRemoteRepositories() []string
+	// GetProperties returns properties for given gav string
+	GetProperties(groupID, artifactID, version string) map[string]string
+	// EvaluateProperty evaluates the string in the property
+	EvaluateProperty(s string, props map[string]string) string
+}
+
+func (e *extendedParser) GetRemoteRepositories() []string {
+	return e.remoteRepositories
+}
+
+func (e *extendedParser) GetProperties(groupID, artifactID, version string) map[string]string {
+	art := newArtifact(groupID, artifactID, version, "", nil)
+	result := e.cache.get(art)
+	if result == nil {
+		return nil
+	}
+	return result.properties
+}
+
+func (e *extendedParser) EvaluateProperty(s string, props map[string]string) string {
+	return evaluateVariable(s, props, nil)
+}
+
+// evaluateVariable
+func NewExtendedParser(filePath string, opts ...option) ExtendedParser {
+	return &extendedParser{newPomParser(filePath, opts...)}
+}
+
 type parser struct {
 	rootPath           string
 	cache              pomCache
@@ -60,6 +97,10 @@ type parser struct {
 }
 
 func NewParser(filePath string, opts ...option) types.Parser {
+	return newPomParser(filePath, opts...)
+}
+
+func newPomParser(filePath string, opts ...option) *parser {
 	o := &options{
 		offline:     false,
 		remoteRepos: []string{centralURL},
@@ -337,7 +378,8 @@ func (p *parser) mergeDependencyManagements(depManagements ...[]pomDependency) [
 }
 
 func (p *parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement, rootDepManagement []pomDependency,
-	exclusions map[string]struct{}) []artifact {
+	exclusions map[string]struct{},
+) []artifact {
 	// Imported POMs often have no dependencies, so dependencyManagement resolution can be skipped.
 	if len(deps) == 0 {
 		return nil
@@ -542,6 +584,7 @@ func (p *parser) openPom(filePath string) (*pom, error) {
 		content:  content,
 	}, nil
 }
+
 func (p *parser) tryRepository(groupID, artifactID, version string) (*pom, error) {
 	// Generate a proper path to the pom.xml
 	// e.g. com.fasterxml.jackson.core, jackson-annotations, 2.10.0
