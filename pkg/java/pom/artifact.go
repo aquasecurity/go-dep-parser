@@ -48,7 +48,7 @@ func (a artifact) JoinLicenses() string {
 	return strings.Join(a.Licenses, ", ")
 }
 
-func (a artifact) ToPomLicenses() pomLicenses {
+func (a artifact) ToPOMLicenses() pomLicenses {
 	return pomLicenses{License: lo.Map(a.Licenses, func(lic string, _ int) pomLicense {
 		return pomLicense{Name: lic}
 	})}

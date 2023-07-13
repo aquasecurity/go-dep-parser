@@ -25,7 +25,7 @@ func (p *pom) inherit(result analysisResult) {
 
 	p.content.GroupId = art.GroupID
 	p.content.ArtifactId = art.ArtifactID
-	p.content.Licenses = art.ToPomLicenses()
+	p.content.Licenses = art.ToPOMLicenses()
 
 	if isProperty(art.Version.String()) {
 		p.content.Version = evaluateVariable(art.Version.String(), p.content.Properties, nil)
