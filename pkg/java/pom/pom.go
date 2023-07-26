@@ -25,7 +25,13 @@ func (p *pom) inherit(result analysisResult) {
 
 	p.content.GroupId = art.GroupID
 	p.content.ArtifactId = art.ArtifactID
-	p.content.Version = art.Version.String()
+	p.content.Licenses = art.ToPOMLicenses()
+
+	if isProperty(art.Version.String()) {
+		p.content.Version = evaluateVariable(art.Version.String(), p.content.Properties, nil)
+	} else {
+		p.content.Version = art.Version.String()
+	}
 }
 
 func (p pom) properties() properties {
@@ -37,9 +43,18 @@ func (p pom) projectProperties() map[string]string {
 	val := reflect.ValueOf(p.content).Elem()
 	props := p.listProperties(val)
 
+	// "version" and "groupId" elements could be inherited from parent.
+	// https://maven.apache.org/pom.html#inheritance
+	props["groupId"] = p.content.GroupId
+	props["version"] = p.content.Version
+
 	// https://maven.apache.org/pom.html#properties
 	projectProperties := map[string]string{}
 	for k, v := range props {
+		if strings.HasPrefix(k, "project.") {
+			continue
+		}
+
 		// e.g. ${project.groupId}
 		key := fmt.Sprintf("project.%s", k)
 		projectProperties[key] = v
@@ -86,7 +101,13 @@ func (p pom) listProperties(val reflect.Value) map[string]string {
 }
 
 func (p pom) artifact() artifact {
-	return newArtifact(p.content.GroupId, p.content.ArtifactId, p.content.Version, p.content.Properties)
+	return newArtifact(p.content.GroupId, p.content.ArtifactId, p.content.Version, p.licenses(), p.content.Properties)
+}
+
+func (p pom) licenses() []string {
+	return lo.FilterMap(p.content.Licenses.License, func(lic pomLicense, _ int) (string, bool) {
+		return lic.Name, lic.Name != ""
+	})
 }
 
 func (p pom) repositories() []string {
@@ -100,10 +121,11 @@ func (p pom) repositories() []string {
 }
 
 type pomXML struct {
-	Parent     pomParent `xml:"parent"`
-	GroupId    string    `xml:"groupId"`
-	ArtifactId string    `xml:"artifactId"`
-	Version    string    `xml:"version"`
+	Parent     pomParent   `xml:"parent"`
+	GroupId    string      `xml:"groupId"`
+	ArtifactId string      `xml:"artifactId"`
+	Version    string      `xml:"version"`
+	Licenses   pomLicenses `xml:"licenses"`
 	Modules    struct {
 		Text   string   `xml:",chardata"`
 		Module []string `xml:"module"`
@@ -138,6 +160,15 @@ type pomParent struct {
 	ArtifactId   string `xml:"artifactId"`
 	Version      string `xml:"version"`
 	RelativePath string `xml:"relativePath"`
+}
+
+type pomLicenses struct {
+	Text    string       `xml:",chardata"`
+	License []pomLicense `xml:"license"`
+}
+
+type pomLicense struct {
+	Name string `xml:"name"`
 }
 
 type pomDependencies struct {

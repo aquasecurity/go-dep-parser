@@ -2,10 +2,10 @@ package packagejson
 
 import (
 	"encoding/json"
-	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 	"io"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
+	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 	"golang.org/x/xerrors"
 )
 
@@ -15,12 +15,16 @@ type packageJSON struct {
 	License              interface{}       `json:"license"`
 	Dependencies         map[string]string `json:"dependencies"`
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
+	DevDependencies      map[string]string `json:"devDependencies"`
+	Workspaces           []string          `json:"workspaces"`
 }
 
 type Package struct {
 	types.Library
 	Dependencies         map[string]string
 	OptionalDependencies map[string]string
+	DevDependencies      map[string]string
+	Workspaces           []string
 }
 
 type Parser struct{}
@@ -35,19 +39,24 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 		return Package{}, xerrors.Errorf("JSON decode error: %w", err)
 	}
 
-	if pkgJSON.Name == "" || pkgJSON.Version == "" {
-		return Package{}, xerrors.New("unable to parse package.json")
+	var id string
+	// Name and version fields are optional
+	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name
+	if pkgJSON.Name != "" && pkgJSON.Version != "" {
+		id = utils.PackageID(pkgJSON.Name, pkgJSON.Version)
 	}
 
 	return Package{
 		Library: types.Library{
-			ID:      utils.PackageID(pkgJSON.Name, pkgJSON.Version),
+			ID:      id,
 			Name:    pkgJSON.Name,
 			Version: pkgJSON.Version,
 			License: parseLicense(pkgJSON.License),
 		},
 		Dependencies:         pkgJSON.Dependencies,
 		OptionalDependencies: pkgJSON.OptionalDependencies,
+		DevDependencies:      pkgJSON.DevDependencies,
+		Workspaces:           pkgJSON.Workspaces,
 	}, nil
 }
 

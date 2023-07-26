@@ -20,7 +20,7 @@ func TestParse(t *testing.T) {
 		wantErr   string
 	}{
 		{
-			name:      "happypath",
+			name:      "happy path",
 			inputFile: "testdata/package.json",
 
 			// docker run --name composer --rm -it node:12-alpine sh
@@ -40,6 +40,14 @@ func TestParse(t *testing.T) {
 				OptionalDependencies: map[string]string{
 					"colors": "^1.4.0",
 				},
+				DevDependencies: map[string]string{
+					"@babel/cli":  "^7.14.5",
+					"@babel/core": "^7.14.6",
+				},
+				Workspaces: []string{
+					"packages/*",
+					"backend",
+				},
 			},
 		},
 		{
@@ -53,6 +61,20 @@ func TestParse(t *testing.T) {
 					License: "ISC",
 				},
 				Dependencies: map[string]string{},
+				DevDependencies: map[string]string{
+					"@babel/cli":  "^7.14.5",
+					"@babel/core": "^7.14.6",
+				},
+			},
+		},
+		{
+			name:      "happy path - version doesn't exist",
+			inputFile: "testdata/without_version_package.json",
+			want: packagejson.Package{
+				Library: types.Library{
+					ID:   "",
+					Name: "angular",
+				},
 			},
 		},
 		{
@@ -64,6 +86,15 @@ func TestParse(t *testing.T) {
 			// npm install --save promise jquery
 			// npm ls | grep -E -o "\S+@\S+" | awk -F@ 'NR>0 {printf("{\""$1"\", \""$2"\"},\n")}'
 			wantErr: "JSON decode error",
+		},
+		{
+			name:      "without name and version",
+			inputFile: "testdata/without_name_and_version_package.json",
+			want: packagejson.Package{
+				Library: types.Library{
+					License: "MIT",
+				},
+			},
 		},
 	}
 

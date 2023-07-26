@@ -8,10 +8,12 @@ type Library struct {
 	ID                 string `json:",omitempty"`
 	Name               string
 	Version            string
+	Dev                bool
 	Indirect           bool          `json:",omitempty"`
 	License            string        `json:",omitempty"`
 	ExternalReferences []ExternalRef `json:",omitempty"`
 	Locations          []Location    `json:",omitempty"`
+	FilePath           string        `json:",omitempty"` // Required to show nested jars
 }
 
 type Libraries []Library
