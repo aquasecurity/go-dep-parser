@@ -210,7 +210,7 @@ func findDependsOn(pkgPath, depName string, packages map[string]Package) (string
 	// add `node_modules` and try to find dep
 	// e.g. for pkgPath == `function/func1`, depName == "debug`:
 	// `node_modules/debug`
-	// case when `function/func1/node_modules_debug` exists resolved in loop
+	// case when `function/func1/node_modules/debug` exists resolved in loop
 	depPath = joinPaths(nodeModulesFolder, depName)
 	if dep, ok := packages[depPath]; ok {
 		depVersion := dep.Version
