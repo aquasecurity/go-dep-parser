@@ -119,10 +119,10 @@ var (
 	npmV3WithWorkspaceLibs = []types.Library{
 		{ID: "debug@2.5.2", Name: "debug", Version: "2.5.2", Indirect: false, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/debug/-/debug-2.5.2.tgz"}}, Locations: []types.Location{{StartLine: 39, EndLine: 46}}},
 		{ID: "debug@2.6.9", Name: "debug", Version: "2.6.9", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"}}, Locations: []types.Location{{StartLine: 31, EndLine: 38}}},
-		{ID: "function1@", Name: "function1", Version: "", Indirect: false, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "functions/func1"}}, Locations: []types.Location{{StartLine: 18, EndLine: 23}, {StartLine: 52, EndLine: 55}}},
+		{ID: "function1@", Name: "function1", Version: "", Indirect: false, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "functions/func1"}}, Locations: []types.Location{{StartLine: 18, EndLine: 23}}},
 		{ID: "ms@0.7.2", Name: "ms", Version: "0.7.2", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/ms/-/ms-0.7.2.tgz"}}, Locations: []types.Location{{StartLine: 47, EndLine: 51}}},
 		{ID: "ms@2.0.0", Name: "ms", Version: "2.0.0", Indirect: true, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz"}}, Locations: []types.Location{{StartLine: 56, EndLine: 60}}},
-		{ID: "nested_func@1.0.0", Name: "nested_func", Version: "1.0.0", Indirect: false, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "functions/nested_func"}}, Locations: []types.Location{{StartLine: 24, EndLine: 30}, {StartLine: 61, EndLine: 64}}},
+		{ID: "nested_func@1.0.0", Name: "nested_func", Version: "1.0.0", Indirect: false, ExternalReferences: []types.ExternalRef{{Type: types.RefOther, URL: "functions/nested_func"}}, Locations: []types.Location{{StartLine: 24, EndLine: 30}}},
 	}
 
 	npmV3WithWorkspaceDeps = []types.Dependency{
