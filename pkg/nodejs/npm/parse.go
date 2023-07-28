@@ -117,6 +117,7 @@ func (p *Parser) parseV2(packages map[string]Package) ([]types.Library, []types.
 		// we need to add location for each these dependencies
 		if savedLib, ok := libs[pkgID]; ok {
 			savedLib.Locations = append(savedLib.Locations, location)
+			sort.Sort(savedLib.Locations)
 			libs[pkgID] = savedLib
 			continue
 		}
@@ -318,6 +319,8 @@ func uniqueDeps(deps []types.Dependency) []types.Dependency {
 			uniqDeps = append(uniqDeps, dep)
 		}
 	}
+
+	sort.Sort(types.Dependencies(uniqDeps))
 	return uniqDeps
 }
 
