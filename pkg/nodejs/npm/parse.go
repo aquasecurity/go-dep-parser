@@ -332,16 +332,16 @@ func isIndirectLib(pkgPath string, directDeps map[string]struct{}) bool {
 }
 
 func pkgNameFromPath(path string) string {
-	// lock file contains path to dependency in `node_modules` or workspace folder. e.g.:
+	// lock file contains path to dependency in `node_modules`. e.g.:
 	// node_modules/string-width
 	// node_modules/string-width/node_modules/strip-ansi
-	// functions/func1
-	// functions/nested_func/node_modules/debug
+	// we renamed to `node_modules` directory prefixes `workspace` when resolving Links
+	// node_modules/function1
+	// node_modules/nested_func/node_modules/debug
 	if index := strings.LastIndex(path, nodeModulesDir); index != -1 {
 		return path[index+len(nodeModulesDir)+1:]
 	}
-	// for case when path doesn't have node_modules folder
-	// we will resolve this package with link later
+	log.Logger.Warnf("npm %q package path doesn't have `node_modules` prefix", path)
 	return path
 }
 
