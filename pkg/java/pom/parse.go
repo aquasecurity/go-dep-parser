@@ -9,10 +9,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	multierror "github.com/hashicorp/go-multierror"
+	"github.com/samber/lo"
+	"golang.org/x/exp/slices"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/xerrors"
 
@@ -115,6 +118,8 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		deps              []types.Dependency
 		rootDepManagement []pomDependency
 		uniqArtifacts     = map[string]artifact{}
+		uniqDeps          = map[string][]string{}
+		savedDeps         []string
 	)
 
 	// Iterate direct and transitive dependencies
@@ -173,19 +178,64 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 				Version:  art.Version,
 				Licenses: art.Licenses,
 			}
+
+			// save only dependency names
+			// version will be determined later
+			dependsOn := lo.FilterMap(result.dependencies, func(a artifact, _ int) (string, bool) {
+				return a.Name(), !slices.Contains(savedDeps, a.Name())
+			})
+			uniqDeps[art.Name()] = dependsOn
+			// mvn only takes top dependencies
+			// this is needed to reproduce mvn logic
+			// take a look at `soft requirement`, `soft requirement with transitive dependencies`
+			// and `hard requirement for the specified version` tests
+			savedDeps = append(savedDeps, dependsOn...)
 		}
 	}
 
 	// Convert to []types.Library
 	for name, art := range uniqArtifacts {
 		libs = append(libs, types.Library{
+			ID:      PackageID(name, art.Version.String()),
 			Name:    name,
 			Version: art.Version.String(),
 			License: art.JoinLicenses(),
 		})
 	}
 
+	// Convert to []types.Dependencies
+	for name, dependsOn := range uniqDeps {
+		// uniqDeps contains only dependency names
+		// get ID from uniqArtifacts
+		id := PackageID(name, depVersion(name, uniqArtifacts))
+
+		// get ID from uniqArtifacts for dependsOn
+		dependsOn = lo.FilterMap(dependsOn, func(dependOnName string, _ int) (string, bool) {
+			ver := depVersion(dependOnName, uniqArtifacts)
+			return PackageID(dependOnName, ver), ver != ""
+		})
+
+		sort.Strings(dependsOn)
+		if len(dependsOn) > 0 {
+			deps = append(deps, types.Dependency{
+				ID:        id,
+				DependsOn: dependsOn,
+			})
+		}
+	}
+
+	sort.Sort(types.Libraries(libs))
+	sort.Sort(types.Dependencies(deps))
+
 	return libs, deps, nil
+}
+
+// depVersion finds dependency in uniqArtifacts and return its version
+func depVersion(depName string, uniqArtifacts map[string]artifact) string {
+	if art, ok := uniqArtifacts[depName]; ok {
+		return art.Version.String()
+	}
+	return ""
 }
 
 func (p *parser) parseModule(currentPath, relativePath string) (artifact, error) {
