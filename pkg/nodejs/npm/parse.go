@@ -178,6 +178,13 @@ func resolveLinks(packages map[string]Package) {
 		return
 	}
 
+	// Init root Dependencies map
+	if packages[""].Dependencies == nil {
+		rootPackage := packages[""]
+		rootPackage.Dependencies = make(map[string]string)
+		packages[""] = rootPackage
+	}
+
 	workspaces := packages[""].Workspaces
 	for pkgPath, pkg := range packages {
 		for linkPath, link := range links {
