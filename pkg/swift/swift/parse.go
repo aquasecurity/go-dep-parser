@@ -30,15 +30,19 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	var libs types.Libraries
 	for _, pin := range lockFile.Object.Pins {
 		libs = append(libs, types.Library{
-			ID: utils.PackageID(pin.Package, pin.State.Version),
-			// GHSA swift uses URL as advisory name
-			// That is why we save URL as name
-			Name:    pin.RepositoryURL,
+			ID:      utils.PackageID(pin.Package, pin.State.Version),
+			Name:    pin.Package,
 			Version: pin.State.Version,
 			Locations: []types.Location{
 				{
 					StartLine: pin.StartLine,
 					EndLine:   pin.EndLine,
+				},
+			},
+			ExternalReferences: []types.ExternalRef{
+				{
+					Type: types.RefGit,
+					URL:  pin.RepositoryURL,
 				},
 			},
 		})

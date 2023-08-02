@@ -19,21 +19,39 @@ func TestParser_Parse(t *testing.T) {
 			want: []types.Library{
 				{
 					ID:        "Nimble@9.2.1",
-					Name:      "https://github.com/Quick/Nimble.git",
+					Name:      "Nimble",
 					Version:   "9.2.1",
 					Locations: []types.Location{{StartLine: 4, EndLine: 12}},
+					ExternalReferences: []types.ExternalRef{
+						{
+							Type: types.RefGit,
+							URL:  "https://github.com/Quick/Nimble.git",
+						},
+					},
 				},
 				{
 					ID:        "Quick@7.0.0",
-					Name:      "https://github.com/Quick/Quick.git",
+					Name:      "Quick",
 					Version:   "7.0.0",
 					Locations: []types.Location{{StartLine: 13, EndLine: 21}},
+					ExternalReferences: []types.ExternalRef{
+						{
+							Type: types.RefGit,
+							URL:  "https://github.com/Quick/Quick.git",
+						},
+					},
 				},
 				{
 					ID:        "ReactiveSwift@7.1.1",
-					Name:      "https://github.com/ReactiveCocoa/ReactiveSwift",
+					Name:      "ReactiveSwift",
 					Version:   "7.1.1",
 					Locations: []types.Location{{StartLine: 22, EndLine: 30}},
+					ExternalReferences: []types.ExternalRef{
+						{
+							Type: types.RefGit,
+							URL:  "https://github.com/ReactiveCocoa/ReactiveSwift",
+						},
+					},
 				},
 			},
 		},

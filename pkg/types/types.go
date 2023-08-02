@@ -74,4 +74,5 @@ const (
 	RefVCS          RefType = "vcs"
 	RefIssueTracker RefType = "issue-tracker"
 	RefOther        RefType = "other"
+	RefGit          RefType = "git"
 )
