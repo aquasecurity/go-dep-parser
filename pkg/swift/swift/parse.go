@@ -3,7 +3,6 @@ package swift
 import (
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
-	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 	"github.com/liamg/jfather"
 	"golang.org/x/xerrors"
 	"io"
@@ -30,19 +29,12 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	var libs types.Libraries
 	for _, pin := range lockFile.Object.Pins {
 		libs = append(libs, types.Library{
-			ID:      utils.PackageID(pin.Package, pin.State.Version),
-			Name:    pin.Package,
+			Name:    pin.RepositoryURL,
 			Version: pin.State.Version,
 			Locations: []types.Location{
 				{
 					StartLine: pin.StartLine,
 					EndLine:   pin.EndLine,
-				},
-			},
-			ExternalReferences: []types.ExternalRef{
-				{
-					Type: types.RefGit,
-					URL:  pin.RepositoryURL,
 				},
 			},
 		})
