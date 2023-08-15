@@ -18,17 +18,17 @@ func TestParser_Parse(t *testing.T) {
 			inputFile: "testdata/happy-Package.resolved",
 			want: []types.Library{
 				{
-					Name:      "https://github.com/Quick/Nimble.git",
+					Name:      "github.com/Quick/Nimble",
 					Version:   "9.2.1",
 					Locations: []types.Location{{StartLine: 4, EndLine: 12}},
 				},
 				{
-					Name:      "https://github.com/Quick/Quick.git",
+					Name:      "github.com/Quick/Quick",
 					Version:   "7.0.0",
 					Locations: []types.Location{{StartLine: 13, EndLine: 21}},
 				},
 				{
-					Name:      "https://github.com/ReactiveCocoa/ReactiveSwift",
+					Name:      "github.com/ReactiveCocoa/ReactiveSwift",
 					Version:   "7.1.1",
 					Locations: []types.Location{{StartLine: 22, EndLine: 30}},
 				},

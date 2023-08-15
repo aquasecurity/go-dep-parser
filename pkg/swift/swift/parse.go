@@ -7,6 +7,7 @@ import (
 	"golang.org/x/xerrors"
 	"io"
 	"sort"
+	"strings"
 )
 
 // Parser is a parser for Package.resolved files
@@ -29,7 +30,7 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	var libs types.Libraries
 	for _, pin := range lockFile.Object.Pins {
 		libs = append(libs, types.Library{
-			Name:    pin.RepositoryURL,
+			Name:    libraryName(pin.RepositoryURL),
 			Version: pin.State.Version,
 			Locations: []types.Location{
 				{
@@ -41,6 +42,15 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	}
 	sort.Sort(libs)
 	return libs, nil, nil
+}
+
+func libraryName(name string) string {
+	// Swift uses `https://github.com/<author>/<package>.git format
+	// `.git` suffix can be omitted (take a look happy test)
+	// Remove `https://` and `.git` to fit the same format
+	name = strings.TrimPrefix(name, "https://")
+	name = strings.TrimSuffix(name, ".git")
+	return name
 }
 
 // UnmarshalJSONWithMetadata needed to detect start and end lines of deps for v1
