@@ -55,14 +55,14 @@ func TestParse(t *testing.T) {
 			f, err := os.Open(tt.file)
 			require.NoError(t, err)
 
-			got, deps, err := NewParser().Parse(f)
+			gotLibs, gotDeps, err := NewParser().Parse(f)
 			require.NoError(t, err)
 
 			sort.Sort(types.Libraries(tt.want))
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want, gotLibs)
 			if tt.wantDeps != nil {
 				sort.Sort(types.Dependencies(tt.wantDeps))
-				assert.Equal(t, tt.wantDeps, deps)
+				assert.Equal(t, tt.wantDeps, gotDeps)
 			}
 		})
 	}
