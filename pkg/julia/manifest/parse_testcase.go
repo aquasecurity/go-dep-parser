@@ -15,10 +15,10 @@ var (
 	juliaV1_6Deps = []types.Dependency{
 		{ID: "ade2ca70-3891-5945-98fb-dc099432e06a@unknown", DependsOn: []string{"de0858da-6303-5e67-8744-51eddeeeb8d7@unknown"}},
 		{ID: "682c06a0-de6a-54ab-a142-c8b1cf79cde6@0.21.4", DependsOn: []string{
-			"ade2ca70-3891-5945-98fb-dc099432e06a@unknown",
-			"a63ad114-7e13-5084-954f-fe012c677804@unknown",
-			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0@2.4.2",
 			"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5@unknown",
+			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0@2.4.2",
+			"a63ad114-7e13-5084-954f-fe012c677804@unknown",
+			"ade2ca70-3891-5945-98fb-dc099432e06a@unknown",
 		}},
 		{ID: "69de0a69-1ddd-5017-9359-2bf0b02dc9f0@2.4.2", DependsOn: []string{"ade2ca70-3891-5945-98fb-dc099432e06a@unknown"}},
 		{ID: "de0858da-6303-5e67-8744-51eddeeeb8d7@unknown", DependsOn: []string{"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5@unknown"}},
@@ -43,16 +43,20 @@ var (
 	juliaV1_8Deps = []types.Dependency{
 		{ID: "ade2ca70-3891-5945-98fb-dc099432e06a@1.8.5", DependsOn: []string{"de0858da-6303-5e67-8744-51eddeeeb8d7@1.8.5"}},
 		{ID: "682c06a0-de6a-54ab-a142-c8b1cf79cde6@0.21.4", DependsOn: []string{
-			"ade2ca70-3891-5945-98fb-dc099432e06a@1.8.5",
-			"a63ad114-7e13-5084-954f-fe012c677804@1.8.5",
-			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0@2.5.10",
 			"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5@1.8.5",
+			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0@2.5.10",
+			"a63ad114-7e13-5084-954f-fe012c677804@1.8.5",
+			"ade2ca70-3891-5945-98fb-dc099432e06a@1.8.5",
 		}},
-		{ID: "69de0a69-1ddd-5017-9359-2bf0b02dc9f0@2.5.10", DependsOn: []string{"ade2ca70-3891-5945-98fb-dc099432e06a@1.8.5", "aea7be01-6a6a-4083-8856-8a6e6704d82a@1.1.1", "cf7118a7-6976-5b1a-9a39-7adc72f591a4@1.8.5"}},
+		{ID: "69de0a69-1ddd-5017-9359-2bf0b02dc9f0@2.5.10", DependsOn: []string{
+			"ade2ca70-3891-5945-98fb-dc099432e06a@1.8.5",
+			"aea7be01-6a6a-4083-8856-8a6e6704d82a@1.1.1",
+			"cf7118a7-6976-5b1a-9a39-7adc72f591a4@1.8.5",
+		}},
 		{ID: "aea7be01-6a6a-4083-8856-8a6e6704d82a@1.1.1", DependsOn: []string{"21216c6a-2e73-6563-6e65-726566657250@1.4.0"}},
 		{ID: "21216c6a-2e73-6563-6e65-726566657250@1.4.0", DependsOn: []string{"fa267f1f-6049-4f14-aa54-33bafae1ed76@1.0.0"}},
 		{ID: "de0858da-6303-5e67-8744-51eddeeeb8d7@1.8.5", DependsOn: []string{"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5@1.8.5"}},
-		{ID: "9a3f8284-a2c9-5f02-9a11-845980a1fd5c@1.8.5", DependsOn: []string{"ea8e919c-243c-51af-8825-aaa63cd721ce@0.7.0", "9e88b42a-f829-5b0c-bbe9-9e923198166b@1.8.5"}},
+		{ID: "9a3f8284-a2c9-5f02-9a11-845980a1fd5c@1.8.5", DependsOn: []string{"9e88b42a-f829-5b0c-bbe9-9e923198166b@1.8.5", "ea8e919c-243c-51af-8825-aaa63cd721ce@0.7.0"}},
 		{ID: "fa267f1f-6049-4f14-aa54-33bafae1ed76@1.0.0", DependsOn: []string{"ade2ca70-3891-5945-98fb-dc099432e06a@1.8.5"}},
 		{ID: "cf7118a7-6976-5b1a-9a39-7adc72f591a4@1.8.5", DependsOn: []string{"9a3f8284-a2c9-5f02-9a11-845980a1fd5c@1.8.5", "ea8e919c-243c-51af-8825-aaa63cd721ce@0.7.0"}},
 	}
