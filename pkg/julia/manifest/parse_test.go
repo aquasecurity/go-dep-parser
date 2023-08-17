@@ -48,6 +48,12 @@ func TestParse(t *testing.T) {
 			want:     juliaV1_9DepExtLibs,
 			wantDeps: nil,
 		},
+		{
+			name:     "shadowed dep v1.9",
+			file:     "testdata/shadowed_dep_v1.9/Manifest.toml",
+			want:     juliaV1_9ShadowedDepLibs,
+			wantDeps: juliaV1_9ShadowedDepDeps,
+		},
 	}
 
 	for _, tt := range tests {
