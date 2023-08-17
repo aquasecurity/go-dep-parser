@@ -62,6 +62,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	var libs []types.Library
 	var deps []types.Dependency
 	for name, manifestDeps := range man.Dependencies {
+		// The TOML schema forces man.Dependencies to be a list, but Julia manifests always specify exactly one
+		// dependency using this format. Check that this invariant holds.
 		if len(manifestDeps) > 1 {
 			return nil, nil, xerrors.Errorf("multiple entries for dep: %s", name)
 		}
