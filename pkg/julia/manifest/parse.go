@@ -79,7 +79,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		}
 
 		libs = append(libs, lib)
-		dep := parseDependencies(pkgID, manifestDep, man.Dependencies, man.JuliaVersion)
+		dep := parseDependencies(pkgID, manifestDep.Dependencies, man.Dependencies, man.JuliaVersion)
 		if dep != nil {
 			deps = append(deps, *dep)
 		}
@@ -89,12 +89,12 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	return libs, deps, nil
 }
 
-// Returns the dependencies in `deps` of the given `dep`. If there are no dependencies, returns `nil`.
-func parseDependencies(pkgId string, dep Dependency, deps map[string][]Dependency, juliaVersion string) *types.Dependency {
+// Returns the matching dependencies in `allDeps` of the given `depNames`. If there are no matching dependencies, returns `nil`.
+func parseDependencies(pkgId string, depNames []string, allDeps map[string][]Dependency, juliaVersion string) *types.Dependency {
 	var dependOn []string
 
-	for _, pkgDep := range dep.Dependencies {
-		dep := deps[pkgDep][0]
+	for _, depName := range depNames {
+		dep := allDeps[depName][0]
 		version := depVersion(dep, juliaVersion)
 		dependOn = append(dependOn, utils.PackageID(dep.UUID, version))
 	}
