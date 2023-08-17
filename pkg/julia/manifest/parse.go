@@ -45,9 +45,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	// All newer manifests include a manifest version and a julia version.
 	if man.ManifestFormat == "" {
 		man = Manifest{
-			JuliaVersion:   "unknown",
-			ManifestFormat: "unknown",
-			Dependencies:   oldDeps,
+			JuliaVersion: "unknown",
+			Dependencies: oldDeps,
 		}
 	}
 
