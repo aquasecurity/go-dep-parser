@@ -176,9 +176,10 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 				},
 				{
-					ID:      "org.example:example-api:4.0.0",
-					Name:    "org.example:example-api",
-					Version: "4.0.0",
+					ID:       "org.example:example-api:4.0.0",
+					Name:     "org.example:example-api",
+					Version:  "4.0.0",
+					Indirect: true,
 				},
 				{
 					ID:      "org.example:example-dependency:1.2.3",
@@ -265,9 +266,10 @@ func TestPom_Parse(t *testing.T) {
 					License: "Apache 2.0",
 				},
 				{
-					ID:      "org.example:example-api:1.7.30",
-					Name:    "org.example:example-api",
-					Version: "1.7.30",
+					ID:       "org.example:example-api:1.7.30",
+					Name:     "org.example:example-api",
+					Version:  "1.7.30",
+					Indirect: true,
 				},
 				{
 					ID:      "org.example:example-child:2.0.0",
@@ -420,9 +422,10 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 				},
 				{
-					ID:      "org.example:example-api:2.0.0",
-					Name:    "org.example:example-api",
-					Version: "2.0.0",
+					ID:       "org.example:example-api:2.0.0",
+					Name:     "org.example:example-api",
+					Version:  "2.0.0",
+					Indirect: true,
 				},
 				{
 					ID:      "org.example:example-dependency2:2.3.4",
@@ -563,9 +566,10 @@ func TestPom_Parse(t *testing.T) {
 					Version: "3.0.0",
 				},
 				{
-					ID:      "org.example:example-dependency:1.2.3",
-					Name:    "org.example:example-dependency",
-					Version: "1.2.3",
+					ID:       "org.example:example-dependency:1.2.3",
+					Name:     "org.example:example-dependency",
+					Version:  "1.2.3",
+					Indirect: true,
 				},
 				{
 					ID:      "org.example:example-nested:3.3.3",
@@ -643,9 +647,46 @@ func TestPom_Parse(t *testing.T) {
 					License: "Apache 2.0",
 				},
 				{
-					ID:      "org.example:example-api:1.7.30",
-					Name:    "org.example:example-api",
-					Version: "1.7.30",
+					ID:       "org.example:example-api:2.0.0",
+					Name:     "org.example:example-api",
+					Version:  "2.0.0",
+					Indirect: true,
+				},
+				{
+					ID:      "org.example:example-dependency:1.2.3",
+					Name:    "org.example:example-dependency",
+					Version: "1.2.3",
+				},
+			},
+			// maven doesn't include modules in dep tree of root pom
+			// for modules uses separate graph:
+			// ➜ mvn dependency:tree
+			// [INFO] --------------------------------[ jar ]---------------------------------
+			// [INFO]
+			// [INFO] --- dependency:3.6.0:tree (default-cli) @ module ---
+			// [INFO] com.example:module:jar:1.1.1
+			// [INFO] \- org.example:example-dependency:jar:1.2.3:compile
+			// [INFO]    \- org.example:example-api:jar:2.0.0:compile
+			// [INFO]
+			// [INFO] ----------------------< com.example:aggregation >-----------------------
+			// [INFO] Building aggregation 1.0.0                                         [2/2]
+			// [INFO]   from pom.xml
+			// [INFO] --------------------------------[ pom ]---------------------------------
+			// [INFO]
+			// [INFO] --- dependency:3.6.0:tree (default-cli) @ aggregation ---
+			// [INFO] com.example:aggregation:pom:1.0.0
+			wantDeps: []types.Dependency{
+				{
+					ID: "com.example:module:1.1.1",
+					DependsOn: []string{
+						"org.example:example-dependency:1.2.3",
+					},
+				},
+				{
+					ID: "org.example:example-dependency:1.2.3",
+					DependsOn: []string{
+						"org.example:example-api:2.0.0",
+					},
 				},
 			},
 		},
@@ -680,6 +721,20 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 				},
 			},
+			wantDeps: []types.Dependency{
+				{
+					ID: "com.example:module1:1.1.1",
+					DependsOn: []string{
+						"org.example:example-api:1.7.30",
+					},
+				},
+				{
+					ID: "com.example:module2:1.1.1",
+					DependsOn: []string{
+						"org.example:example-api:2.0.0",
+					},
+				},
+			},
 		},
 		{
 			name:      "overwrite artifact version from dependencyManagement in the root POM",
@@ -692,16 +747,18 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 				},
 				{
-					ID:      "org.example:example-api:2.0.0",
-					Name:    "org.example:example-api",
-					Version: "2.0.0",
+					ID:       "org.example:example-api:2.0.0",
+					Name:     "org.example:example-api",
+					Version:  "2.0.0",
+					Indirect: true,
 				},
 				// dependency version is taken from `com.example:root-pom-dep-management` from dependencyManagement
 				// not from `com.example:example-nested` from `com.example:example-nested`
 				{
-					ID:      "org.example:example-dependency:1.2.4",
-					Name:    "org.example:example-dependency",
-					Version: "1.2.4",
+					ID:       "org.example:example-dependency:1.2.4",
+					Name:     "org.example:example-dependency",
+					Version:  "1.2.4",
+					Indirect: true,
 				},
 				{
 					ID:      "org.example:example-nested:3.3.3",
@@ -738,9 +795,10 @@ func TestPom_Parse(t *testing.T) {
 				// Managed dependencies (org.example:example-api:1.7.30) in org.example:example-dependency-management3
 				// should not affect dependencies of example-dependency (org.example:example-api:2.0.0)
 				{
-					ID:      "org.example:example-api:2.0.0",
-					Name:    "org.example:example-api",
-					Version: "2.0.0",
+					ID:       "org.example:example-api:2.0.0",
+					Name:     "org.example:example-api",
+					Version:  "2.0.0",
+					Indirect: true,
 				},
 				{
 					ID:      "org.example:example-dependency-management3:1.1.1",
@@ -748,9 +806,10 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.1.1",
 				},
 				{
-					ID:      "org.example:example-dependency:1.2.3",
-					Name:    "org.example:example-dependency",
-					Version: "1.2.3",
+					ID:       "org.example:example-dependency:1.2.3",
+					Name:     "org.example:example-dependency",
+					Version:  "1.2.3",
+					Indirect: true,
 				},
 				{
 					ID:      "org.example:transitive-dependency-management:2.0.0",

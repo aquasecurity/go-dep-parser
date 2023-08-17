@@ -134,7 +134,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 				return nil, nil, err
 			}
 			libs = append(libs, moduleLibs...)
-			if deps != nil {
+			if moduleDeps != nil {
 				deps = append(deps, moduleDeps...)
 			}
 			continue
@@ -144,6 +144,11 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		if uniqueArt, ok := uniqArtifacts[art.Name()]; ok {
 			if !uniqueArt.Version.shouldOverride(art.Version) {
 				continue
+			}
+			// mark artifact as Direct, if saved artifact is Direct
+			// take a look `hard requirement for the specified version` test
+			if uniqueArt.Direct {
+				art.Direct = true
 			}
 		}
 
@@ -155,6 +160,13 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		if art.Root {
 			// Managed dependencies in the root POM affect transitive dependencies
 			rootDepManagement = p.resolveDepManagement(result.properties, result.dependencyManagement)
+
+			// mark root artifact and its dependencies as Direct
+			art.Direct = true
+			result.dependencies = lo.Map(result.dependencies, func(dep artifact, _ int) artifact {
+				dep.Direct = true
+				return dep
+			})
 		}
 
 		// Parse, cache, and enqueue modules.
@@ -177,6 +189,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			uniqArtifacts[art.Name()] = artifact{
 				Version:  art.Version,
 				Licenses: art.Licenses,
+				Direct:   art.Direct,
 			}
 
 			// save only dependency names
@@ -196,10 +209,11 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 	// Convert to []types.Library
 	for name, art := range uniqArtifacts {
 		libs = append(libs, types.Library{
-			ID:      PackageID(name, art.Version.String()),
-			Name:    name,
-			Version: art.Version.String(),
-			License: art.JoinLicenses(),
+			ID:       PackageID(name, art.Version.String()),
+			Name:     name,
+			Version:  art.Version.String(),
+			License:  art.JoinLicenses(),
+			Indirect: !art.Direct,
 		})
 	}
 
