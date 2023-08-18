@@ -7,7 +7,6 @@ import (
 	"github.com/BurntSushi/toml"
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
-	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 
 	"golang.org/x/xerrors"
 )
@@ -84,7 +83,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	for name, manifestDeps := range man.Dependencies {
 		for _, manifestDep := range manifestDeps {
 			version := depVersion(&manifestDep, man.JuliaVersion)
-			pkgID := utils.PackageID(manifestDep.UUID, version)
+			pkgID := manifestDep.UUID
 			lib := types.Library{
 				ID:      pkgID,
 				Name:    name,
@@ -119,8 +118,7 @@ func parseDependencies(pkgId string, deps map[string]*string, allDeps map[string
 		if err != nil {
 			return nil, err
 		}
-		version := depVersion(dep, juliaVersion)
-		dependOn = append(dependOn, utils.PackageID(dep.UUID, version))
+		dependOn = append(dependOn, dep.UUID)
 	}
 
 	if len(dependOn) > 0 {
