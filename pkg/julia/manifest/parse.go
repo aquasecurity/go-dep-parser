@@ -49,7 +49,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	decoder := toml.NewDecoder(r)
 	// Try to read the old Manifest format. If that fails, try the new format.
 	if _, err := decoder.Decode(&oldDeps); err != nil {
-		r.Seek(0, io.SeekStart)
+		if _, err = r.Seek(0, io.SeekStart); err != nil {
+			return nil, nil, xerrors.Errorf("seek error: %w", err)
+		}
 		if manMetadata, err = decoder.Decode(&primMan); err != nil {
 			return nil, nil, xerrors.Errorf("decode error: %w", err)
 		}
