@@ -15,10 +15,10 @@ var (
 	juliaV1_6Deps = []types.Dependency{
 		{ID: "ade2ca70-3891-5945-98fb-dc099432e06a", DependsOn: []string{"de0858da-6303-5e67-8744-51eddeeeb8d7"}},
 		{ID: "682c06a0-de6a-54ab-a142-c8b1cf79cde6", DependsOn: []string{
-			"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5",
-			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0",
-			"a63ad114-7e13-5084-954f-fe012c677804",
 			"ade2ca70-3891-5945-98fb-dc099432e06a",
+			"a63ad114-7e13-5084-954f-fe012c677804",
+			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0",
+			"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5",
 		}},
 		{ID: "69de0a69-1ddd-5017-9359-2bf0b02dc9f0", DependsOn: []string{"ade2ca70-3891-5945-98fb-dc099432e06a"}},
 		{ID: "de0858da-6303-5e67-8744-51eddeeeb8d7", DependsOn: []string{"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"}},
@@ -43,10 +43,10 @@ var (
 	juliaV1_8Deps = []types.Dependency{
 		{ID: "ade2ca70-3891-5945-98fb-dc099432e06a", DependsOn: []string{"de0858da-6303-5e67-8744-51eddeeeb8d7"}},
 		{ID: "682c06a0-de6a-54ab-a142-c8b1cf79cde6", DependsOn: []string{
-			"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5",
-			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0",
-			"a63ad114-7e13-5084-954f-fe012c677804",
 			"ade2ca70-3891-5945-98fb-dc099432e06a",
+			"a63ad114-7e13-5084-954f-fe012c677804",
+			"69de0a69-1ddd-5017-9359-2bf0b02dc9f0",
+			"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5",
 		}},
 		{ID: "69de0a69-1ddd-5017-9359-2bf0b02dc9f0", DependsOn: []string{
 			"ade2ca70-3891-5945-98fb-dc099432e06a",
@@ -56,7 +56,7 @@ var (
 		{ID: "aea7be01-6a6a-4083-8856-8a6e6704d82a", DependsOn: []string{"21216c6a-2e73-6563-6e65-726566657250"}},
 		{ID: "21216c6a-2e73-6563-6e65-726566657250", DependsOn: []string{"fa267f1f-6049-4f14-aa54-33bafae1ed76"}},
 		{ID: "de0858da-6303-5e67-8744-51eddeeeb8d7", DependsOn: []string{"4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"}},
-		{ID: "9a3f8284-a2c9-5f02-9a11-845980a1fd5c", DependsOn: []string{"9e88b42a-f829-5b0c-bbe9-9e923198166b", "ea8e919c-243c-51af-8825-aaa63cd721ce"}},
+		{ID: "9a3f8284-a2c9-5f02-9a11-845980a1fd5c", DependsOn: []string{"ea8e919c-243c-51af-8825-aaa63cd721ce", "9e88b42a-f829-5b0c-bbe9-9e923198166b"}},
 		{ID: "fa267f1f-6049-4f14-aa54-33bafae1ed76", DependsOn: []string{"ade2ca70-3891-5945-98fb-dc099432e06a"}},
 		{ID: "cf7118a7-6976-5b1a-9a39-7adc72f591a4", DependsOn: []string{"9a3f8284-a2c9-5f02-9a11-845980a1fd5c", "ea8e919c-243c-51af-8825-aaa63cd721ce"}},
 	}
