@@ -11,15 +11,6 @@
         }
       },
       {
-        "package": "Quick",
-        "repositoryURL": "https://github.com/Quick/Quick.git",
-        "state": {
-          "branch": null,
-          "revision": "e206b8deba0d01fce70388a6d9dc66cba5603958",
-          "version": "7.0.0"
-        }
-      },
-      {
         "package": "ReactiveSwift",
         "repositoryURL": "https://github.com/ReactiveCocoa/ReactiveSwift",
         "state": {
