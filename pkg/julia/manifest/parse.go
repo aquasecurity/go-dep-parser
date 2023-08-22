@@ -139,6 +139,7 @@ func decodeDependency(man *primitiveManifest, dep primitiveDependency, metadata 
 			}
 			possibleUuids = append(possibleUuids, primDep[0].UUID)
 		}
+		sort.Strings(possibleUuids)
 		dep.DependsOn = possibleUuids
 		return dep, nil
 	}
@@ -150,6 +151,7 @@ func decodeDependency(man *primitiveManifest, dep primitiveDependency, metadata 
 	err = metadata.PrimitiveDecode(dep.Dependencies, &possibleDepsMap)
 	if err == nil {
 		possibleUuids := maps.Values(possibleDepsMap)
+		sort.Strings(possibleUuids)
 		dep.DependsOn = possibleUuids
 		return dep, nil
 	}
