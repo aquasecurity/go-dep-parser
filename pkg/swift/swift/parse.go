@@ -28,9 +28,13 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	}
 
 	var libs types.Libraries
-	for _, pin := range lockFile.Object.Pins {
+	pins := lockFile.Object.Pins
+	if lockFile.Version > 1 {
+		pins = lockFile.Pins
+	}
+	for _, pin := range pins {
 		libs = append(libs, types.Library{
-			Name:    libraryName(pin.RepositoryURL),
+			Name:    libraryName(pin, lockFile.Version),
 			Version: pin.State.Version,
 			Locations: []types.Location{
 				{
@@ -44,7 +48,13 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 	return libs, nil, nil
 }
 
-func libraryName(name string) string {
+func libraryName(pin Pin, lockVersion int) string {
+	// Package.resolved v1 uses `RepositoryURL`
+	// v2 uses `Location`
+	name := pin.RepositoryURL
+	if lockVersion > 1 {
+		name = pin.Location
+	}
 	// Swift uses `https://github.com/<author>/<package>.git format
 	// `.git` suffix can be omitted (take a look happy test)
 	// Remove `https://` and `.git` to fit the same format
