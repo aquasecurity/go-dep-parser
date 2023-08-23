@@ -197,7 +197,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			dependsOn := lo.FilterMap(result.dependencies, func(a artifact, _ int) (string, bool) {
 				return a.Name(), !slices.Contains(savedDeps, a.Name())
 			})
-			uniqDeps[art.Name()] = dependsOn
+			uniqDeps[PackageID(art.Name(), art.Version.String())] = dependsOn
 			// mvn only takes top dependencies
 			// this is needed to reproduce mvn logic
 			// take a look at `soft requirement`, `soft requirement with transitive dependencies`
@@ -218,11 +218,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 	}
 
 	// Convert to []types.Dependencies
-	for name, dependsOn := range uniqDeps {
-		// uniqDeps contains only dependency names
-		// get ID from uniqArtifacts
-		id := PackageID(name, depVersion(name, uniqArtifacts))
-
+	for pkgID, dependsOn := range uniqDeps {
 		// get ID from uniqArtifacts for dependsOn
 		dependsOn = lo.FilterMap(dependsOn, func(dependOnName string, _ int) (string, bool) {
 			ver := depVersion(dependOnName, uniqArtifacts)
@@ -232,7 +228,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		sort.Strings(dependsOn)
 		if len(dependsOn) > 0 {
 			deps = append(deps, types.Dependency{
-				ID:        id,
+				ID:        pkgID,
 				DependsOn: dependsOn,
 			})
 		}
