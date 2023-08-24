@@ -26,7 +26,7 @@ func TestPom_Parse(t *testing.T) {
 	}{
 		{
 			name:      "local repository",
-			inputFile: filepath.Join("testdata", "happy", "pom.xml"),
+			inputFile: filepath.Join("testdata", "happy2", "pom.xml"),
 			local:     true,
 			want: []types.Library{
 				{
@@ -374,7 +374,6 @@ func TestPom_Parse(t *testing.T) {
 			// [INFO] com.example:soft:jar:1.0.0
 			// [INFO] +- org.example:example-api:jar:1.7.30:compile
 			// [INFO] \- org.example:example-dependency:jar:1.2.3:compile
-
 			name:      "soft requirement",
 			inputFile: filepath.Join("testdata", "soft-requirement", "pom.xml"),
 			local:     true,

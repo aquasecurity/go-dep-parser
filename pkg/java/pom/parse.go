@@ -3,6 +3,7 @@ package pom
 import (
 	"encoding/xml"
 	"fmt"
+	"golang.org/x/exp/slices"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,7 +16,6 @@ import (
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/samber/lo"
-	"golang.org/x/exp/slices"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/xerrors"
 
@@ -197,7 +197,10 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			dependsOn := lo.FilterMap(result.dependencies, func(a artifact, _ int) (string, bool) {
 				return a.Name(), !slices.Contains(savedDeps, a.Name())
 			})
-			uniqDeps[PackageID(art.Name(), art.Version.String())] = dependsOn
+			//dependsOn := lo.Map(result.dependencies, func(a artifact, _ int) string {
+			//	return a.Name()
+			//})
+			uniqDeps[packageID(art.Name(), art.Version.String())] = dependsOn
 			// mvn only takes top dependencies
 			// this is needed to reproduce mvn logic
 			// take a look at `soft requirement`, `soft requirement with transitive dependencies`
@@ -209,7 +212,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 	// Convert to []types.Library
 	for name, art := range uniqArtifacts {
 		libs = append(libs, types.Library{
-			ID:       PackageID(name, art.Version.String()),
+			ID:       packageID(name, art.Version.String()),
 			Name:     name,
 			Version:  art.Version.String(),
 			License:  art.JoinLicenses(),
@@ -222,7 +225,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		// get ID from uniqArtifacts for dependsOn
 		dependsOn = lo.FilterMap(dependsOn, func(dependOnName string, _ int) (string, bool) {
 			ver := depVersion(dependOnName, uniqArtifacts)
-			return PackageID(dependOnName, ver), ver != ""
+			return packageID(dependOnName, ver), ver != ""
 		})
 
 		sort.Strings(dependsOn)

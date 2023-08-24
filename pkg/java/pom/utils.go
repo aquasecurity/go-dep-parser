@@ -21,6 +21,6 @@ func isProperty(version string) bool {
 	return false
 }
 
-func PackageID(name, version string) string {
+func packageID(name, version string) string {
 	return fmt.Sprintf("%s:%s", name, version)
 }
