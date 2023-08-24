@@ -147,6 +147,8 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			return nil, nil, xerrors.Errorf("resolve error (%s): %w", art, err)
 		}
 
+		art.Licenses = append(art.Licenses, result.artifact.Licenses...)
+
 		if art.Root {
 			// Managed dependencies in the root POM affect transitive dependencies
 			rootDepManagement = p.resolveDepManagement(result.properties, result.dependencyManagement)
