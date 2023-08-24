@@ -182,6 +182,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					Name:    "org.example:example-child",
 					Version: "2.0.0",
+					License: "Apache 2.0",
 				},
 			},
 		},
