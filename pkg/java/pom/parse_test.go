@@ -26,7 +26,7 @@ func TestPom_Parse(t *testing.T) {
 	}{
 		{
 			name:      "local repository",
-			inputFile: filepath.Join("testdata", "happy2", "pom.xml"),
+			inputFile: filepath.Join("testdata", "happy", "pom.xml"),
 			local:     true,
 			want: []types.Library{
 				{
@@ -374,6 +374,7 @@ func TestPom_Parse(t *testing.T) {
 			// [INFO] com.example:soft:jar:1.0.0
 			// [INFO] +- org.example:example-api:jar:1.7.30:compile
 			// [INFO] \- org.example:example-dependency:jar:1.2.3:compile
+			// Save DependsOn for each library - https://github.com/aquasecurity/go-dep-parser/pull/243#discussion_r1303904548
 			name:      "soft requirement",
 			inputFile: filepath.Join("testdata", "soft-requirement", "pom.xml"),
 			local:     true,
@@ -403,6 +404,12 @@ func TestPom_Parse(t *testing.T) {
 						"org.example:example-dependency:1.2.3",
 					},
 				},
+				{
+					ID: "org.example:example-dependency:1.2.3",
+					DependsOn: []string{
+						"org.example:example-api:1.7.30",
+					},
+				},
 			},
 		},
 		{
@@ -411,6 +418,7 @@ func TestPom_Parse(t *testing.T) {
 			// [INFO] +- org.example:example-dependency:jar:1.2.3:compile
 			// [INFO] |  \- org.example:example-api:jar:2.0.0:compile
 			// [INFO] \- org.example:example-dependency2:jar:2.3.4:compile
+			// Save DependsOn for each library - https://github.com/aquasecurity/go-dep-parser/pull/243#discussion_r1303904548
 			name:      "soft requirement with transitive dependencies",
 			inputFile: filepath.Join("testdata", "soft-requirement-with-transitive-dependencies", "pom.xml"),
 			local:     true,
@@ -446,6 +454,12 @@ func TestPom_Parse(t *testing.T) {
 					},
 				},
 				{
+					ID: "org.example:example-dependency2:2.3.4",
+					DependsOn: []string{
+						"org.example:example-api:2.0.0",
+					},
+				},
+				{
 					ID: "org.example:example-dependency:1.2.3",
 					DependsOn: []string{
 						"org.example:example-api:2.0.0",
@@ -455,9 +469,11 @@ func TestPom_Parse(t *testing.T) {
 		},
 		{
 			// mvn dependency:tree
-			// [INFO] com.example:hard:jar:1.0.0
-			// [INFO] +- org.example:example-api:jar:2.0.0:compile
-			// [INFO] \- org.example:example-dependency:jar:1.2.4:compile
+			//[INFO] com.example:hard:jar:1.0.0
+			//[INFO] +- org.example:example-nested:jar:3.3.4:compile
+			//[INFO] \- org.example:example-dependency:jar:1.2.3:compile
+			//[INFO]    \- org.example:example-api:jar:2.0.0:compile
+			// Save DependsOn for each library - https://github.com/aquasecurity/go-dep-parser/pull/243#discussion_r1303904548
 			name:      "hard requirement for the specified version",
 			inputFile: filepath.Join("testdata", "hard-requirement", "pom.xml"),
 			local:     true,
@@ -469,22 +485,40 @@ func TestPom_Parse(t *testing.T) {
 					License: "Apache 2.0",
 				},
 				{
-					ID:      "org.example:example-api:2.0.0",
-					Name:    "org.example:example-api",
-					Version: "2.0.0",
+					ID:       "org.example:example-api:2.0.0",
+					Name:     "org.example:example-api",
+					Version:  "2.0.0",
+					Indirect: true,
 				},
 				{
-					ID:      "org.example:example-dependency:1.2.4",
+					ID:      "org.example:example-dependency:1.2.3",
 					Name:    "org.example:example-dependency",
-					Version: "1.2.4",
+					Version: "1.2.3",
+				},
+				{
+					ID:      "org.example:example-nested:3.3.4",
+					Name:    "org.example:example-nested",
+					Version: "3.3.4",
 				},
 			},
 			wantDeps: []types.Dependency{
 				{
 					ID: "com.example:hard:1.0.0",
 					DependsOn: []string{
+						"org.example:example-dependency:1.2.3",
+						"org.example:example-nested:3.3.4",
+					},
+				},
+				{
+					ID: "org.example:example-dependency:1.2.3",
+					DependsOn: []string{
 						"org.example:example-api:2.0.0",
-						"org.example:example-dependency:1.2.4",
+					},
+				},
+				{
+					ID: "org.example:example-nested:3.3.4",
+					DependsOn: []string{
+						"org.example:example-dependency:1.2.3",
 					},
 				},
 			},

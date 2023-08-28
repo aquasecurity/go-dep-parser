@@ -3,7 +3,6 @@ package pom
 import (
 	"encoding/xml"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"io"
 	"net/http"
 	"net/url"
@@ -119,7 +118,6 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		rootDepManagement []pomDependency
 		uniqArtifacts     = map[string]artifact{}
 		uniqDeps          = map[string][]string{}
-		savedDeps         []string
 	)
 
 	// Iterate direct and transitive dependencies
@@ -194,18 +192,10 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 
 			// save only dependency names
 			// version will be determined later
-			dependsOn := lo.FilterMap(result.dependencies, func(a artifact, _ int) (string, bool) {
-				return a.Name(), !slices.Contains(savedDeps, a.Name())
+			dependsOn := lo.Map(result.dependencies, func(a artifact, _ int) string {
+				return a.Name()
 			})
-			//dependsOn := lo.Map(result.dependencies, func(a artifact, _ int) string {
-			//	return a.Name()
-			//})
 			uniqDeps[packageID(art.Name(), art.Version.String())] = dependsOn
-			// mvn only takes top dependencies
-			// this is needed to reproduce mvn logic
-			// take a look at `soft requirement`, `soft requirement with transitive dependencies`
-			// and `hard requirement for the specified version` tests
-			savedDeps = append(savedDeps, dependsOn...)
 		}
 	}
 
