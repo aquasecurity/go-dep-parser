@@ -195,7 +195,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			dependsOn := lo.Map(result.dependencies, func(a artifact, _ int) string {
 				return a.Name()
 			})
-			uniqDeps[packageID(art.Name(), art.Version.String())] = dependsOn
+			uniqDeps[art.Name()] = dependsOn
 		}
 	}
 
@@ -211,8 +211,11 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 	}
 
 	// Convert to []types.Dependencies
-	for pkgID, dependsOn := range uniqDeps {
-		// get ID from uniqArtifacts for dependsOn
+	for pkgName, dependsOn := range uniqDeps {
+		// uniqDeps contains only dependency names
+		// get pkgID from uniqArtifacts
+		pkgID := packageID(pkgName, depVersion(pkgName, uniqArtifacts))
+		// get depID from uniqArtifacts for dependsOn
 		dependsOn = lo.FilterMap(dependsOn, func(dependOnName string, _ int) (string, bool) {
 			ver := depVersion(dependOnName, uniqArtifacts)
 			return packageID(dependOnName, ver), ver != ""
