@@ -46,7 +46,7 @@ func (a artifact) Equal(o artifact) bool {
 }
 
 func (a artifact) JoinLicenses() string {
-	return strings.Join(lo.Uniq(a.Licenses), ", ")
+	return strings.Join(a.Licenses, ", ")
 }
 
 func (a artifact) ToPOMLicenses() pomLicenses {
