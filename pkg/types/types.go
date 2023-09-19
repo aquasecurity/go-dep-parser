@@ -74,4 +74,6 @@ const (
 	RefVCS          RefType = "vcs"
 	RefIssueTracker RefType = "issue-tracker"
 	RefOther        RefType = "other"
+
+	NonSeparableLicensePrefix = "non-separable: "
 )
