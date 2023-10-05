@@ -2,6 +2,7 @@ package packaging
 
 import (
 	"bufio"
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"net/textproto"
 	"strings"
 
@@ -23,14 +24,16 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 	rd := textproto.NewReader(bufio.NewReader(r))
 	h, err := rd.ReadMIMEHeader()
 	name, version := h.Get("name"), h.Get("version")
-	if err != nil &&
-		name == "" && version == "" {
-		// Some unnecessary headers for this case may contain bytes in the
-		// key or value outside the set allowed by RFC 7230
-		// In this case we get error:
-		// cf. https://cs.opensource.google/go/go/+/a6642e67e16b9d769a0c08e486ba08408064df19
-		// If `name` and `version` are found, we don't need to stop
-		return nil, nil, xerrors.Errorf("read MIME error: %w", err)
+	if err != nil {
+		if name == "" || version == "" {
+			// Some unnecessary headers for this case may contain bytes in the
+			// key or value outside the set allowed by RFC 7230
+			// In this case we get error:
+			// cf. https://cs.opensource.google/go/go/+/a6642e67e16b9d769a0c08e486ba08408064df19
+			// If `name` and `version` are found, we don't need to stop
+			return nil, nil, xerrors.Errorf("read MIME error: %w", err)
+		}
+		log.Logger.Debugf("Package 'name' and 'version' were found, but a MIME reading error occurs: %s", err)
 	}
 
 	// "License-Expression" takes precedence as "License" is deprecated.
