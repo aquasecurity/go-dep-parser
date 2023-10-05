@@ -2,13 +2,15 @@ package packaging
 
 import (
 	"bufio"
-	"github.com/aquasecurity/go-dep-parser/pkg/log"
+	"errors"
+	"io"
 	"net/textproto"
 	"strings"
 
 	"golang.org/x/xerrors"
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -23,17 +25,19 @@ func NewParser() types.Parser {
 func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	rd := textproto.NewReader(bufio.NewReader(r))
 	h, err := rd.ReadMIMEHeader()
+	if e := textproto.ProtocolError(""); errors.As(err, &e) {
+		// A MIME header may contain bytes in the key or value outside the set allowed by RFC 7230.
+		// cf. https://cs.opensource.google/go/go/+/a6642e67e16b9d769a0c08e486ba08408064df19
+		// However, our required key/value could have been correctly parsed,
+		// so we continue with the subsequent process.
+		log.Logger.Debugf("MIME protocol error: %s", err)
+	} else if err != nil && err != io.EOF {
+		return nil, nil, xerrors.Errorf("read MIME error: %w", err)
+	}
+
 	name, version := h.Get("name"), h.Get("version")
-	if err != nil {
-		if name == "" || version == "" {
-			// Some unnecessary headers for this case may contain bytes in the
-			// key or value outside the set allowed by RFC 7230
-			// In this case we get error:
-			// cf. https://cs.opensource.google/go/go/+/a6642e67e16b9d769a0c08e486ba08408064df19
-			// If `name` and `version` are found, we don't need to stop
-			return nil, nil, xerrors.Errorf("read MIME error: %w", err)
-		}
-		log.Logger.Debugf("Package 'name' and 'version' were found, but a MIME reading error occurs: %s", err)
+	if name == "" || version == "" {
+		return nil, nil, xerrors.New("name or version is empty")
 	}
 
 	// "License-Expression" takes precedence as "License" is deprecated.
