@@ -11,7 +11,6 @@ import (
 
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
-	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/log"
 )
@@ -22,20 +21,18 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
-func splitNameVer(nameVer string) (name, version string) {
+func packageID(name, version string) string {
+	return fmt.Sprintf("%s/%s", name, version)
+}
+
+func splitNameVer(nameVer string) (string, string) {
 	split := strings.Split(nameVer, "/")
 	if len(split) != 2 {
 		// Invalid name
 		log.Logger.Warnf("Cannot parse .NET library version from: %s", nameVer)
 		return "", ""
 	}
-	name = split[0]
-	version = split[1]
-	return
-}
-
-func joinNameVer(name, version string) (nameVer string) {
-	return fmt.Sprintf("%s/%s", name, version)
+	return split[0], split[1]
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
@@ -51,39 +48,34 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	var libraries []types.Library
 	var deps []types.Dependency
-	for pkgNameVersion, target := range depsFile.Targets[depsFile.RuntimeTarget.Name] {
-		library, ok := depsFile.Libraries[pkgNameVersion]
-		if !ok {
-			continue
-		}
-
+	targets := depsFile.Targets[depsFile.RuntimeTarget.Name]
+	for pkgNameVersion, target := range targets {
 		name, version := splitNameVer(pkgNameVersion)
 		if name == "" || version == "" {
 			continue
 		}
 
 		lib := types.Library{
-			ID:        utils.PackageID(name, version),
+			ID:        packageID(name, version),
 			Name:      name,
 			Version:   version,
-			Locations: []types.Location{{StartLine: library.StartLine, EndLine: library.EndLine}},
+			Locations: []types.Location{{StartLine: target.StartLine, EndLine: target.EndLine}},
 		}
 
 		var childDeps []string
 		for depName, depVersion := range target.Dependencies {
-			nameVer := joinNameVer(depName, depVersion)
-			_, ok := depsFile.Libraries[nameVer]
-			if !ok {
-				continue
+			depID := packageID(depName, depVersion)
+			if _, ok := targets[depID]; ok {
+				childDeps = append(childDeps, depID)
 			}
-			depID := utils.PackageID(depName, depVersion)
-			childDeps = append(childDeps, depID)
 		}
 
-		deps = append(deps, types.Dependency{
-			ID:        lib.ID,
-			DependsOn: childDeps,
-		})
+		if len(childDeps) > 0 {
+			deps = append(deps, types.Dependency{
+				ID:        lib.ID,
+				DependsOn: childDeps,
+			})
+		}
 
 		libraries = append(libraries, lib)
 	}
@@ -93,7 +85,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 type dotNetDependencies struct {
 	RuntimeTarget dotNetRuntimeTarget                `json:"runtimeTarget"`
-	Libraries     map[string]dotNetLibrary           `json:"libraries"`
 	Targets       map[string]map[string]dotNetTarget `json:"targets"`
 }
 
@@ -104,16 +95,12 @@ type dotNetRuntimeTarget struct {
 type dotNetTarget struct {
 	Dependencies map[string]string   `json:"dependencies"`
 	Runtime      map[string]struct{} `json:"runtime"`
-}
-
-type dotNetLibrary struct {
-	Type      string `json:"type"`
-	StartLine int
-	EndLine   int
+	StartLine    int
+	EndLine      int
 }
 
 // UnmarshalJSONWithMetadata needed to detect start and end lines of deps
-func (t *dotNetLibrary) UnmarshalJSONWithMetadata(node jfather.Node) error {
+func (t *dotNetTarget) UnmarshalJSONWithMetadata(node jfather.Node) error {
 	if err := node.Decode(&t); err != nil {
 		return err
 	}
