@@ -28,7 +28,7 @@ func NewParser() types.Parser {
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	// requirements.txt can use byte order marks (BOM)
-	// We need to remove them to avoid the file being read incorrectly
+	// We need to override them to avoid the file being read incorrectly
 	var transformer = u.BOMOverride(encoding.Nop.NewDecoder())
 	decodedReader := transform.NewReader(r, transformer)
 
