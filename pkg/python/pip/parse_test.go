@@ -2,7 +2,6 @@ package pip
 
 import (
 	"os"
-	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -48,10 +47,14 @@ func TestParse(t *testing.T) {
 			file: "testdata/requirement_exstras.txt",
 			want: requirementsExtras,
 		},
+		{
+			file: "testdata/requirements_utf16le.txt",
+			want: requirementsUtf16le,
+		},
 	}
 
 	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
+		t.Run(v.file, func(t *testing.T) {
 			f, err := os.Open(v.file)
 			require.NoError(t, err)
 
