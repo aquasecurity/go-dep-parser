@@ -510,10 +510,12 @@ func (p *parser) tryRelativePath(parentArtifact artifact, currentPath, relativeP
 		return nil, err
 	}
 
-	// We can inherit GroupID from parent (requires p.analyze function to get GroupID)
-	// Version can contain a property (requires p.analyze function to get version)
-	// But ArtifactID must be the same for parent and base poms
-	// This check is necessary to avoid an infinite loop when using relatedPath or `../pom.xml`
+	// To avoid an infinite loop or parsing the wrong parent when using relatedPath or `../pom.xml`,
+	// we need to compare GAV of `parentArtifact` (`parent` tag from base pom) and GAV of pom from `relativePath`.
+	// See `compare ArtifactIDs for base and parent pom's` test for example.
+	// But GroupID can be inherited from parent (`p.analyze` function is required to get the GroupID).
+	// Version can contain a property (`p.analyze` function is required to get the GroupID).
+	// So we can only match ArtifactID's.
 	if pom.artifact().ArtifactID != parentArtifact.ArtifactID {
 		return nil, xerrors.New("'parent.relativePath' points at wrong local POM")
 	}
