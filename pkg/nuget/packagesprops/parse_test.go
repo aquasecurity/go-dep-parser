@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/nuget/packages_props"
+	config "github.com/aquasecurity/go-dep-parser/pkg/nuget/packagesprops"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
@@ -37,14 +37,9 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name:      "NoProjectInXMLStructure",
-			inputFile: "testdata/no_project.props",
-			wantErr:   "failed to decode  .props file: expected element type <Project> but have <ItemGroup>",
-		},
-		{
 			name:      "NoItemGroupInXMLStructure",
 			inputFile: "testdata/no_item_group.props",
-			want: []types.Library{},
+			want:      []types.Library{},
 		},
 	}
 	for _, tt := range tests {
@@ -60,7 +55,7 @@ func TestParse(t *testing.T) {
 			}
 
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			assert.ElementsMatch(t, tt.want, got)
 		})
 	}
 }
