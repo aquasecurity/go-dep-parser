@@ -22,18 +22,18 @@ func TestParse(t *testing.T) {
 			name:      "PackagesProps",
 			inputFile: "testdata/packages.props",
 			want: []types.Library{
-				{Name: "Microsoft.Extensions.Configuration", Version: "2.1.1"},
-				{Name: "Microsoft.Extensions.DependencyInjection.Abstractions", Version: "2.2.1"},
-				{Name: "Microsoft.Extensions.Http", Version: "3.2.1"},
+				{Name: "Microsoft.Extensions.Configuration", Version: "2.1.1", ID: "Microsoft.Extensions.Configuration@2.1.1"},
+				{Name: "Microsoft.Extensions.DependencyInjection.Abstractions", Version: "2.2.1", ID: "Microsoft.Extensions.DependencyInjection.Abstractions@2.2.1"},
+				{Name: "Microsoft.Extensions.Http", Version: "3.2.1", ID: "Microsoft.Extensions.Http@3.2.1"},
 			},
 		},
 		{
 			name:      "DirectoryPackagesProps",
 			inputFile: "testdata/Directory.Packages.props",
 			want: []types.Library{
-				{Name: "PackageOne", Version: "6.2.3"},
-				{Name: "PackageTwo", Version: "6.0.0"},
-				{Name: "PackageThree", Version: "2.4.1"},
+				{Name: "PackageOne", Version: "6.2.3", ID: "PackageOne@6.2.3"},
+				{Name: "PackageTwo", Version: "6.0.0", ID: "PackageTwo@6.0.0"},
+				{Name: "PackageThree", Version: "2.4.1", ID: "PackageThree@2.4.1"},
 			},
 		},
 		{

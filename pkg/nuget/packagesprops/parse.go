@@ -42,24 +42,17 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
-func (p *Parser) addPackage(libs *[]types.Library, pkg propsPackageEntry) {
-	if (len(pkg.UpdatePackageName) == 0 && len(pkg.IncludePackageName) == 0) || len(pkg.Version) == 0 {
-		return
-	}
-	var lib types.Library
+func parsePackage(pkg propsPackageEntry) types.Library {
 	// Update attribute is considered legacy, so preferring Include
-	if len(pkg.IncludePackageName) > 0 {
-		lib = types.Library{
-			Name:    pkg.IncludePackageName,
-			Version: pkg.Version,
-		}
-	} else {
-		lib = types.Library{
-			Name:    pkg.UpdatePackageName,
-			Version: pkg.Version,
-		}
+	name := pkg.UpdatePackageName
+	if pkg.IncludePackageName != "" {
+		name = pkg.IncludePackageName
 	}
-	*libs = append(*libs, lib)
+	return types.Library{
+		ID:      utils.PackageID(name, pkg.Version),
+		Name:    name,
+		Version: pkg.Version,
+	}
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
@@ -74,12 +67,18 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	for _, itemGroup := range configData.ItemGroups {
 		for _, refPkg := range itemGroup.ReferencePackages {
 			var pkg = propsPackageEntry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
-			p.addPackage(&libs, pkg)
+			var lib = parsePackage(pkg)
+			if len(lib.Name) > 0 && len(lib.Version) > 0 {
+				libs = append(libs, lib)
+			}
 		}
 
 		for _, verPkg := range itemGroup.VersionPackages {
 			var pkg = propsPackageEntry{verPkg.Version, verPkg.UpdatePackageName, verPkg.IncludePackageName}
-			p.addPackage(&libs, pkg)
+			var lib = parsePackage(pkg)
+			if len(lib.Name) > 0 && len(lib.Version) > 0 {
+				libs = append(libs, lib)
+			}
 		}
 	}
 	return utils.UniqueLibraries(libs), nil, nil
