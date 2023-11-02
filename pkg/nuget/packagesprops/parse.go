@@ -16,20 +16,10 @@ type propsPackageEntry struct {
 	IncludePackageName string `xml:"Include,attr"`
 }
 
-type propsPackageReferenceEntry struct {
-	xml.Name `xml:"PackageReference"`
-	propsPackageEntry
-}
-
-type propsPackageVersionEntry struct {
-	xml.Name `xml:"PackageVersion"`
-	propsPackageEntry
-}
-
 type propsItemGroup struct {
 	xml.Name          `xml:"ItemGroup"`
-	ReferencePackages []propsPackageReferenceEntry `xml:"PackageReference"`
-	VersionPackages   []propsPackageVersionEntry   `xml:"PackageVersion"`
+	ReferencePackages []propsPackageEntry `xml:"PackageReference"`
+	VersionPackages   []propsPackageEntry `xml:"PackageVersion"`
 }
 
 type propsProject struct {
