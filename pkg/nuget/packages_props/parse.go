@@ -69,7 +69,7 @@ func (p *Parser) addPackage(libs* []types.Library, pkg propsPackageEntry) {
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var configData propsProject
 	if err := xml.NewDecoder(r).Decode(&configData); err != nil {
-		return nil, nil, xerrors.Errorf("failed to decode  .props file: %w", err)
+		return nil, nil, xerrors.Errorf("failed to decode '*packages.props' file: %w", err)
 	}
 	// https://github.com/dotnet/roslyn-tools/blob/8617f451b13e3dc29751cc78109f32ec73eeedb0/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L488
 	// Based on this documentation both legacy packages.props and Directory.packages.props are supported
