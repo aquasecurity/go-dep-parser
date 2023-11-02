@@ -60,7 +60,7 @@ func TestParse(t *testing.T) {
 			}
 
 			assert.NoError(t, err)
-			assert.ElementsMatch(t, tt.want, got)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
