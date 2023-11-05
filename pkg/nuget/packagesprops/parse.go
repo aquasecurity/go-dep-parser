@@ -52,6 +52,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 	// https://github.com/dotnet/roslyn-tools/blob/8617f451b13e3dc29751cc78109f32ec73eeedb0/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L488
 	// Based on this documentation both legacy packages.props and Directory.packages.props are supported
+	// Directory.packages.props example: https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
 
 	libs := make([]types.Library, 0)
 	for _, itemGroup := range configData.ItemGroups {
