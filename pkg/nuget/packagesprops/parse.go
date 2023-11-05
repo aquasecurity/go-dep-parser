@@ -1,4 +1,4 @@
-package config
+package packagesprops
 
 import (
 	"encoding/xml"
@@ -17,9 +17,9 @@ type propsPackageEntry struct {
 }
 
 type propsItemGroup struct {
-	xml.Name          `xml:"ItemGroup"`
-	ReferencePackages []propsPackageEntry `xml:"PackageReference"`
-	VersionPackages   []propsPackageEntry `xml:"PackageVersion"`
+	xml.Name              `xml:"ItemGroup"`
+	PackageReferenceEntry []propsPackageEntry `xml:"PackageReference"`
+	PackageVersionEntry   []propsPackageEntry `xml:"PackageVersion"`
 }
 
 type propsProject struct {
@@ -55,7 +55,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	libs := make([]types.Library, 0)
 	for _, itemGroup := range configData.ItemGroups {
-		for _, refPkg := range itemGroup.ReferencePackages {
+		for _, refPkg := range itemGroup.PackageReferenceEntry {
 			var pkg = propsPackageEntry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
 			var lib = parsePackage(pkg)
 			if len(lib.Name) > 0 && len(lib.Version) > 0 {
@@ -63,7 +63,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			}
 		}
 
-		for _, verPkg := range itemGroup.VersionPackages {
+		for _, verPkg := range itemGroup.PackageVersionEntry {
 			var pkg = propsPackageEntry{verPkg.Version, verPkg.UpdatePackageName, verPkg.IncludePackageName}
 			var lib = parsePackage(pkg)
 			if len(lib.Name) > 0 && len(lib.Version) > 0 {
