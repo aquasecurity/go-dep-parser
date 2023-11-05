@@ -10,7 +10,7 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
 
-type propsPackageEntry struct {
+type entry struct {
 	Version            string `xml:"Version,attr"`
 	UpdatePackageName  string `xml:"Update,attr"`
 	IncludePackageName string `xml:"Include,attr"`
@@ -18,8 +18,8 @@ type propsPackageEntry struct {
 
 type propsItemGroup struct {
 	xml.Name              `xml:"ItemGroup"`
-	PackageReferenceEntry []propsPackageEntry `xml:"PackageReference"`
-	PackageVersionEntry   []propsPackageEntry `xml:"PackageVersion"`
+	PackageReferenceEntry []entry `xml:"PackageReference"`
+	PackageVersionEntry   []entry `xml:"PackageVersion"`
 }
 
 type propsProject struct {
@@ -32,7 +32,7 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
-func parsePackage(pkg propsPackageEntry) types.Library {
+func parsePackage(pkg entry) types.Library {
 	// Update attribute is considered legacy, so preferring Include
 	name := pkg.UpdatePackageName
 	if pkg.IncludePackageName != "" {
@@ -56,16 +56,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	libs := make([]types.Library, 0)
 	for _, itemGroup := range configData.ItemGroups {
-		for _, refPkg := range itemGroup.PackageReferenceEntry {
-			var pkg = propsPackageEntry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
-			var lib = parsePackage(pkg)
-			if len(lib.Name) > 0 && len(lib.Version) > 0 {
-				libs = append(libs, lib)
-			}
-		}
-
-		for _, verPkg := range itemGroup.PackageVersionEntry {
-			var pkg = propsPackageEntry{verPkg.Version, verPkg.UpdatePackageName, verPkg.IncludePackageName}
+		for _, refPkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
+			var pkg = entry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
 			var lib = parsePackage(pkg)
 			if len(lib.Name) > 0 && len(lib.Version) > 0 {
 				libs = append(libs, lib)
