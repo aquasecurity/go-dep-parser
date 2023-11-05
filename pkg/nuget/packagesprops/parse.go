@@ -2,6 +2,7 @@ package packagesprops
 
 import (
 	"encoding/xml"
+	"strings"
 
 	"golang.org/x/xerrors"
 
@@ -45,12 +46,28 @@ func parsePackage(pkg entry) types.Library {
 	}
 }
 
+func isNonEmptyNonVariableLib(lib types.Library) bool {
+	if len(lib.Name) == 0 || len(lib.Version) == 0 {
+		return false
+	}
+	if isVariable(lib.Name) || isVariable(lib.Version) {
+		return false
+	}
+	return true
+
+}
+
+func isVariable(s string) bool {
+	trimmed := strings.Trim(s, " ")
+	return strings.HasPrefix(trimmed, "$(") && strings.HasSuffix(trimmed, ")")
+}
+
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var configData propsProject
 	if err := xml.NewDecoder(r).Decode(&configData); err != nil {
 		return nil, nil, xerrors.Errorf("failed to decode '*.packages.props' file: %w", err)
 	}
-	// https://github.com/dotnet/roslyn-tools/blob/8617f451b13e3dc29751cc78109f32ec73eeedb0/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L488
+	// https://github.com/dotnet/roslyn-tools/blob/b4c5220f5dfc4278847b6d38eff91cc1188f8066/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L150
 	// Based on this documentation both legacy packages.props and Directory.packages.props are supported
 	// Directory.packages.props example: https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
 
@@ -59,7 +76,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		for _, refPkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
 			var pkg = entry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
 			var lib = parsePackage(pkg)
-			if len(lib.Name) > 0 && len(lib.Version) > 0 {
+			if isNonEmptyNonVariableLib(lib) {
 				libs = append(libs, lib)
 			}
 		}

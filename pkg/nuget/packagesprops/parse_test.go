@@ -38,11 +38,18 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:      "SeveralItemGroupElements",
-			inputFile: "testdata/SeveralItemGroups",
+			inputFile: "testdata/several_item_groups",
 			want: []types.Library{
 				{Name: "PackageOne", Version: "6.2.3", ID: "PackageOne@6.2.3"},
 				{Name: "PackageTwo", Version: "6.0.0", ID: "PackageTwo@6.0.0"},
 				{Name: "PackageThree", Version: "2.4.1", ID: "PackageThree@2.4.1"},
+			},
+		},
+		{
+			name:      "VariablesAsNamesOrVersion",
+			inputFile: "testdata/variables_and_empty",
+			want: []types.Library{
+				{Name: "PackageFour", Version: "2.4.1", ID: "PackageFour@2.4.1"},
 			},
 		},
 		{
