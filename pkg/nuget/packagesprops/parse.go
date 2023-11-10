@@ -17,14 +17,13 @@ type entry struct {
 	IncludePackageName string `xml:"Include,attr"`
 }
 
-type propsItemGroup struct {
-	xml.Name              `xml:"ItemGroup"`
+type itemGroup struct {
 	PackageReferenceEntry []entry `xml:"PackageReference"`
 	PackageVersionEntry   []entry `xml:"PackageVersion"`
 }
 
-type propsProject struct {
-	ItemGroups []propsItemGroup `xml:"ItemGroup"`
+type project struct {
+	ItemGroups []itemGroup `xml:"ItemGroup"`
 }
 
 type Parser struct{}
@@ -63,7 +62,7 @@ func isVariable(s string) bool {
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
-	var configData propsProject
+	var configData project
 	if err := xml.NewDecoder(r).Decode(&configData); err != nil {
 		return nil, nil, xerrors.Errorf("failed to decode '*.packages.props' file: %w", err)
 	}
