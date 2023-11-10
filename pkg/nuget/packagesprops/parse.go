@@ -34,18 +34,19 @@ func NewParser() types.Parser {
 
 func parsePackage(pkg entry) types.Library {
 	// Update attribute is considered legacy, so preferring Include
-	name := pkg.UpdatePackageName
+	name := strings.Trim(pkg.UpdatePackageName, " ")
 	if pkg.IncludePackageName != "" {
-		name = pkg.IncludePackageName
+		name = strings.Trim(pkg.IncludePackageName, " ")
 	}
+	version := strings.Trim(pkg.Version, " ")
 	return types.Library{
-		ID:      utils.PackageID(name, pkg.Version),
+		ID:      utils.PackageID(name, version),
 		Name:    name,
-		Version: pkg.Version,
+		Version: version,
 	}
 }
 
-func isNonEmptyNonVariableLib(lib types.Library) bool {
+func shouldSkipLib(lib types.Library) bool {
 	if len(lib.Name) == 0 || len(lib.Version) == 0 {
 		return false
 	}
@@ -75,7 +76,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		for _, refPkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
 			var pkg = entry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
 			var lib = parsePackage(pkg)
-			if isNonEmptyNonVariableLib(lib) {
+			if shouldSkipLib(lib) {
 				libs = append(libs, lib)
 			}
 		}
