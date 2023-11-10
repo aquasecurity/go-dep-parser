@@ -32,7 +32,7 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
-func parsePackage(pkg entry) types.Library {
+func library(pkg entry) types.Library {
 	// Update attribute is considered legacy, so preferring Include
 	name := strings.Trim(pkg.UpdatePackageName, " ")
 	if pkg.IncludePackageName != "" {
@@ -75,9 +75,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	libs := make([]types.Library, 0)
 	for _, itemGroup := range configData.ItemGroups {
-		for _, refPkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
-			pkg := entry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
-			lib := parsePackage(pkg)
+		for _, pkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
+			lib := library(pkg)
 			if shouldSkipLib(lib) {
 				libs = append(libs, lib)
 			}
