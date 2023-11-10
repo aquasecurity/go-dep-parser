@@ -11,15 +11,15 @@ import (
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
 
-type entry struct {
+type pkg struct {
 	Version            string `xml:"Version,attr"`
 	UpdatePackageName  string `xml:"Update,attr"`
 	IncludePackageName string `xml:"Include,attr"`
 }
 
 type itemGroup struct {
-	PackageReferenceEntry []entry `xml:"PackageReference"`
-	PackageVersionEntry   []entry `xml:"PackageVersion"`
+	PackageReferenceEntry []pkg `xml:"PackageReference"`
+	PackageVersionEntry   []pkg `xml:"PackageVersion"`
 }
 
 type project struct {
@@ -32,13 +32,13 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
-func library(pkg entry) types.Library {
+func library(p pkg) types.Library {
 	// Update attribute is considered legacy, so preferring Include
-	name := strings.Trim(pkg.UpdatePackageName, " ")
-	if pkg.IncludePackageName != "" {
-		name = strings.Trim(pkg.IncludePackageName, " ")
+	name := strings.Trim(p.UpdatePackageName, " ")
+	if p.IncludePackageName != "" {
+		name = strings.Trim(p.IncludePackageName, " ")
 	}
-	version := strings.Trim(pkg.Version, " ")
+	version := strings.Trim(p.Version, " ")
 	return types.Library{
 		ID:      utils.PackageID(name, version),
 		Name:    name,
