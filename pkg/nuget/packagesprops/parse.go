@@ -76,8 +76,8 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	libs := make([]types.Library, 0)
 	for _, itemGroup := range configData.ItemGroups {
 		for _, refPkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
-			var pkg = entry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
-			var lib = parsePackage(pkg)
+			pkg := entry{refPkg.Version, refPkg.UpdatePackageName, refPkg.IncludePackageName}
+			lib := parsePackage(pkg)
 			if shouldSkipLib(lib) {
 				libs = append(libs, lib)
 			}
