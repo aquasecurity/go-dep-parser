@@ -23,6 +23,7 @@ type itemGroup struct {
 }
 
 type project struct {
+	XMLName    xml.Name    `xml:"Project"`
 	ItemGroups []itemGroup `xml:"ItemGroup"`
 }
 
