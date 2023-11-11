@@ -18,6 +18,8 @@ type pkg struct {
 }
 
 // https://github.com/dotnet/roslyn-tools/blob/b4c5220f5dfc4278847b6d38eff91cc1188f8066/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L150
+// Based on this documentation both legacy packages.props and Directory.packages.props are supported
+// Directory.packages.props example: https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
 type itemGroup struct {
 	PackageReferenceEntry []pkg `xml:"PackageReference"`
 	PackageVersionEntry   []pkg `xml:"PackageVersion"`
@@ -73,14 +75,11 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	if err := xml.NewDecoder(r).Decode(&configData); err != nil {
 		return nil, nil, xerrors.Errorf("failed to decode '*.packages.props' file: %w", err)
 	}
-	// https://github.com/dotnet/roslyn-tools/blob/b4c5220f5dfc4278847b6d38eff91cc1188f8066/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L150
-	// Based on this documentation both legacy packages.props and Directory.packages.props are supported
-	// Directory.packages.props example: https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
 
 	libs := make([]types.Library, 0)
 	for _, itemGroup := range configData.ItemGroups {
 		for _, pkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
-			lib := library(pkg)
+			lib := pkg.library()
 			if shouldSkipLib(lib) {
 				libs = append(libs, lib)
 			}
