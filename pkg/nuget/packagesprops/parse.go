@@ -52,14 +52,15 @@ func (p pkg) library() types.Library {
 
 func shouldSkipLib(lib types.Library) bool {
 	if len(lib.Name) == 0 || len(lib.Version) == 0 {
-		return false
+		return true
 	}
 	// *packages.props files don't contain variable resolution information.
 	// So we need to skip them.
 	if isVariable(lib.Name) || isVariable(lib.Version) {
-		return false
+		return true
 	}
-	return true
+	return false
+}
 
 }
 
