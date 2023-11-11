@@ -64,8 +64,6 @@ func shouldSkipLib(lib types.Library) bool {
 	return false
 }
 
-}
-
 func isVariable(s string) bool {
 	trimmed := strings.Trim(s, " ")
 	return strings.HasPrefix(trimmed, "$(") && strings.HasSuffix(trimmed, ")")
@@ -81,7 +79,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	for _, itemGroup := range configData.ItemGroups {
 		for _, pkg := range append(itemGroup.PackageReferenceEntry, itemGroup.PackageVersionEntry...) {
 			lib := pkg.library()
-			if shouldSkipLib(lib) {
+			if !shouldSkipLib(lib) {
 				libs = append(libs, lib)
 			}
 		}
