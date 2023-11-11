@@ -17,6 +17,7 @@ type pkg struct {
 	IncludePackageName string `xml:"Include,attr"`
 }
 
+// https://github.com/dotnet/roslyn-tools/blob/b4c5220f5dfc4278847b6d38eff91cc1188f8066/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L150
 type itemGroup struct {
 	PackageReferenceEntry []pkg `xml:"PackageReference"`
 	PackageVersionEntry   []pkg `xml:"PackageVersion"`
