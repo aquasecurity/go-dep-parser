@@ -65,8 +65,7 @@ func shouldSkipLib(lib types.Library) bool {
 }
 
 func isVariable(s string) bool {
-	trimmed := strings.Trim(s, " ")
-	return strings.HasPrefix(trimmed, "$(") && strings.HasSuffix(trimmed, ")")
+	return strings.HasPrefix(s, "$(") && strings.HasSuffix(s, ")")
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
