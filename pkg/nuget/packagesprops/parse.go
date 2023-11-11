@@ -34,13 +34,15 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
-func library(p pkg) types.Library {
+func (p pkg) library() types.Library {
 	// Update attribute is considered legacy, so preferring Include
-	name := strings.Trim(p.UpdatePackageName, " ")
+	name := p.UpdatePackageName
 	if p.IncludePackageName != "" {
-		name = strings.Trim(p.IncludePackageName, " ")
+		name = p.IncludePackageName
 	}
-	version := strings.Trim(p.Version, " ")
+
+	name = strings.TrimSpace(name)
+	version := strings.TrimSpace(p.Version)
 	return types.Library{
 		ID:      utils.PackageID(name, version),
 		Name:    name,
