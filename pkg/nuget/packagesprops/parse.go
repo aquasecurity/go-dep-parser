@@ -18,8 +18,6 @@ type pkg struct {
 }
 
 // https://github.com/dotnet/roslyn-tools/blob/b4c5220f5dfc4278847b6d38eff91cc1188f8066/src/RoslynInsertionTool/RoslynInsertionTool/CoreXT.cs#L150
-// Based on this documentation both legacy packages.props and Directory.packages.props are supported
-// Directory.packages.props example: https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions
 type itemGroup struct {
 	PackageReferenceEntry []pkg `xml:"PackageReference"`
 	PackageVersionEntry   []pkg `xml:"PackageVersion"`
