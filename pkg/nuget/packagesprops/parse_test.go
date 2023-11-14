@@ -32,8 +32,8 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/Directory.Packages.props",
 			want: []types.Library{
 				{Name: "PackageOne", Version: "6.2.3", ID: "PackageOne@6.2.3"},
-				{Name: "PackageTwo", Version: "6.0.0", ID: "PackageTwo@6.0.0"},
 				{Name: "PackageThree", Version: "2.4.1", ID: "PackageThree@2.4.1"},
+				{Name: "PackageTwo", Version: "6.0.0", ID: "PackageTwo@6.0.0"},
 			},
 		},
 		{
@@ -41,8 +41,8 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/several_item_groups",
 			want: []types.Library{
 				{Name: "PackageOne", Version: "6.2.3", ID: "PackageOne@6.2.3"},
-				{Name: "PackageTwo", Version: "6.0.0", ID: "PackageTwo@6.0.0"},
 				{Name: "PackageThree", Version: "2.4.1", ID: "PackageThree@2.4.1"},
+				{Name: "PackageTwo", Version: "6.0.0", ID: "PackageTwo@6.0.0"},
 			},
 		},
 		{
@@ -55,7 +55,7 @@ func TestParse(t *testing.T) {
 		{
 			name:      "NoItemGroupInXMLStructure",
 			inputFile: "testdata/no_item_group.props",
-			want:      []types.Library{},
+			want:      []types.Library(nil),
 		},
 		{
 			name:      "NoProject",
@@ -76,7 +76,7 @@ func TestParse(t *testing.T) {
 			}
 
 			assert.NoError(t, err)
-			assert.ElementsMatch(t, tt.want, got)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
