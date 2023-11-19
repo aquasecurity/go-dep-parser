@@ -2,6 +2,7 @@ package pub
 
 import (
 	"fmt"
+
 	"golang.org/x/xerrors"
 	"gopkg.in/yaml.v3"
 
@@ -22,7 +23,12 @@ func NewParser() types.Parser {
 }
 
 type lock struct {
-	Packages map[string]Dep `yaml:"packages"`
+	Packages map[string]DepWithMetadata `yaml:"packages"`
+}
+
+type DepWithMetadata struct {
+	Dep  Dep
+	Line int
 }
 
 type Dep struct {
@@ -43,10 +49,11 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 		// It will be confusing if we exclude direct dev dependencies and include transitive dev dependencies.
 		// We decided to keep all dev dependencies until Pub will add support for "transitive main" and "transitive dev".
 		lib := types.Library{
-			ID:       pkgID(name, dep.Version),
-			Name:     name,
-			Version:  dep.Version,
-			Indirect: dep.Dependency == transitiveDep,
+			ID:        pkgID(name, dep.Dep.Version),
+			Name:      name,
+			Version:   dep.Dep.Version,
+			Indirect:  dep.Dep.Dependency == transitiveDep,
+			Locations: []types.Location{{StartLine: dep.Line, EndLine: dep.Line}},
 		}
 		libs = append(libs, lib)
 	}
@@ -56,4 +63,15 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 
 func pkgID(name, version string) string {
 	return fmt.Sprintf(idFormat, name, version)
+}
+
+func (dep *DepWithMetadata) UnmarshalYAML(value *yaml.Node) error {
+	err := value.Decode(&dep.Dep)
+	if err != nil {
+		return err
+	}
+
+	dep.Line = value.Line - 1
+
+	return nil
 }
