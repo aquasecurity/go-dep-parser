@@ -2,14 +2,15 @@ package pip
 
 import (
 	"bufio"
+	"strings"
+	"unicode"
+
 	dio "github.com/aquasecurity/go-dep-parser/pkg/io"
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"golang.org/x/text/encoding"
 	u "golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 	"golang.org/x/xerrors"
-	"strings"
-	"unicode"
 )
 
 const (
@@ -35,7 +36,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	scanner := bufio.NewScanner(decodedReader)
 	var libs []types.Library
+	var lineNumber int // It is used to save dependency location
 	for scanner.Scan() {
+		lineNumber++
 		line := scanner.Text()
 		line = strings.ReplaceAll(line, " ", "")
 		line = strings.ReplaceAll(line, `\`, "")
@@ -48,8 +51,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			continue
 		}
 		libs = append(libs, types.Library{
-			Name:    s[0],
-			Version: s[1],
+			Name:      s[0],
+			Version:   s[1],
+			Locations: []types.Location{{StartLine: lineNumber, EndLine: lineNumber}},
 		})
 	}
 	if err := scanner.Err(); err != nil {
