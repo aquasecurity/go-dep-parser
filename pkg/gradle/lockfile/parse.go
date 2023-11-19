@@ -18,7 +18,9 @@ func NewParser() types.Parser {
 func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
 	scanner := bufio.NewScanner(r)
+	var lineNumber int // It is used to save dependency location
 	for scanner.Scan() {
+		lineNumber++
 		line := strings.TrimSpace(scanner.Text())
 		if strings.HasPrefix(line, "#") { // skip comments
 			continue
@@ -30,8 +32,9 @@ func (Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, er
 			continue
 		}
 		libs = append(libs, types.Library{
-			Name:    strings.Join(dep[:2], ":"),
-			Version: strings.Split(dep[2], "=")[0], // remove classPaths
+			Name:      strings.Join(dep[:2], ":"),
+			Version:   strings.Split(dep[2], "=")[0], // remove classPaths
+			Locations: []types.Location{{StartLine: lineNumber, EndLine: lineNumber}},
 		})
 
 	}
