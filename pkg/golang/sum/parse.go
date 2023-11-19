@@ -17,13 +17,20 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
+type VersionWithMetadata struct {
+	Version    string
+	LineNumber int
+}
+
 // Parse parses a go.sum file
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var libs []types.Library
-	uniqueLibs := make(map[string]string)
+	uniqueLibs := make(map[string]VersionWithMetadata)
 
 	scanner := bufio.NewScanner(r)
+	var lineNumber int // It is used to save dependency location
 	for scanner.Scan() {
+		lineNumber++
 		line := strings.TrimSpace(scanner.Text())
 		s := strings.Fields(line)
 		if len(s) < 2 {
@@ -32,7 +39,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 		// go.sum records and sorts all non-major versions
 		// with the latest version as last entry
-		uniqueLibs[s[0]] = strings.TrimSuffix(strings.TrimPrefix(s[1], "v"), "/go.mod")
+		uniqueLibs[s[0]] = VersionWithMetadata{
+			Version:    strings.TrimSuffix(strings.TrimPrefix(s[1], "v"), "/go.mod"),
+			LineNumber: lineNumber,
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, nil, xerrors.Errorf("scan error: %w", err)
@@ -40,9 +50,10 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 	for k, v := range uniqueLibs {
 		libs = append(libs, types.Library{
-			ID:      mod.ModuleID(k, v),
-			Name:    k,
-			Version: v,
+			ID:        mod.ModuleID(k, v.Version),
+			Name:      k,
+			Version:   v.Version,
+			Locations: []types.Location{{StartLine: v.LineNumber, EndLine: v.LineNumber}},
 		})
 	}
 

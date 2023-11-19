@@ -45,7 +45,8 @@ func TestParse(t *testing.T) {
 			require.NoError(t, err)
 
 			for i := range got {
-				got[i].ID = "" // Not compare IDs, tested in mod.TestModuleID()
+				got[i].ID = ""         // Not compare IDs, tested in mod.TestModuleID()
+				got[i].Locations = nil // Not compare Locations
 			}
 
 			sort.Slice(got, func(i, j int) bool {
