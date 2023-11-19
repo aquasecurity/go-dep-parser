@@ -20,8 +20,9 @@ func TestParseWordPress(t *testing.T) {
 		{
 			file: "testdata/version.php",
 			want: types.Library{
-				Name:    "wordpress",
-				Version: "4.9.4-alpha",
+				Name:      "wordpress",
+				Version:   "4.9.4-alpha",
+				Locations: []types.Location{{StartLine: 22, EndLine: 22}},
 			},
 		},
 		{
