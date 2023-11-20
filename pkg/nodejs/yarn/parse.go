@@ -18,7 +18,7 @@ import (
 var (
 	yarnPatternRegexp    = regexp.MustCompile(`^\s?\\?"?(?P<package>\S+?)@(?:(?P<protocol>\S+?):)?(?P<version>.+?)\\?"?:?$`)
 	yarnVersionRegexp    = regexp.MustCompile(`^"?version:?"?\s+"?(?P<version>[^"]+)"?`)
-	yarnDependencyRegexp = regexp.MustCompile(`\s{4,}"?(?P<package>.+?)"?:?\s"?(?P<version>[^"]+)"?`)
+	yarnDependencyRegexp = regexp.MustCompile(`\s{4,}"?(?P<package>.+?)"?:?\s"?(?:(?P<protocol>\S+?):)?(?P<version>[^"]+)"?`)
 )
 
 type LockFile struct {
@@ -103,7 +103,12 @@ func getDependency(target string) (name, version string, err error) {
 	if len(capture) < 3 {
 		return "", "", xerrors.New("not dependency")
 	}
-	return capture[1], capture[2], nil
+	// skip dependencies with ignored protocols
+	// We warn about this when parsing this dependency as a library
+	if ignoreProtocol(capture[2]) {
+		return "", "", nil
+	}
+	return capture[1], capture[3], nil
 }
 
 func validProtocol(protocol string) bool {
@@ -164,8 +169,9 @@ func scanBlocks(data []byte, atEOF bool) (advance int, token []byte, err error) 
 
 func parseBlock(block []byte, lineNum int) (lib Library, deps []string, newLine int, err error) {
 	var (
-		emptyLines int // lib can start with empty lines first
-		skipBlock  bool
+		emptyLines       int // lib can start with empty lines first
+		skipBlock        bool
+		packageNameFound bool
 	)
 
 	scanner := NewLineScanner(bytes.NewReader(block))
@@ -201,21 +207,28 @@ func parseBlock(block []byte, lineNum int) (lib Library, deps []string, newLine 
 			continue
 		}
 
-		// try parse package patterns
-		if name, protocol, patterns, patternErr := parsePackagePatterns(line); patternErr == nil {
-			if patterns == nil || !validProtocol(protocol) {
-				skipBlock = true
-				if !ignoreProtocol(protocol) {
-					// we need to calculate the last line of the block in order to correctly determine the line numbers of the next blocks
-					// store the error. we will handle it later
-					err = xerrors.Errorf("unknown protocol: '%s', line: %s", protocol, line)
+		// Lines can use same patterns with packages.
+		// e.g. dependencies under `dependenciesMeta`:
+		// dependenciesMeta:
+		//  debug@4.3.4:
+		// To avoid rewriting package name,
+		// we need to parse only 1st found package line
+		if !packageNameFound {
+			// try parse package patterns
+			if name, protocol, patterns, patternErr := parsePackagePatterns(line); patternErr == nil {
+				if patterns == nil || !validProtocol(protocol) {
+					skipBlock = true
+					if !ignoreProtocol(protocol) {
+						// we need to calculate the last line of the block in order to correctly determine the line numbers of the next blocks
+						// store the error. we will handle it later
+						err = xerrors.Errorf("unknown protocol: '%s', line: %s", protocol, line)
+					}
+					continue
+				} else {
+					lib.Patterns = patterns
+					lib.Name = name
 					continue
 				}
-				continue
-			} else {
-				lib.Patterns = patterns
-				lib.Name = name
-				continue
 			}
 		}
 	}
@@ -246,7 +259,9 @@ func parseDependencies(scanner *LineScanner) (deps []string) {
 			// finished dependencies block
 			return deps
 		} else {
-			deps = append(deps, dep)
+			if dep != "" {
+				deps = append(deps, dep)
+			}
 		}
 	}
 

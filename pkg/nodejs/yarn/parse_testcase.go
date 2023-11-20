@@ -15871,4 +15871,23 @@ var (
 	yarnBadProtocol = []types.Library{
 		{ID: "jquery@3.4.1", Name: "jquery", Version: "3.4.1", Locations: []types.Location{{StartLine: 4, EndLine: 7}}},
 	}
+
+	// docker run --name node --rm -it node@sha256:807e66e2bee193961c9642bb1157d77a61747bf76737ca786da45b10749dcb42 sh
+	// mkdir app && cd app
+	// yarn init -y
+	// yarn set version berry
+	// yarn add debug@4.3.4
+	// yarn unplug debug
+	// Libraries are filled manually
+	yarnV2WithDependenciesMeta = []types.Library{
+		{ID: "debug@4.3.4", Name: "debug", Version: "4.3.4", Locations: []types.Location{{StartLine: 19, EndLine: 29}}},
+		{ID: "ms@2.1.2", Name: "ms", Version: "2.1.2", Locations: []types.Location{{StartLine: 31, EndLine: 36}}},
+	}
+
+	yarnV2WithDependenciesMetaDeps = []types.Dependency{
+		{
+			ID:        "debug@4.3.4",
+			DependsOn: []string{"ms@2.1.2"},
+		},
+	}
 )
