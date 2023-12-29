@@ -259,7 +259,9 @@ func (d pomDependency) ToArtifact(ex map[string]struct{}) artifact {
 	// we need to initialize a new map for each new artifact
 	// See `exclusions in child` test for more information
 	exclusions := map[string]struct{}{}
-	maps.Copy(exclusions, ex)
+	if ex != nil {
+		exclusions = maps.Clone(ex)
+	}
 	for _, e := range d.Exclusions.Exclusion {
 		exclusions[fmt.Sprintf("%s:%s", e.GroupID, e.ArtifactID)] = struct{}{}
 	}
