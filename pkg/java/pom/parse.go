@@ -642,3 +642,22 @@ func parsePom(r io.Reader) (*pomXML, error) {
 	}
 	return parsed, nil
 }
+
+func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	*deps = pomDependencies{}
+	for {
+		var dep pomDependency
+		err := d.Decode(&dep)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+
+		endLine, _ := d.InputPos()
+		dep.endLine = endLine
+
+		(*deps).Dependency = append((*deps).Dependency, dep)
+	}
+	return nil
+}

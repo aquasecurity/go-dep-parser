@@ -184,6 +184,7 @@ type pomDependency struct {
 	Scope      string        `xml:"scope"`
 	Optional   bool          `xml:"optional"`
 	Exclusions pomExclusions `xml:"exclusions"`
+	endLine    int
 }
 
 type pomExclusions struct {
