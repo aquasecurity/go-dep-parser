@@ -562,17 +562,16 @@ func TestPom_Parse(t *testing.T) {
 					License: "Apache 2.0",
 				},
 				{
-					ID:      "org.example:example-api:1.7.30",
+					ID:      "org.example:example-api:1.1.1",
 					Name:    "org.example:example-api",
-					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Version: "1.1.1",
 				},
 			},
 			wantDeps: []types.Dependency{
 				{
 					ID: "com.example:import:2.0.0",
 					DependsOn: []string{
-						"org.example:example-api:1.7.30",
+						"org.example:example-api:1.1.1",
 					},
 				},
 			},

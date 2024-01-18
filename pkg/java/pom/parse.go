@@ -396,6 +396,10 @@ func (p *parser) resolveDepManagement(props map[string]string, depManagement []p
 		if err != nil {
 			continue
 		}
+
+		// We need to recursively check all nested depManagements,
+		// so that we don't miss dependencies on nested depManagements with `Import` scope.
+		result.dependencyManagement = p.resolveDepManagement(utils.MergeMaps(result.properties, props), result.dependencyManagement)
 		for k, dd := range result.dependencyManagement {
 			// Evaluate variables and overwrite dependencyManagement
 			result.dependencyManagement[k] = dd.Resolve(result.properties, nil, nil)
