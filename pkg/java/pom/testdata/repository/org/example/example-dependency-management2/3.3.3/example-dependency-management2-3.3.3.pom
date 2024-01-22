@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>example-dependency-management</artifactId>
+    <artifactId>example-dependency-management2</artifactId>
     <version>3.3.3</version>
 
     <packaging>pom</packaging>
@@ -16,20 +16,12 @@
         <dependencies>
             <dependency>
                 <groupId>org.example</groupId>
-                <artifactId>example-dependency-management2</artifactId>
-                <version>${project.version}</version>
+                <artifactId>example-dependency-management3</artifactId>
+                <version>2.2.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>example-dependency</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-    </dependencies>
 
 </project>

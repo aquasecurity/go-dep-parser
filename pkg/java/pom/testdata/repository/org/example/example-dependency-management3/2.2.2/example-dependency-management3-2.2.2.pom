@@ -5,31 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>example-dependency-management</artifactId>
-    <version>3.3.3</version>
+    <artifactId>example-dependency-management3</artifactId>
+    <version>2.2.2</version>
 
     <packaging>pom</packaging>
     <name>Example API Dependency Management</name>
     <description>The example API</description>
 
+    <!-- This dependencyManagement doesn't affect dependencies of example-dependency-->
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.example</groupId>
-                <artifactId>example-dependency-management2</artifactId>
+                <artifactId>example-api</artifactId>
                 <version>${project.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>example-dependency</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-    </dependencies>
 
 </project>
