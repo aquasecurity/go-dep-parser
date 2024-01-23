@@ -2,14 +2,15 @@ package pom
 
 import (
 	"fmt"
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/aquasecurity/go-dep-parser/pkg/log"
 	"github.com/samber/lo"
 	"golang.org/x/exp/slices"
+
+	"github.com/aquasecurity/go-dep-parser/pkg/log"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 )
 
 var (

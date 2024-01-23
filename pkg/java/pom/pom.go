@@ -3,7 +3,6 @@ package pom
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"io"
 	"maps"
 	"reflect"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/samber/lo"
 
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
 )
 
