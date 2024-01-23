@@ -338,17 +338,17 @@ func lineNumberShift(dep pomDependency) int {
 
 	if dep.Exclusions.Exclusion != nil {
 		shift += 2 // <exclusions> + </exclusions> tags
+		for _, exclusion := range dep.Exclusions.Exclusion {
+			shift += 2 // <exclusion> + </exclusions> tags
+			if exclusion.GroupID != "" {
+				shift += 1
+			}
+			if exclusion.ArtifactID != "" {
+				shift += 1
+			}
+		}
 	}
 
-	for _, exc := range dep.Exclusions.Exclusion {
-		shift += 2 // <exclusion> + </exclusions> tags
-		if exc.GroupID != "" {
-			shift += 1
-		}
-		if exc.ArtifactID != "" {
-			shift += 1
-		}
-	}
 	return shift
 }
 
