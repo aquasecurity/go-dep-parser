@@ -26,6 +26,9 @@ type artifact struct {
 	Module bool
 	Root   bool
 	Direct bool
+
+	StartLine int
+	EndLine   int
 }
 
 func newArtifact(groupID, artifactID, version string, licenses []string, props map[string]string) artifact {

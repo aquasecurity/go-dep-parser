@@ -131,6 +131,13 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			if err != nil {
 				return nil, nil, err
 			}
+
+			// We don't need to store the location of module dependencies to avoid confusion.
+			moduleLibs = lo.Map(moduleLibs, func(lib types.Library, _ int) types.Library {
+				lib.Locations = nil
+				return lib
+			})
+
 			libs = append(libs, moduleLibs...)
 			if moduleDeps != nil {
 				deps = append(deps, moduleDeps...)
@@ -147,6 +154,11 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			// take a look `hard requirement for the specified version` test
 			if uniqueArt.Direct {
 				art.Direct = true
+			}
+			// We don't need to overwrite dependency location for hard links
+			if uniqueArt.EndLine != 0 {
+				art.StartLine = uniqueArt.StartLine
+				art.EndLine = uniqueArt.EndLine
 			}
 		}
 
@@ -185,9 +197,12 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		if !art.IsEmpty() {
 			// Override the version
 			uniqArtifacts[art.Name()] = artifact{
-				Version:  art.Version,
-				Licenses: result.artifact.Licenses,
-				Direct:   art.Direct,
+				Version:   art.Version,
+				Licenses:  result.artifact.Licenses,
+				Direct:    art.Direct,
+				Root:      art.Root,
+				StartLine: art.StartLine,
+				EndLine:   art.EndLine,
 			}
 
 			// save only dependency names
@@ -207,6 +222,15 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			Version:  art.Version.String(),
 			License:  art.JoinLicenses(),
 			Indirect: !art.Direct,
+		}
+		// We need to add location only for deps from `Dependencies` tag of base pom.xml file
+		if art.Direct && !art.Root && art.EndLine != 0 {
+			lib.Locations = types.Locations{
+				{
+					StartLine: art.StartLine,
+					EndLine:   art.EndLine,
+				},
+			}
 		}
 		libs = append(libs, lib)
 
@@ -409,7 +433,7 @@ func (p *parser) mergeDependencies(parent, child []artifact, exclusions map[stri
 	var deps []artifact
 	unique := map[string]struct{}{}
 
-	for _, d := range append(parent, child...) {
+	for _, d := range append(child, parent...) {
 		if excludeDep(exclusions, d) {
 			continue
 		}
@@ -465,6 +489,13 @@ func (p *parser) parseParent(currentPath string, parent pomParent) (analysisResu
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
+
+	// We don't need to store the location of parent dependencies to avoid confusion.
+	result.dependencies = lo.Map(result.dependencies, func(a artifact, _ int) artifact {
+		a.StartLine = 0
+		a.EndLine = 0
+		return a
+	})
 
 	p.cache.put(target, result)
 
@@ -641,23 +672,4 @@ func parsePom(r io.Reader) (*pomXML, error) {
 		return nil, xerrors.Errorf("xml decode error: %w", err)
 	}
 	return parsed, nil
-}
-
-func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	*deps = pomDependencies{}
-	for {
-		var dep pomDependency
-		err := d.Decode(&dep)
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return err
-		}
-
-		endLine, _ := d.InputPos()
-		dep.endLine = endLine
-
-		(*deps).Dependency = append((*deps).Dependency, dep)
-	}
-	return nil
 }

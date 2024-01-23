@@ -184,7 +184,8 @@ type pomDependency struct {
 	Scope      string        `xml:"scope"`
 	Optional   bool          `xml:"optional"`
 	Exclusions pomExclusions `xml:"exclusions"`
-	endLine    int
+	StartLine  int
+	EndLine    int
 }
 
 type pomExclusions struct {
@@ -213,6 +214,8 @@ func (d pomDependency) Resolve(props map[string]string, depManagement, rootDepMa
 		Scope:      evaluateVariable(d.Scope, props, nil),
 		Optional:   d.Optional,
 		Exclusions: d.Exclusions,
+		StartLine:  d.StartLine,
+		EndLine:    d.EndLine,
 	}
 
 	// If this dependency is managed in the root POM,
@@ -266,6 +269,8 @@ func (d pomDependency) ToArtifact(exclusions map[string]struct{}) artifact {
 		ArtifactID: d.ArtifactID,
 		Version:    newVersion(d.Version),
 		Exclusions: exclusions,
+		StartLine:  d.StartLine,
+		EndLine:    d.EndLine,
 	}
 }
 
@@ -276,7 +281,7 @@ type property struct {
 	Value   string `xml:",chardata"`
 }
 
-func (props *properties) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (props *properties) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	*props = properties{}
 	for {
 		var p property
@@ -288,6 +293,33 @@ func (props *properties) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 		}
 
 		(*props)[p.XMLName.Local] = p.Value
+	}
+	return nil
+}
+
+func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
+	*deps = pomDependencies{}
+	prevEndLine := -1
+	for {
+		var dep pomDependency
+		err := d.Decode(&dep)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+
+		dep.EndLine, _ = d.InputPos()
+		// InputPos() returns line number of `dependency` end tag (</dependency>).
+		// So we use ending line of previous dependency, incremented by one, for starting line of current dependency
+		dep.StartLine = prevEndLine + 1
+		// For first dependency, we use end line of the current dependency, decreasing it by three (ArtifactID, GroupID and Version)
+		if dep.StartLine == 0 {
+			dep.StartLine = dep.EndLine - 3
+		}
+		prevEndLine = dep.EndLine
+
+		(*deps).Dependency = append((*deps).Dependency, dep)
 	}
 	return nil
 }
