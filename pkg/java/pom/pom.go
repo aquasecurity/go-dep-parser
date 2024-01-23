@@ -304,7 +304,6 @@ func (props *properties) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error 
 
 func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	*deps = pomDependencies{}
-	prevEndLine := -1
 	for {
 		var dep pomDependency
 		err := d.Decode(&dep)
@@ -315,18 +314,42 @@ func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) er
 		}
 
 		dep.EndLine, _ = d.InputPos()
-		// InputPos() returns line number of `dependency` end tag (</dependency>).
-		// So we use ending line of previous dependency, incremented by one, for starting line of current dependency
-		dep.StartLine = prevEndLine + 1
-		// For first dependency, we use end line of the current dependency, decreasing it by three (ArtifactID, GroupID and Version)
-		if dep.StartLine == 0 {
-			dep.StartLine = dep.EndLine - 3
-		}
-		prevEndLine = dep.EndLine
+		dep.StartLine = dep.EndLine - lineNumberShift(dep)
 
 		(*deps).Dependency = append((*deps).Dependency, dep)
 	}
 	return nil
+}
+
+// lineNumberShift defines number of lines used by dependency to shift end line
+// This is necessary because InputPos() returns  line number of the `dependency` end tag (</dependency>).
+func lineNumberShift(dep pomDependency) int {
+	shift := 1 // Compensate </dependency> tag
+
+	for _, v := range []string{dep.GroupID, dep.ArtifactID, dep.Version, dep.Scope} {
+		if v != "" {
+			shift += 1
+		}
+	}
+
+	if dep.Optional {
+		shift += 1
+	}
+
+	if dep.Exclusions.Exclusion != nil {
+		shift += 2 // <exclusions> + </exclusions> tags
+	}
+
+	for _, exc := range dep.Exclusions.Exclusion {
+		shift += 2 // <exclusion> + </exclusions> tags
+		if exc.GroupID != "" {
+			shift += 1
+		}
+		if exc.ArtifactID != "" {
+			shift += 1
+		}
+	}
+	return shift
 }
 
 func findDep(name string, depManagement []pomDependency) (pomDependency, bool) {

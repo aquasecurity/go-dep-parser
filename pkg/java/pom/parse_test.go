@@ -42,7 +42,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 33,
+							StartLine: 32,
 							EndLine:   36,
 						},
 					},
@@ -75,7 +75,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 33,
+							StartLine: 32,
 							EndLine:   36,
 						},
 					},
@@ -102,7 +102,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.3.4",
 					Locations: types.Locations{
 						{
-							StartLine: 18,
+							StartLine: 17,
 							EndLine:   21,
 						},
 					},
@@ -127,7 +127,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 34,
+							StartLine: 33,
 							EndLine:   37,
 						},
 					},
@@ -159,7 +159,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 19,
+							StartLine: 18,
 							EndLine:   22,
 						},
 					},
@@ -228,7 +228,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.2.3",
 					Locations: types.Locations{
 						{
-							StartLine: 23,
+							StartLine: 22,
 							EndLine:   26,
 						},
 					},
@@ -334,7 +334,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "Apache 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 29,
+							StartLine: 28,
 							EndLine:   32,
 						},
 					},
@@ -373,7 +373,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 27,
+							StartLine: 26,
 							EndLine:   30,
 						},
 					},
@@ -437,7 +437,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 26,
+							StartLine: 25,
 							EndLine:   29,
 						},
 					},
@@ -475,7 +475,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 33,
+							StartLine: 32,
 							EndLine:   36,
 						},
 					},
@@ -548,7 +548,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.2.3",
 					Locations: types.Locations{
 						{
-							StartLine: 14,
+							StartLine: 13,
 							EndLine:   17,
 						},
 					},
@@ -617,7 +617,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "3.3.4",
 					Locations: types.Locations{
 						{
-							StartLine: 29,
+							StartLine: 28,
 							EndLine:   32,
 						},
 					},
@@ -746,7 +746,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "3.3.3",
 					Locations: types.Locations{
 						{
-							StartLine: 25,
+							StartLine: 14,
 							EndLine:   28,
 						},
 					},
@@ -796,7 +796,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "4.0.0",
 					Locations: types.Locations{
 						{
-							StartLine: 11,
+							StartLine: 10,
 							EndLine:   14,
 						},
 					},
@@ -845,7 +845,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.2.3",
 					Locations: types.Locations{
 						{
-							StartLine: 21,
+							StartLine: 14,
 							EndLine:   24,
 						},
 					},
@@ -1014,7 +1014,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "3.3.3",
 					Locations: types.Locations{
 						{
-							StartLine: 21,
+							StartLine: 20,
 							EndLine:   24,
 						},
 					},
@@ -1061,7 +1061,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.1.1",
 					Locations: types.Locations{
 						{
-							StartLine: 15,
+							StartLine: 14,
 							EndLine:   18,
 						},
 					},
@@ -1117,7 +1117,7 @@ func TestPom_Parse(t *testing.T) {
 					License: "The Apache Software License, Version 2.0",
 					Locations: types.Locations{
 						{
-							StartLine: 28,
+							StartLine: 27,
 							EndLine:   31,
 						},
 					},
@@ -1149,7 +1149,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "999",
 					Locations: types.Locations{
 						{
-							StartLine: 22,
+							StartLine: 21,
 							EndLine:   25,
 						},
 					},
