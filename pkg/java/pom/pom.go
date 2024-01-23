@@ -3,6 +3,7 @@ package pom
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"io"
 	"maps"
 	"reflect"
@@ -274,8 +275,12 @@ func (d pomDependency) ToArtifact(ex map[string]struct{}) artifact {
 		ArtifactID: d.ArtifactID,
 		Version:    newVersion(d.Version),
 		Exclusions: exclusions,
-		StartLine:  d.StartLine,
-		EndLine:    d.EndLine,
+		Location: types.Locations{
+			{
+				StartLine: d.StartLine,
+				EndLine:   d.EndLine,
+			},
+		},
 	}
 }
 

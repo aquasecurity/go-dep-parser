@@ -156,9 +156,8 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 				art.Direct = true
 			}
 			// We don't need to overwrite dependency location for hard links
-			if uniqueArt.EndLine != 0 {
-				art.StartLine = uniqueArt.StartLine
-				art.EndLine = uniqueArt.EndLine
+			if uniqueArt.Location != nil {
+				art.Location = uniqueArt.Location
 			}
 		}
 
@@ -197,12 +196,11 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		if !art.IsEmpty() {
 			// Override the version
 			uniqArtifacts[art.Name()] = artifact{
-				Version:   art.Version,
-				Licenses:  result.artifact.Licenses,
-				Direct:    art.Direct,
-				Root:      art.Root,
-				StartLine: art.StartLine,
-				EndLine:   art.EndLine,
+				Version:  art.Version,
+				Licenses: result.artifact.Licenses,
+				Direct:   art.Direct,
+				Root:     art.Root,
+				Location: art.Location,
 			}
 
 			// save only dependency names
@@ -224,13 +222,8 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			Indirect: !art.Direct,
 		}
 		// We need to add location only for deps from `Dependencies` tag of base pom.xml file
-		if art.Direct && !art.Root && art.EndLine != 0 {
-			lib.Locations = types.Locations{
-				{
-					StartLine: art.StartLine,
-					EndLine:   art.EndLine,
-				},
-			}
+		if art.Direct && !art.Root && art.Location != nil {
+			lib.Locations = art.Location
 		}
 		libs = append(libs, lib)
 
@@ -492,8 +485,7 @@ func (p *parser) parseParent(currentPath string, parent pomParent) (analysisResu
 
 	// We don't need to store the location of parent dependencies to avoid confusion.
 	result.dependencies = lo.Map(result.dependencies, func(a artifact, _ int) artifact {
-		a.StartLine = 0
-		a.EndLine = 0
+		a.Location = nil
 		return a
 	})
 

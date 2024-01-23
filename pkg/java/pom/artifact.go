@@ -2,6 +2,7 @@ package pom
 
 import (
 	"fmt"
+	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"os"
 	"regexp"
 	"strings"
@@ -27,8 +28,7 @@ type artifact struct {
 	Root   bool
 	Direct bool
 
-	StartLine int
-	EndLine   int
+	Location types.Locations
 }
 
 func newArtifact(groupID, artifactID, version string, licenses []string, props map[string]string) artifact {
