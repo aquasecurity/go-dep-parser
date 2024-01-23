@@ -794,6 +794,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "org.example:example-exclusions:4.0.0",
 					Name:    "org.example:example-exclusions",
 					Version: "4.0.0",
+					Locations: types.Locations{
+						{
+							StartLine: 11,
+							EndLine:   14,
+						},
+					},
 				},
 			},
 			wantDeps: []types.Dependency{
