@@ -309,7 +309,6 @@ func (props *properties) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error 
 }
 
 func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
-	*deps = pomDependencies{}
 	for {
 		token, err := d.Token()
 		if err != nil {
