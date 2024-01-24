@@ -382,9 +382,7 @@ func (p *parser) parseDependencies(deps []pomDependency, props map[string]string
 			continue
 		}
 
-		art := d.ToArtifact(opts)
-
-		dependencies = append(dependencies, art)
+		dependencies = append(dependencies, d.ToArtifact(opts))
 	}
 	return dependencies
 }
