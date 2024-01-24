@@ -260,28 +260,34 @@ func (d pomDependency) Resolve(props map[string]string, depManagement, rootDepMa
 
 // ToArtifact converts dependency to artifact.
 // It should be called after calling Resolve() so that variables can be evaluated.
-func (d pomDependency) ToArtifact(ex map[string]struct{}) artifact {
+func (d pomDependency) ToArtifact(opts analysisOptions) artifact {
 	// To avoid shadow adding exclusions to top pom's,
 	// we need to initialize a new map for each new artifact
 	// See `exclusions in child` test for more information
 	exclusions := map[string]struct{}{}
-	if ex != nil {
-		exclusions = maps.Clone(ex)
+	if opts.exclusions != nil {
+		exclusions = maps.Clone(opts.exclusions)
 	}
 	for _, e := range d.Exclusions.Exclusion {
 		exclusions[fmt.Sprintf("%s:%s", e.GroupID, e.ArtifactID)] = struct{}{}
 	}
+
+	var locations types.Locations
+	if opts.lineNumber {
+		locations = types.Locations{
+			{
+				StartLine: d.StartLine,
+				EndLine:   d.EndLine,
+			},
+		}
+	}
+
 	return artifact{
 		GroupID:    d.GroupID,
 		ArtifactID: d.ArtifactID,
 		Version:    newVersion(d.Version),
 		Exclusions: exclusions,
-		Locations: types.Locations{
-			{
-				StartLine: d.StartLine,
-				EndLine:   d.EndLine,
-			},
-		},
+		Locations:  locations,
 	}
 }
 

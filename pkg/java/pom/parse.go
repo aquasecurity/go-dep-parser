@@ -382,10 +382,7 @@ func (p *parser) parseDependencies(deps []pomDependency, props map[string]string
 			continue
 		}
 
-		art := d.ToArtifact(opts.exclusions)
-		if !opts.lineNumber {
-			art.Locations = nil
-		}
+		art := d.ToArtifact(opts)
 
 		dependencies = append(dependencies, art)
 	}
