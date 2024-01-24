@@ -92,7 +92,7 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	// Analyze root POM
-	result, err := p.analyze(root, analysisOptions{})
+	result, err := p.analyze(root, analysisOptions{lineNumber: true})
 	if err != nil {
 		return nil, nil, xerrors.Errorf("analyze error (%s): %w", p.rootPath, err)
 	}
@@ -132,12 +132,6 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 				return nil, nil, err
 			}
 
-			// We don't need to store the location of module dependencies to avoid confusion.
-			moduleLibs = lo.Map(moduleLibs, func(lib types.Library, _ int) types.Library {
-				lib.Locations = nil
-				return lib
-			})
-
 			libs = append(libs, moduleLibs...)
 			if moduleDeps != nil {
 				deps = append(deps, moduleDeps...)
@@ -156,8 +150,8 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 				art.Direct = true
 			}
 			// We don't need to overwrite dependency location for hard links
-			if uniqueArt.Location != nil {
-				art.Location = uniqueArt.Location
+			if uniqueArt.Locations != nil {
+				art.Locations = uniqueArt.Locations
 			}
 		}
 
@@ -196,11 +190,11 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 		if !art.IsEmpty() {
 			// Override the version
 			uniqArtifacts[art.Name()] = artifact{
-				Version:  art.Version,
-				Licenses: result.artifact.Licenses,
-				Direct:   art.Direct,
-				Root:     art.Root,
-				Location: art.Location,
+				Version:   art.Version,
+				Licenses:  result.artifact.Licenses,
+				Direct:    art.Direct,
+				Root:      art.Root,
+				Locations: art.Locations,
 			}
 
 			// save only dependency names
@@ -215,15 +209,12 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 	// Convert to []types.Library and []types.Dependency
 	for name, art := range uniqArtifacts {
 		lib := types.Library{
-			ID:       packageID(name, art.Version.String()),
-			Name:     name,
-			Version:  art.Version.String(),
-			License:  art.JoinLicenses(),
-			Indirect: !art.Direct,
-		}
-		// We need to add location only for deps from `Dependencies` tag of base pom.xml file
-		if art.Direct && !art.Root && art.Location != nil {
-			lib.Locations = art.Location
+			ID:        packageID(name, art.Version.String()),
+			Name:      name,
+			Version:   art.Version.String(),
+			License:   art.JoinLicenses(),
+			Indirect:  !art.Direct,
+			Locations: art.Locations,
 		}
 		libs = append(libs, lib)
 
@@ -311,6 +302,7 @@ type analysisResult struct {
 type analysisOptions struct {
 	exclusions    map[string]struct{}
 	depManagement []pomDependency // from the root POM
+	lineNumber    bool            // Save line numbers
 }
 
 func (p *parser) analyze(pom *pom, opts analysisOptions) (analysisResult, error) {
@@ -341,7 +333,7 @@ func (p *parser) analyze(pom *pom, opts analysisOptions) (analysisResult, error)
 
 	// Merge dependencies. Child dependencies must be preferred than parent dependencies.
 	// Parents don't have to resolve dependencies.
-	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, opts.depManagement, opts.exclusions)
+	deps := p.parseDependencies(pom.content.Dependencies.Dependency, props, depManagement, opts)
 	deps = p.mergeDependencies(parent.dependencies, deps, opts.exclusions)
 
 	return analysisResult{
@@ -370,8 +362,8 @@ func (p *parser) mergeDependencyManagements(depManagements ...[]pomDependency) [
 	return depManagement
 }
 
-func (p *parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement, rootDepManagement []pomDependency,
-	exclusions map[string]struct{}) []artifact {
+func (p *parser) parseDependencies(deps []pomDependency, props map[string]string, depManagement []pomDependency,
+	opts analysisOptions) []artifact {
 	// Imported POMs often have no dependencies, so dependencyManagement resolution can be skipped.
 	if len(deps) == 0 {
 		return nil
@@ -380,6 +372,7 @@ func (p *parser) parseDependencies(deps []pomDependency, props map[string]string
 	// Resolve dependencyManagement
 	depManagement = p.resolveDepManagement(props, depManagement)
 
+	rootDepManagement := opts.depManagement
 	var dependencies []artifact
 	for _, d := range deps {
 		// Resolve dependencies
@@ -388,7 +381,13 @@ func (p *parser) parseDependencies(deps []pomDependency, props map[string]string
 		if (d.Scope != "" && d.Scope != "compile") || d.Optional {
 			continue
 		}
-		dependencies = append(dependencies, d.ToArtifact(exclusions))
+
+		art := d.ToArtifact(opts.exclusions)
+		if !opts.lineNumber {
+			art.Locations = nil
+		}
+
+		dependencies = append(dependencies, art)
 	}
 	return dependencies
 }
@@ -482,12 +481,6 @@ func (p *parser) parseParent(currentPath string, parent pomParent) (analysisResu
 	if err != nil {
 		return analysisResult{}, xerrors.Errorf("analyze error: %w", err)
 	}
-
-	// We don't need to store the location of parent dependencies to avoid confusion.
-	result.dependencies = lo.Map(result.dependencies, func(a artifact, _ int) artifact {
-		a.Location = nil
-		return a
-	})
 
 	p.cache.put(target, result)
 

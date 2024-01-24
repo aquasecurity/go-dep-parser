@@ -276,7 +276,7 @@ func (d pomDependency) ToArtifact(ex map[string]struct{}) artifact {
 		ArtifactID: d.ArtifactID,
 		Version:    newVersion(d.Version),
 		Exclusions: exclusions,
-		Location: types.Locations{
+		Locations: types.Locations{
 			{
 				StartLine: d.StartLine,
 				EndLine:   d.EndLine,

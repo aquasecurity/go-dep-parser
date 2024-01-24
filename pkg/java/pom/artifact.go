@@ -29,7 +29,7 @@ type artifact struct {
 	Root   bool
 	Direct bool
 
-	Location types.Locations
+	Locations types.Locations
 }
 
 func newArtifact(groupID, artifactID, version string, licenses []string, props map[string]string) artifact {
@@ -54,9 +54,11 @@ func (a artifact) JoinLicenses() string {
 }
 
 func (a artifact) ToPOMLicenses() pomLicenses {
-	return pomLicenses{License: lo.Map(a.Licenses, func(lic string, _ int) pomLicense {
-		return pomLicense{Name: lic}
-	})}
+	return pomLicenses{
+		License: lo.Map(a.Licenses, func(lic string, _ int) pomLicense {
+			return pomLicense{Name: lic}
+		}),
+	}
 }
 
 func (a artifact) Inherit(parent artifact) artifact {
