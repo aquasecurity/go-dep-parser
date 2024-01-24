@@ -3,6 +3,7 @@ package pom
 import (
 	"encoding/xml"
 	"fmt"
+	"golang.org/x/xerrors"
 	"io"
 	"maps"
 	"reflect"
@@ -310,51 +311,33 @@ func (props *properties) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error 
 func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	*deps = pomDependencies{}
 	for {
-		var dep pomDependency
-		err := d.Decode(&dep)
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return err
+		token, err := d.Token()
+		if err != nil {
+			if err == io.EOF {
+				break // End of file, exit loop
+			}
+			return xerrors.Errorf("Error decoding XML: %w")
 		}
 
-		dep.EndLine, _ = d.InputPos()
-		dep.StartLine = dep.EndLine - lineNumberShift(dep)
+		switch t := token.(type) {
+		case xml.StartElement:
+			if t.Name.Local == "dependency" {
+				var dep pomDependency
+				dep.StartLine, _ = d.InputPos() // <dependency> tag starts
 
-		(*deps).Dependency = append((*deps).Dependency, dep)
+				// Decode <dependency>
+				err = d.DecodeElement(&dep, &t)
+				if err != nil {
+					return xerrors.Errorf("Error decoding dependency: %w")
+				}
+
+				dep.EndLine, _ = d.InputPos()
+
+				(*deps).Dependency = append((*deps).Dependency, dep)
+			}
+		}
 	}
 	return nil
-}
-
-// lineNumberShift defines number of lines used by dependency to shift end line
-// This is necessary because InputPos() returns  line number of the `dependency` end tag (</dependency>).
-func lineNumberShift(dep pomDependency) int {
-	shift := 1 // Compensate </dependency> tag
-
-	for _, v := range []string{dep.GroupID, dep.ArtifactID, dep.Version, dep.Scope} {
-		if v != "" {
-			shift += 1
-		}
-	}
-
-	if dep.Optional {
-		shift += 1
-	}
-
-	if dep.Exclusions.Exclusion != nil {
-		shift += 2 // <exclusions> + </exclusions> tags
-		for _, exclusion := range dep.Exclusions.Exclusion {
-			shift += 2 // <exclusion> + </exclusions> tags
-			if exclusion.GroupID != "" {
-				shift += 1
-			}
-			if exclusion.ArtifactID != "" {
-				shift += 1
-			}
-		}
-	}
-
-	return shift
 }
 
 func findDep(name string, depManagement []pomDependency) (pomDependency, bool) {
