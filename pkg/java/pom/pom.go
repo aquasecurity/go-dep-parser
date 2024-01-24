@@ -300,7 +300,7 @@ func (props *properties) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error 
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return err
+			return xerrors.Errorf("XML decode error: %w", err)
 		}
 
 		(*props)[p.XMLName.Local] = p.Value
@@ -311,11 +311,10 @@ func (props *properties) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error 
 func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) error {
 	for {
 		token, err := d.Token()
-		if err != nil {
-			if err == io.EOF {
-				break // End of file, exit loop
-			}
-			return xerrors.Errorf("Error decoding XML: %w")
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return xerrors.Errorf("XML decode error: %w", err)
 		}
 
 		switch t := token.(type) {
@@ -324,13 +323,13 @@ func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) er
 				var dep pomDependency
 				dep.StartLine, _ = d.InputPos() // <dependency> tag starts
 
-				// Decode <dependency>
+				// Decode the <dependency> element
 				err = d.DecodeElement(&dep, &t)
 				if err != nil {
 					return xerrors.Errorf("Error decoding dependency: %w")
 				}
 
-				dep.EndLine, _ = d.InputPos()
+				dep.EndLine, _ = d.InputPos() // <dependency> tag ends
 
 				deps.Dependency = append(deps.Dependency, dep)
 			}
