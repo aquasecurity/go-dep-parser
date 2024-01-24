@@ -332,7 +332,7 @@ func (deps *pomDependencies) UnmarshalXML(d *xml.Decoder, _ xml.StartElement) er
 
 				dep.EndLine, _ = d.InputPos()
 
-				(*deps).Dependency = append((*deps).Dependency, dep)
+				deps.Dependency = append(deps.Dependency, dep)
 			}
 		}
 	}
