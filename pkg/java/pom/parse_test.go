@@ -670,9 +670,9 @@ func TestPom_Parse(t *testing.T) {
 					License: "Apache 2.0",
 				},
 				{
-					ID:      "org.example:example-api:2.2.2",
+					ID:      "org.example:example-api:1.1.1",
 					Name:    "org.example:example-api",
-					Version: "2.2.2",
+					Version: "1.1.1",
 					Locations: types.Locations{
 						{
 							StartLine: 34,
@@ -685,7 +685,7 @@ func TestPom_Parse(t *testing.T) {
 				{
 					ID: "com.example:import:2.0.0",
 					DependsOn: []string{
-						"org.example:example-api:2.2.2",
+						"org.example:example-api:1.1.1",
 					},
 				},
 			},
