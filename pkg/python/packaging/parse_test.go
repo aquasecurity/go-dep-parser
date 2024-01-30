@@ -33,7 +33,18 @@ func TestParse(t *testing.T) {
 			// cd /usr/lib/python3.9/site-packages/setuptools-52.0.0-py3.9.egg-info/
 			// cat PKG-INFO | grep -e "^Name:" -e "^Version:" -e "^License:" | cut -d" " -f2- | \
 			// tr "\n" "\t" | awk -F "\t" '{printf("\{\""$1"\", \""$2"\", \""$3"\"\}\n")}'
-			want: []types.Library{{Name: "setuptools", Version: "51.3.3", License: "non-separable: UNKNOWN"}},
+			want: []types.Library{
+				{
+					Name:    "setuptools",
+					Version: "51.3.3",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NonSeparableTextLicenseType,
+							Value: "UNKNOWN",
+						},
+					},
+				},
+			},
 		},
 		{
 			name:  "egg PKG-INFO with description containing non-RFC 7230 bytes",
@@ -42,7 +53,12 @@ func TestParse(t *testing.T) {
 				{
 					Name:    "Unidecode",
 					Version: "0.4.1",
-					License: "UNKNOWN",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NonSeparableTextLicenseType,
+							Value: "UNKNOWN",
+						},
+					},
 				},
 			},
 		},
@@ -55,7 +71,18 @@ func TestParse(t *testing.T) {
 			// cd /usr/lib/python3.9/site-packages/
 			// cat distlib-0.3.1-py3.9.egg-info | grep -e "^Name:" -e "^Version:" -e "^License:" | cut -d" " -f2- | \
 			// tr "\n" "\t" | awk -F "\t" '{printf("\{\""$1"\", \""$2"\", \""$3"\"\}\n")}'
-			want: []types.Library{{Name: "distlib", Version: "0.3.1", License: "non-separable: Python license"}},
+			want: []types.Library{
+				{
+					Name:    "distlib",
+					Version: "0.3.1",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NonSeparableTextLicenseType,
+							Value: "Python license",
+						},
+					},
+				},
+			},
 		},
 		{
 			name:  "wheel METADATA",
@@ -68,7 +95,12 @@ func TestParse(t *testing.T) {
 
 			// for single METADATA file with known name
 			// cat "{{ libname }}.METADATA | grep -e "^Name:" -e "^Version:" -e "^License:" | cut -d" " -f2- | tr "\n" "\t" | awk -F "\t" '{printf("\{\""$1"\", \""$2"\", \""$3"\"\}\n")}'
-			want: []types.Library{{Name: "simple", Version: "0.1.0", License: ""}},
+			want: []types.Library{
+				{
+					Name:    "simple",
+					Version: "0.1.0",
+				},
+			},
 		},
 		{
 			name: "wheel METADATA with license",
@@ -76,7 +108,18 @@ func TestParse(t *testing.T) {
 			// for single METADATA file with known name
 			// cat "{{ libname }}.METADATA | grep -e "^Name:" -e "^Version:" -e "^License:" | cut -d" " -f2- | tr "\n" "\t" | awk -F "\t" '{printf("\{\""$1"\", \""$2"\", \""$3"\"\}\n")}'
 			input: "testdata/distlib-0.3.1.METADATA",
-			want:  []types.Library{{Name: "distlib", Version: "0.3.1", License: "non-separable: Python license"}},
+			want: []types.Library{
+				{
+					Name:    "distlib",
+					Version: "0.3.1",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NonSeparableTextLicenseType,
+							Value: "Python license",
+						},
+					},
+				},
+			},
 		},
 		{
 			name:    "invalid",
@@ -90,7 +133,12 @@ func TestParse(t *testing.T) {
 				{
 					Name:    "iniconfig",
 					Version: "2.0.0",
-					License: "MIT",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NameLicenseType,
+							Value: "MIT",
+						},
+					},
 				},
 			},
 		},
@@ -101,7 +149,16 @@ func TestParse(t *testing.T) {
 				{
 					Name:    "zipp",
 					Version: "3.12.1",
-					License: "Apache Software License, MIT License",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NameLicenseType,
+							Value: "Apache Software License",
+						},
+						{
+							Type:  types.NameLicenseType,
+							Value: "MIT License",
+						},
+					},
 				},
 			},
 		},
@@ -112,7 +169,16 @@ func TestParse(t *testing.T) {
 				{
 					Name:    "networkx",
 					Version: "3.0",
-					License: "file://LICENSE-APACHE, file://LICENSE.txt",
+					Licenses: types.Licenses{
+						{
+							Type:  types.FileLicenseType,
+							Value: "LICENSE-APACHE",
+						},
+						{
+							Type:  types.FileLicenseType,
+							Value: "LICENSE.txt",
+						},
+					},
 				},
 			},
 		},

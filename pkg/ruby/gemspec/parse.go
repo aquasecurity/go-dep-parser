@@ -48,7 +48,8 @@ func NewParser() types.Parser {
 }
 
 func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.Dependency, err error) {
-	var newVar, name, version, license string
+	var newVar, name, version string
+	var licenses types.Licenses
 
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
@@ -73,16 +74,16 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 			version = trim(version)
 		case strings.HasPrefix(line, fmt.Sprintf("%s.licenses", newVar)):
 			// https://guides.rubygems.org/specification-reference/#licenses=
-			license = findSubString(licensesRegexp, line, "licenses")
-			license = parseLicenses(license)
+			license := findSubString(licensesRegexp, line, "licenses")
+			licenses = parseLicenses(license)
 		case strings.HasPrefix(line, fmt.Sprintf("%s.license", newVar)):
 			// https://guides.rubygems.org/specification-reference/#license=
-			license = findSubString(licenseRegexp, line, "license")
-			license = trim(license)
+			license := findSubString(licenseRegexp, line, "license")
+			licenses = types.LicensesFromString(trim(license), types.NameLicenseType)
 		}
 
 		// No need to iterate the loop anymore
-		if name != "" && version != "" && license != "" {
+		if name != "" && version != "" && licenses != nil {
 			break
 		}
 	}
@@ -96,9 +97,9 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 
 	return []types.Library{
 		{
-			Name:    name,
-			Version: version,
-			License: license,
+			Name:     name,
+			Version:  version,
+			Licenses: licenses,
 		}}, nil, nil
 }
 
@@ -118,17 +119,17 @@ func trim(s string) string {
 	return strings.Trim(s, `'"`)
 }
 
-func parseLicenses(s string) string {
+func parseLicenses(s string) types.Licenses {
 	// e.g. `"Ruby".freeze, "BSDL".freeze`
 	//      => {"\"Ruby\".freeze", "\"BSDL\".freeze"}
 	ss := strings.Split(s, ",")
 
 	// e.g. {"\"Ruby\".freeze", "\"BSDL\".freeze"}
 	//      => {"Ruby", "BSDL"}
-	var licenses []string
+	var licenses types.Licenses
 	for _, l := range ss {
-		licenses = append(licenses, trim(l))
+		licenses = append(licenses, types.LicensesFromString(trim(l), types.NameLicenseType)...)
 	}
 
-	return strings.Join(licenses, ", ")
+	return licenses
 }

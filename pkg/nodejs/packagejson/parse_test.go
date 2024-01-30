@@ -32,7 +32,12 @@ func TestParse(t *testing.T) {
 					ID:      "bootstrap@5.0.2",
 					Name:    "bootstrap",
 					Version: "5.0.2",
-					License: "MIT",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NameLicenseType,
+							Value: "MIT",
+						},
+					},
 				},
 				Dependencies: map[string]string{
 					"js-tokens": "^4.0.0",
@@ -58,7 +63,12 @@ func TestParse(t *testing.T) {
 					ID:      "angular@4.1.2",
 					Name:    "angular",
 					Version: "4.1.2",
-					License: "ISC",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NameLicenseType,
+							Value: "ISC",
+						},
+					},
 				},
 				Dependencies: map[string]string{},
 				DevDependencies: map[string]string{
@@ -92,7 +102,12 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/without_name_and_version_package.json",
 			want: packagejson.Package{
 				Library: types.Library{
-					License: "MIT",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NameLicenseType,
+							Value: "MIT",
+						},
+					},
 				},
 			},
 		},

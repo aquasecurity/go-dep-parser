@@ -12,7 +12,7 @@ import (
 type packageJSON struct {
 	Name                 string            `json:"name"`
 	Version              string            `json:"version"`
-	License              interface{}       `json:"license"`
+	License              any               `json:"license"`
 	Dependencies         map[string]string `json:"dependencies"`
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
 	DevDependencies      map[string]string `json:"devDependencies"`
@@ -48,10 +48,10 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 
 	return Package{
 		Library: types.Library{
-			ID:      id,
-			Name:    pkgJSON.Name,
-			Version: pkgJSON.Version,
-			License: parseLicense(pkgJSON.License),
+			ID:       id,
+			Name:     pkgJSON.Name,
+			Version:  pkgJSON.Version,
+			Licenses: parseLicense(pkgJSON.License),
 		},
 		Dependencies:         pkgJSON.Dependencies,
 		OptionalDependencies: pkgJSON.OptionalDependencies,
@@ -60,15 +60,17 @@ func (p *Parser) Parse(r io.Reader) (Package, error) {
 	}, nil
 }
 
-func parseLicense(val interface{}) string {
+func parseLicense(val interface{}) types.Licenses {
+	var license string
 	// the license isn't always a string, check for legacy struct if not string
 	switch v := val.(type) {
 	case string:
-		return v
+		license = v
 	case map[string]interface{}:
-		if license, ok := v["type"]; ok {
-			return license.(string)
+		if l, ok := v["type"]; ok {
+			license = l.(string)
 		}
 	}
-	return ""
+	// NPM uses SPDX licenses and expressions - https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license
+	return types.LicensesFromString(license, types.NameLicenseType)
 }

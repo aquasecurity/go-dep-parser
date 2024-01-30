@@ -24,7 +24,12 @@ func TestParse(t *testing.T) {
 			want: []types.Library{{
 				Name:    "rake",
 				Version: "13.0.3",
-				License: "MIT",
+				Licenses: types.Licenses{
+					{
+						Type:  types.NameLicenseType,
+						Value: "MIT",
+					},
+				},
 			}},
 		},
 		{
@@ -41,7 +46,12 @@ func TestParse(t *testing.T) {
 			want: []types.Library{{
 				Name:    "async",
 				Version: "1.25.0",
-				License: "MIT",
+				Licenses: types.Licenses{
+					{
+						Type:  types.NameLicenseType,
+						Value: "MIT",
+					},
+				},
 			}},
 		},
 		{
@@ -50,7 +60,20 @@ func TestParse(t *testing.T) {
 			want: []types.Library{{
 				Name:    "test-unit",
 				Version: "3.3.7",
-				License: "Ruby, BSDL, PSFL",
+				Licenses: types.Licenses{
+					{
+						Type:  types.NameLicenseType,
+						Value: "Ruby",
+					},
+					{
+						Type:  types.NameLicenseType,
+						Value: "BSDL",
+					},
+					{
+						Type:  types.NameLicenseType,
+						Value: "PSFL",
+					},
+				},
 			}},
 		},
 		{

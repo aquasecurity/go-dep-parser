@@ -21,12 +21,28 @@ func TestParse(t *testing.T) {
 		{
 			name:  "_libgcc_mutex",
 			input: "testdata/_libgcc_mutex-0.1-main.json",
-			want:  []types.Library{{Name: "_libgcc_mutex", Version: "0.1"}},
+			want: []types.Library{
+				{
+					Name:    "_libgcc_mutex",
+					Version: "0.1",
+				},
+			},
 		},
 		{
 			name:  "libgomp",
 			input: "testdata/libgomp-11.2.0-h1234567_1.json",
-			want:  []types.Library{{Name: "libgomp", Version: "11.2.0", License: "GPL-3.0-only WITH GCC-exception-3.1"}},
+			want: []types.Library{
+				{
+					Name:    "libgomp",
+					Version: "11.2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.NameLicenseType,
+							Value: "GPL-3.0-only WITH GCC-exception-3.1",
+						},
+					},
+				},
+			},
 		},
 		{
 			name:    "invalid_json",
