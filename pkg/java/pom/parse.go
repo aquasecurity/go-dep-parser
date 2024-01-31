@@ -52,6 +52,7 @@ type parser struct {
 	localRepository    string
 	remoteRepositories []string
 	offline            bool
+	settings           settings
 }
 
 func NewParser(filePath string, opts ...option) types.Parser {
@@ -77,6 +78,7 @@ func NewParser(filePath string, opts ...option) types.Parser {
 		localRepository:    localRepository,
 		remoteRepositories: o.remoteRepos,
 		offline:            o.offline,
+		settings:           s,
 	}
 }
 
@@ -84,6 +86,24 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	content, err := parsePom(r)
 	if err != nil {
 		return nil, nil, xerrors.Errorf("failed to parse POM: %w", err)
+	}
+
+	for _, rep := range content.Repositories.Repository {
+		repoURL, err := url.Parse(rep.URL)
+		if err != nil {
+			continue
+		}
+
+		for _, server := range p.settings.Servers {
+			if rep.ID == server.ID && server.Username != "" && server.Password != "" {
+				repoURL.User = url.UserPassword(server.Username, server.Password)
+				break
+			}
+		}
+
+		if rep.Releases.Enabled != "false" {
+			p.remoteRepositories = append(p.remoteRepositories, repoURL.String())
+		}
 	}
 
 	root := &pom{
@@ -623,13 +643,24 @@ func (p *parser) fetchPOMFromRemoteRepository(paths []string) (*pom, error) {
 			continue
 		}
 
-		paths = append([]string{repoURL.Path}, paths...)
-		repoURL.Path = path.Join(paths...)
+		repoPaths := append([]string{repoURL.Path}, paths...)
+		repoURL.Path = path.Join(repoPaths...)
 
-		resp, err := http.Get(repoURL.String())
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", repoURL.String(), nil)
+		if err != nil {
+			continue
+		}
+		if repoURL.User != nil {
+			password, _ := repoURL.User.Password()
+			req.SetBasicAuth(repoURL.User.Username(), password)
+		}
+
+		resp, err := client.Do(req)
 		if err != nil || resp.StatusCode != http.StatusOK {
 			continue
 		}
+		defer resp.Body.Close()
 
 		content, err := parsePom(resp.Body)
 		if err != nil {

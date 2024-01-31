@@ -8,24 +8,43 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
+type Server struct {
+	ID       string `xml:"id"`
+	Username string `xml:"username"`
+	Password string `xml:"password"`
+}
+
 type settings struct {
-	LocalRepository string `xml:"localRepository"`
+	LocalRepository string   `xml:"localRepository"`
+	Servers         []Server `xml:"servers>server"`
 }
 
 func readSettings() settings {
+	s := settings{}
+	settingsFound := false
+
 	userSettingsPath := filepath.Join(os.Getenv("HOME"), ".m2", "settings.xml")
 	userSettings, err := openSettings(userSettingsPath)
-	if err == nil && userSettings.LocalRepository != "" {
-		return userSettings
+	if err == nil {
+		if userSettings.LocalRepository != "" {
+			return userSettings
+		}
+		s = userSettings
+		settingsFound = true
 	}
 
 	globalSettingsPath := filepath.Join(os.Getenv("MAVEN_HOME"), "conf", "settings.xml")
 	globalSettings, err := openSettings(globalSettingsPath)
-	if err == nil && globalSettings.LocalRepository != "" {
-		return globalSettings
+	if err == nil {
+		if globalSettings.LocalRepository != "" {
+			return globalSettings
+		}
+		if !settingsFound {
+			s = globalSettings
+		}
 	}
 
-	return settings{}
+	return s
 }
 
 func openSettings(filePath string) (settings, error) {
