@@ -21,27 +21,24 @@ type settings struct {
 
 func readSettings() settings {
 	s := settings{}
-	settingsFound := false
+
+	mavenHome, found := os.LookupEnv("MAVEN_HOME")
+	if !found {
+		mavenHome = "/usr/share/maven"
+	}
+	globalSettingsPath := filepath.Join(mavenHome, "conf", "settings.xml")
+	globalSettings, err := openSettings(globalSettingsPath)
+	if err == nil {
+		s = globalSettings
+	}
 
 	userSettingsPath := filepath.Join(os.Getenv("HOME"), ".m2", "settings.xml")
 	userSettings, err := openSettings(userSettingsPath)
 	if err == nil {
 		if userSettings.LocalRepository != "" {
-			return userSettings
+			s.LocalRepository = userSettings.LocalRepository
 		}
-		s = userSettings
-		settingsFound = true
-	}
-
-	globalSettingsPath := filepath.Join(os.Getenv("MAVEN_HOME"), "conf", "settings.xml")
-	globalSettings, err := openSettings(globalSettingsPath)
-	if err == nil {
-		if globalSettings.LocalRepository != "" {
-			return globalSettings
-		}
-		if !settingsFound {
-			s = globalSettings
-		}
+		s.Servers = append(s.Servers, userSettings.Servers...)
 	}
 
 	return s

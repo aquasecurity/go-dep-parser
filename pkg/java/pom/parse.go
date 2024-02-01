@@ -52,7 +52,7 @@ type parser struct {
 	localRepository    string
 	remoteRepositories []string
 	offline            bool
-	settings           settings
+	servers            []Server
 }
 
 func NewParser(filePath string, opts ...option) types.Parser {
@@ -78,7 +78,7 @@ func NewParser(filePath string, opts ...option) types.Parser {
 		localRepository:    localRepository,
 		remoteRepositories: o.remoteRepos,
 		offline:            o.offline,
-		settings:           s,
+		servers:            s.Servers,
 	}
 }
 
@@ -88,22 +88,26 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		return nil, nil, xerrors.Errorf("failed to parse POM: %w", err)
 	}
 
-	for _, rep := range content.Repositories.Repository {
+	allRepositories := append(content.Repositories.Repository, content.PluginRepositories.Repository...)
+	for _, rep := range allRepositories {
+		if rep.Releases.Enabled == "false" {
+			continue
+		}
+
 		repoURL, err := url.Parse(rep.URL)
 		if err != nil {
 			continue
 		}
 
-		for _, server := range p.settings.Servers {
+		for _, server := range p.servers {
 			if rep.ID == server.ID && server.Username != "" && server.Password != "" {
 				repoURL.User = url.UserPassword(server.Username, server.Password)
 				break
 			}
 		}
 
-		if rep.Releases.Enabled != "false" {
-			p.remoteRepositories = append(p.remoteRepositories, repoURL.String())
-		}
+		log.Logger.Debugf("Adding repository %s: %s", rep.ID, rep.URL)
+		p.remoteRepositories = append(p.remoteRepositories, repoURL.String())
 	}
 
 	root := &pom{

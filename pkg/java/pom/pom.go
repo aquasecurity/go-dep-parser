@@ -3,13 +3,13 @@ package pom
 import (
 	"encoding/xml"
 	"fmt"
-	"golang.org/x/xerrors"
 	"io"
 	"maps"
 	"reflect"
 	"strings"
 
 	"github.com/samber/lo"
+	"golang.org/x/xerrors"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
@@ -156,6 +156,23 @@ type pomXML struct {
 			} `xml:"snapshots"`
 		} `xml:"repository"`
 	} `xml:"repositories"`
+	PluginRepositories struct {
+		Text       string `xml:",chardata"`
+		Repository []struct {
+			Text     string `xml:",chardata"`
+			ID       string `xml:"id"`
+			Name     string `xml:"name"`
+			URL      string `xml:"url"`
+			Releases struct {
+				Text    string `xml:",chardata"`
+				Enabled string `xml:"enabled"`
+			} `xml:"releases"`
+			Snapshots struct {
+				Text    string `xml:",chardata"`
+				Enabled string `xml:"enabled"`
+			} `xml:"snapshots"`
+		} `xml:"pluginRepository"`
+	} `xml:"pluginRepositories"`
 }
 
 type pomParent struct {
