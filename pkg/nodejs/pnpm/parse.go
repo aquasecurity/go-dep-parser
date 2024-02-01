@@ -71,7 +71,7 @@ func (p *Parser) parse(lockVer float64, lockFile LockFile) ([]types.Library, []t
 			continue
 		}
 
-		// There is cases when `depPath` doesn't contain name ad version of dependency
+		// Dependency name may be present in dependencyPath or Name field. Same for Version.
 		// e.g. packages installed from local directory or tarball
 		// cf. https://github.com/pnpm/spec/blob/274ff02de23376ad59773a9f25ecfedd03a41f64/lockfile/6.0.md#packagesdependencypathname
 		name := info.Name
