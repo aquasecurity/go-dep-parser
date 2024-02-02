@@ -36,6 +36,9 @@ func ReadSettings() settings {
 	userSettings, err := openSettings(userSettingsPath)
 	if err == nil {
 		if userSettings.LocalRepository != "" {
+			// If both global(${maven.home}/conf/settings.xml and user settings(${user.home}/.m2/settings
+			// are present, those will be merged with user settings being dominant
+			// https://maven.apache.org/settings.html#quick-overview
 			s.LocalRepository = userSettings.LocalRepository
 		}
 		for _, userServer := range userSettings.Servers {
@@ -47,6 +50,8 @@ func ReadSettings() settings {
 				}
 			}
 			if !found {
+				// Remote repository URLs are queried first in global settings.xml, followed by user settings.xml
+				// https://maven.apache.org/guides/mini/guide-multiple-repositories.html#repository-order
 				s.Servers = append(s.Servers, userServer)
 			}
 		}
