@@ -19,7 +19,7 @@ type settings struct {
 	Servers         []Server `xml:"servers>server"`
 }
 
-func readSettings() settings {
+func ReadSettings() settings {
 	s := settings{}
 
 	mavenHome, found := os.LookupEnv("MAVEN_HOME")
@@ -38,7 +38,18 @@ func readSettings() settings {
 		if userSettings.LocalRepository != "" {
 			s.LocalRepository = userSettings.LocalRepository
 		}
-		s.Servers = append(s.Servers, userSettings.Servers...)
+		for _, userServer := range userSettings.Servers {
+			found := false
+			for _, server := range s.Servers {
+				if server.ID == userServer.ID {
+					found = true
+					break
+				}
+			}
+			if !found {
+				s.Servers = append(s.Servers, userServer)
+			}
+		}
 	}
 
 	return s

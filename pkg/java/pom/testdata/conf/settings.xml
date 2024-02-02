@@ -55,6 +55,13 @@ under the License.
     </proxies>
 
     <servers>
+        <server>
+            <id>global</id>
+        </server>
+        <server>
+            <id>testServerID</id>
+            <username>globalUser</username>
+        </server>
     </servers>
 
     <mirrors>

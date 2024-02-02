@@ -65,7 +65,7 @@ func NewParser(filePath string, opts ...option) types.Parser {
 		opt(o)
 	}
 
-	s := readSettings()
+	s := ReadSettings()
 	localRepository := s.LocalRepository
 	if localRepository == "" {
 		homeDir, _ := os.UserHomeDir()
@@ -88,9 +88,8 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		return nil, nil, xerrors.Errorf("failed to parse POM: %w", err)
 	}
 
-	allRepositories := append(content.Repositories.Repository, content.PluginRepositories.Repository...)
-	for _, rep := range allRepositories {
-		if rep.Releases.Enabled == "false" {
+	for _, rep := range content.Repositories.Repository {
+		if rep.Releases.Enabled == "false" && rep.Snapshots.Enabled == "false" {
 			continue
 		}
 
