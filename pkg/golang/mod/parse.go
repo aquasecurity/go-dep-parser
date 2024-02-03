@@ -94,6 +94,12 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			Version:            require.Mod.Version[1:],
 			Indirect:           require.Indirect,
 			ExternalReferences: p.GetExternalRefs(require.Mod.Path),
+			Locations: []types.Location{
+				{
+					StartLine: require.Syntax.Start.Line,
+					EndLine:   require.Syntax.End.Line,
+				},
+			},
 		}
 	}
 

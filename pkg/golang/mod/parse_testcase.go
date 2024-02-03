@@ -16,12 +16,24 @@ var (
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
 				},
 			},
+			Locations: []types.Location{
+				{
+					StartLine: 5,
+					EndLine:   5,
+				},
+			},
 		},
 		{
 			ID:       "golang.org/x/xerrors@v0.0.0-20200804184101-5ec99f83aff1",
 			Name:     "golang.org/x/xerrors",
 			Version:  "0.0.0-20200804184101-5ec99f83aff1",
 			Indirect: true,
+			Locations: []types.Location{
+				{
+					StartLine: 8,
+					EndLine:   8,
+				},
+			},
 		},
 		{
 			ID:       "gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b",
@@ -32,6 +44,12 @@ var (
 				{
 					Type: types.RefVCS,
 					URL:  "https://github.com/go-yaml/yaml",
+				},
+			},
+			Locations: []types.Location{
+				{
+					StartLine: 9,
+					EndLine:   9,
 				},
 			},
 		},
@@ -56,6 +74,12 @@ var (
 			Name:     "golang.org/x/xerrors",
 			Version:  "0.0.0-20200804184101-5ec99f83aff1",
 			Indirect: true,
+			Locations: []types.Location{
+				{
+					StartLine: 7,
+					EndLine:   7,
+				},
+			},
 		},
 	}
 
@@ -72,12 +96,24 @@ var (
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
 				},
 			},
+			Locations: []types.Location{
+				{
+					StartLine: 5,
+					EndLine:   5,
+				},
+			},
 		},
 		{
 			ID:       "golang.org/x/xerrors@v0.0.0-20200804184101-5ec99f83aff1",
 			Name:     "golang.org/x/xerrors",
 			Version:  "0.0.0-20200804184101-5ec99f83aff1",
 			Indirect: true,
+			Locations: []types.Location{
+				{
+					StartLine: 7,
+					EndLine:   7,
+				},
+			},
 		},
 	}
 
@@ -100,6 +136,12 @@ var (
 			Name:     "golang.org/x/xerrors",
 			Version:  "0.0.0-20200804184101-5ec99f83aff1",
 			Indirect: true,
+			Locations: []types.Location{
+				{
+					StartLine: 7,
+					EndLine:   7,
+				},
+			},
 		},
 	}
 
@@ -116,12 +158,24 @@ var (
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
 				},
 			},
+			Locations: []types.Location{
+				{
+					StartLine: 5,
+					EndLine:   5,
+				},
+			},
 		},
 		{
 			ID:       "golang.org/x/xerrors@v0.0.0-20200804184101-5ec99f83aff1",
 			Name:     "golang.org/x/xerrors",
 			Version:  "0.0.0-20200804184101-5ec99f83aff1",
 			Indirect: true,
+			Locations: []types.Location{
+				{
+					StartLine: 8,
+					EndLine:   8,
+				},
+			},
 		},
 		{
 			ID:       "gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b",
@@ -132,6 +186,12 @@ var (
 				{
 					Type: types.RefVCS,
 					URL:  "https://github.com/go-yaml/yaml",
+				},
+			},
+			Locations: []types.Location{
+				{
+					StartLine: 9,
+					EndLine:   9,
 				},
 			},
 		},
@@ -150,6 +210,12 @@ var (
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
 				},
 			},
+			Locations: []types.Location{
+				{
+					StartLine: 5,
+					EndLine:   5,
+				},
+			},
 		},
 		{
 			ID:       "gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b",
@@ -160,6 +226,12 @@ var (
 				{
 					Type: types.RefVCS,
 					URL:  "https://github.com/go-yaml/yaml",
+				},
+			},
+			Locations: []types.Location{
+				{
+					StartLine: 9,
+					EndLine:   9,
 				},
 			},
 		},
@@ -178,6 +250,12 @@ var (
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
 				},
 			},
+			Locations: []types.Location{
+				{
+					StartLine: 5,
+					EndLine:   5,
+				},
+			},
 		},
 		{
 			ID:       "gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b",
@@ -188,6 +266,12 @@ var (
 				{
 					Type: types.RefVCS,
 					URL:  "https://github.com/go-yaml/yaml",
+				},
+			},
+			Locations: []types.Location{
+				{
+					StartLine: 9,
+					EndLine:   9,
 				},
 			},
 		},
@@ -206,12 +290,24 @@ var (
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
 				},
 			},
+			Locations: []types.Location{
+				{
+					StartLine: 5,
+					EndLine:   5,
+				},
+			},
 		},
 		{
 			ID:       "golang.org/x/xerrors@v0.0.0-20200804184101-5ec99f83aff1",
 			Name:     "golang.org/x/xerrors",
 			Version:  "0.0.0-20200804184101-5ec99f83aff1",
 			Indirect: true,
+			Locations: []types.Location{
+				{
+					StartLine: 8,
+					EndLine:   8,
+				},
+			},
 		},
 		{
 			ID:       "gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b",
@@ -222,6 +318,12 @@ var (
 				{
 					Type: types.RefVCS,
 					URL:  "https://github.com/go-yaml/yaml",
+				},
+			},
+			Locations: []types.Location{
+				{
+					StartLine: 9,
+					EndLine:   9,
 				},
 			},
 		},
@@ -240,6 +342,12 @@ var (
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
 				},
 			},
+			Locations: []types.Location{
+				{
+					StartLine: 5,
+					EndLine:   5,
+				},
+			},
 		},
 	}
 
@@ -254,6 +362,12 @@ var (
 				{
 					Type: types.RefVCS,
 					URL:  "https://github.com/aquasecurity/go-dep-parser",
+				},
+			},
+			Locations: []types.Location{
+				{
+					StartLine: 3,
+					EndLine:   3,
 				},
 			},
 		},

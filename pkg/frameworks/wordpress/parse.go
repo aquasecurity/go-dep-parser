@@ -19,7 +19,9 @@ func Parse(r io.Reader) (lib types.Library, err error) {
 	var version string
 	isComment := false
 	scanner := bufio.NewScanner(r)
+	var lineNumber int // It is used to save dependency location
 	for scanner.Scan() {
+		lineNumber++
 		line := scanner.Text()
 
 		// Remove comment
@@ -72,7 +74,8 @@ func Parse(r io.Reader) (lib types.Library, err error) {
 	}
 
 	return types.Library{
-		Name:    "wordpress",
-		Version: version,
+		Name:      "wordpress",
+		Version:   version,
+		Locations: []types.Location{{StartLine: lineNumber, EndLine: lineNumber}},
 	}, nil
 }
