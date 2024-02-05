@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/samber/lo"
 	"golang.org/x/net/html/charset"
 )
 
@@ -19,12 +20,13 @@ type settings struct {
 	Servers         []Server `xml:"servers>server"`
 }
 
-func ReadSettings() settings {
+func readSettings() settings {
 	s := settings{}
 
-	mavenHome, found := os.LookupEnv("MAVEN_HOME")
-	if !found {
-		mavenHome = "/usr/share/maven"
+	// Some package managers use this path by default
+	mavenHome := "/usr/share/maven"
+	if mHome := os.Getenv("MAVEN_HOME"); mHome != "" {
+		mavenHome = mHome
 	}
 	globalSettingsPath := filepath.Join(mavenHome, "conf", "settings.xml")
 	globalSettings, err := openSettings(globalSettingsPath)
@@ -35,23 +37,18 @@ func ReadSettings() settings {
 	userSettingsPath := filepath.Join(os.Getenv("HOME"), ".m2", "settings.xml")
 	userSettings, err := openSettings(userSettingsPath)
 	if err == nil {
+		// We need to merge global and user settings. User settings being dominant.
+		// https://maven.apache.org/settings.html#quick-overview
 		if userSettings.LocalRepository != "" {
-			// If both global(${maven.home}/conf/settings.xml and user settings(${user.home}/.m2/settings
-			// are present, those will be merged with user settings being dominant
-			// https://maven.apache.org/settings.html#quick-overview
 			s.LocalRepository = userSettings.LocalRepository
 		}
+
+		// Global servers are checked before user servers
+		// https://maven.apache.org/guides/mini/guide-multiple-repositories.html#repository-order
 		for _, userServer := range userSettings.Servers {
-			found := false
-			for _, server := range s.Servers {
-				if server.ID == userServer.ID {
-					found = true
-					break
-				}
-			}
-			if !found {
-				// Remote repository URLs are queried first in global settings.xml, followed by user settings.xml
-				// https://maven.apache.org/guides/mini/guide-multiple-repositories.html#repository-order
+			// It is possible that global server and user server use same ID, but different user/password.
+			// In this case we need to save both servers.
+			if !lo.Contains(s.Servers, userServer) {
 				s.Servers = append(s.Servers, userServer)
 			}
 		}

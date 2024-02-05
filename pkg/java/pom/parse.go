@@ -65,7 +65,7 @@ func NewParser(filePath string, opts ...option) types.Parser {
 		opt(o)
 	}
 
-	s := ReadSettings()
+	s := readSettings()
 	localRepository := s.LocalRepository
 	if localRepository == "" {
 		homeDir, _ := os.UserHomeDir()
