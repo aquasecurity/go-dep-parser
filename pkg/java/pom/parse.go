@@ -88,6 +88,7 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		return nil, nil, xerrors.Errorf("failed to parse POM: %w", err)
 	}
 
+	var remoteRepositories []string
 	for _, rep := range content.Repositories.Repository {
 		if rep.Releases.Enabled == "false" && rep.Snapshots.Enabled == "false" {
 			continue
@@ -95,6 +96,7 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 
 		repoURL, err := url.Parse(rep.URL)
 		if err != nil {
+			log.Logger.Debugf("Unable to parse remote repository url: %s", err)
 			continue
 		}
 
@@ -106,8 +108,11 @@ func (p *parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 		}
 
 		log.Logger.Debugf("Adding repository %s: %s", rep.ID, rep.URL)
-		p.remoteRepositories = append(p.remoteRepositories, repoURL.String())
+		remoteRepositories = append(remoteRepositories, repoURL.String())
 	}
+
+	// Add central maven repository or repositories obtained using `WithRemoteRepos` function.
+	remoteRepositories = append(remoteRepositories, p.remoteRepositories...)
 
 	root := &pom{
 		filePath: p.rootPath,
