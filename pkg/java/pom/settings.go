@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/samber/lo"
 	"golang.org/x/net/html/charset"
 )
 
@@ -20,8 +19,23 @@ type settings struct {
 	Servers         []Server `xml:"servers>server"`
 }
 
+func serverFound(servers []Server, id string) bool {
+	for _, server := range servers {
+		if server.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
 func readSettings() settings {
 	s := settings{}
+
+	userSettingsPath := filepath.Join(os.Getenv("HOME"), ".m2", "settings.xml")
+	userSettings, err := openSettings(userSettingsPath)
+	if err == nil {
+		s = userSettings
+	}
 
 	// Some package managers use this path by default
 	mavenHome := "/usr/share/maven"
@@ -31,25 +45,16 @@ func readSettings() settings {
 	globalSettingsPath := filepath.Join(mavenHome, "conf", "settings.xml")
 	globalSettings, err := openSettings(globalSettingsPath)
 	if err == nil {
-		s = globalSettings
-	}
-
-	userSettingsPath := filepath.Join(os.Getenv("HOME"), ".m2", "settings.xml")
-	userSettings, err := openSettings(userSettingsPath)
-	if err == nil {
 		// We need to merge global and user settings. User settings being dominant.
 		// https://maven.apache.org/settings.html#quick-overview
-		if userSettings.LocalRepository != "" {
-			s.LocalRepository = userSettings.LocalRepository
+		if s.LocalRepository == "" {
+			s.LocalRepository = globalSettings.LocalRepository
 		}
-
-		// Global servers are checked before user servers
+		// Servers are added based on output of `mvn help:effective-settings`.
 		// https://maven.apache.org/guides/mini/guide-multiple-repositories.html#repository-order
-		for _, userServer := range userSettings.Servers {
-			// It is possible that global server and user server use same ID, but different user/password.
-			// In this case we need to save both servers.
-			if !lo.Contains(s.Servers, userServer) {
-				s.Servers = append(s.Servers, userServer)
+		for _, server := range globalSettings.Servers {
+			if !serverFound(s.Servers, server.ID) {
+				s.Servers = append(s.Servers, server)
 			}
 		}
 	}

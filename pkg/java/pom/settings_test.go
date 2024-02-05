@@ -41,7 +41,7 @@ func Test_ReadSettings(t *testing.T) {
 			name: "happy path with only user settings",
 			envs: map[string]string{
 				"HOME":       filepath.Join("testdata", "settings", "user"),
-				"MAVEN_HOME": "",
+				"MAVEN_HOME": "NOT_EXISTING_PATH",
 			},
 			wantSettings: settings{
 				LocalRepository: "testdata/user/repository",
@@ -62,6 +62,7 @@ func Test_ReadSettings(t *testing.T) {
 			},
 		},
 		{
+			// Expected result is the output of mvn help:effective-settings
 			name: "happy path with global and user settings",
 			envs: map[string]string{
 				"HOME":       filepath.Join("testdata", "settings", "user"),
@@ -71,24 +72,19 @@ func Test_ReadSettings(t *testing.T) {
 				LocalRepository: "testdata/user/repository",
 				Servers: []Server{
 					{
-						ID: "global-server",
-					},
-					{
-						ID:       "server-with-credentials",
-						Username: "test-user",
-						Password: "test-password-from-global",
-					},
-					{
-						ID:       "server-with-name-only",
-						Username: "test-user-only",
-					},
-					{
 						ID: "user-server",
 					},
 					{
 						ID:       "server-with-credentials",
 						Username: "test-user",
 						Password: "test-password",
+					},
+					{
+						ID:       "server-with-name-only",
+						Username: "test-user-only",
+					},
+					{
+						ID: "global-server",
 					},
 				},
 			},
@@ -97,7 +93,7 @@ func Test_ReadSettings(t *testing.T) {
 			name: "without settings",
 			envs: map[string]string{
 				"HOME":       "",
-				"MAVEN_HOME": "",
+				"MAVEN_HOME": "NOT_EXISTING_PATH",
 			},
 			wantSettings: settings{},
 		},
