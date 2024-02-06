@@ -62,7 +62,32 @@ func Test_ReadSettings(t *testing.T) {
 			},
 		},
 		{
-			// Expected result is the output of mvn help:effective-settings
+			// $ mvn help:effective-settings
+			//[INFO] ------------------< org.apache.maven:standalone-pom >-------------------
+			//[INFO] --- maven-help-plugin:3.4.0:effective-settings (default-cli) @ standalone-pom ---
+			//Effective user-specific configuration settings:
+			//
+			//<?xml version="1.0" encoding="UTF-8"?>
+			//<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+			//  <localRepository>/root/testdata/user/repository</localRepository>
+			//  <servers>
+			//    <server>
+			//      <id>user-server</id>
+			//    </server>
+			//    <server>
+			//      <username>test-user</username>
+			//      <password>***</password>
+			//      <id>server-with-credentials</id>
+			//    </server>
+			//    <server>
+			//      <username>test-user-only</username>
+			//      <id>server-with-name-only</id>
+			//    </server>
+			//    <server>
+			//      <id>global-server</id>
+			//    </server>
+			//  </servers>
+			//</settings>
 			name: "happy path with global and user settings",
 			envs: map[string]string{
 				"HOME":       filepath.Join("testdata", "settings", "user"),
