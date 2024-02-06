@@ -19,6 +19,8 @@ type settings struct {
 	Servers         []Server `xml:"servers>server"`
 }
 
+// serverFound checks that servers already contain server.
+// Maven compares servers by ID only.
 func serverFound(servers []Server, id string) bool {
 	for _, server := range servers {
 		if server.ID == id {
