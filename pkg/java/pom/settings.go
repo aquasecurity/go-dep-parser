@@ -50,8 +50,7 @@ func readSettings() settings {
 		if s.LocalRepository == "" {
 			s.LocalRepository = globalSettings.LocalRepository
 		}
-		// Servers are added based on output of `mvn help:effective-settings`.
-		// https://maven.apache.org/guides/mini/guide-multiple-repositories.html#repository-order
+		// Maven checks user servers first, then global servers
 		for _, server := range globalSettings.Servers {
 			if !serverFound(s.Servers, server.ID) {
 				s.Servers = append(s.Servers, server)
