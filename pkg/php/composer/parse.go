@@ -51,7 +51,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 			Name:     pkg.Name,
 			Version:  pkg.Version,
 			Indirect: false, // composer.lock file doesn't have info about Direct/Indirect deps. Will think that all dependencies are Direct
-			Licenses: types.LicensesFromStringSlice(pkg.License, types.NameLicenseType),
+			Licenses: types.LicensesFromStringSlice(pkg.License, types.LicenseTypeName),
 			Locations: []types.Location{
 				{
 					StartLine: pkg.StartLine,

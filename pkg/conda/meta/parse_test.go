@@ -37,7 +37,7 @@ func TestParse(t *testing.T) {
 					Version: "11.2.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "GPL-3.0-only WITH GCC-exception-3.1",
 						},
 					},

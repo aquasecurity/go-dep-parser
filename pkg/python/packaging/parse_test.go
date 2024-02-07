@@ -39,7 +39,7 @@ func TestParse(t *testing.T) {
 					Version: "51.3.3",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NonSeparableTextLicenseType,
+							Type:  types.LicenseTypeNonSeparable,
 							Value: "UNKNOWN",
 						},
 					},
@@ -55,7 +55,7 @@ func TestParse(t *testing.T) {
 					Version: "0.4.1",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NonSeparableTextLicenseType,
+							Type:  types.LicenseTypeNonSeparable,
 							Value: "UNKNOWN",
 						},
 					},
@@ -77,7 +77,7 @@ func TestParse(t *testing.T) {
 					Version: "0.3.1",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NonSeparableTextLicenseType,
+							Type:  types.LicenseTypeNonSeparable,
 							Value: "Python license",
 						},
 					},
@@ -114,7 +114,7 @@ func TestParse(t *testing.T) {
 					Version: "0.3.1",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NonSeparableTextLicenseType,
+							Type:  types.LicenseTypeNonSeparable,
 							Value: "Python license",
 						},
 					},
@@ -135,7 +135,7 @@ func TestParse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "MIT",
 						},
 					},
@@ -151,11 +151,11 @@ func TestParse(t *testing.T) {
 					Version: "3.12.1",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache Software License",
 						},
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "MIT License",
 						},
 					},
@@ -171,11 +171,11 @@ func TestParse(t *testing.T) {
 					Version: "3.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.FileLicenseType,
+							Type:  types.LicenseTypeFile,
 							Value: "LICENSE-APACHE",
 						},
 						{
-							Type:  types.FileLicenseType,
+							Type:  types.LicenseTypeFile,
 							Value: "LICENSE.txt",
 						},
 					},

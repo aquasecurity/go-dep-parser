@@ -26,7 +26,7 @@ func TestParse(t *testing.T) {
 				Version: "13.0.3",
 				Licenses: types.Licenses{
 					{
-						Type:  types.NameLicenseType,
+						Type:  types.LicenseTypeName,
 						Value: "MIT",
 					},
 				},
@@ -48,7 +48,7 @@ func TestParse(t *testing.T) {
 				Version: "1.25.0",
 				Licenses: types.Licenses{
 					{
-						Type:  types.NameLicenseType,
+						Type:  types.LicenseTypeName,
 						Value: "MIT",
 					},
 				},
@@ -62,15 +62,15 @@ func TestParse(t *testing.T) {
 				Version: "3.3.7",
 				Licenses: types.Licenses{
 					{
-						Type:  types.NameLicenseType,
+						Type:  types.LicenseTypeName,
 						Value: "Ruby",
 					},
 					{
-						Type:  types.NameLicenseType,
+						Type:  types.LicenseTypeName,
 						Value: "BSDL",
 					},
 					{
-						Type:  types.NameLicenseType,
+						Type:  types.LicenseTypeName,
 						Value: "PSFL",
 					},
 				},

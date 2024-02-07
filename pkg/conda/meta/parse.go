@@ -38,6 +38,6 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	return []types.Library{{
 		Name:     data.Name,
 		Version:  data.Version,
-		Licenses: types.LicensesFromString(data.License, types.NameLicenseType),
+		Licenses: types.LicensesFromString(data.License, types.LicenseTypeName),
 	}}, nil, nil
 }

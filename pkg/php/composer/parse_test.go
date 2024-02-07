@@ -22,7 +22,7 @@ var (
 			Version: "6.5.8",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},
@@ -39,7 +39,7 @@ var (
 			Version: "1.5.2",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},
@@ -56,7 +56,7 @@ var (
 			Version: "1.9.0",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},
@@ -73,7 +73,7 @@ var (
 			Version: "1.0.1",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},
@@ -90,7 +90,7 @@ var (
 			Version: "3.0.3",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},
@@ -107,7 +107,7 @@ var (
 			Version: "v1.27.0",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},
@@ -124,7 +124,7 @@ var (
 			Version: "v1.27.0",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},
@@ -141,7 +141,7 @@ var (
 			Version: "v1.27.0",
 			Licenses: types.Licenses{
 				{
-					Type:  types.NameLicenseType,
+					Type:  types.LicenseTypeName,
 					Value: "MIT",
 				},
 			},

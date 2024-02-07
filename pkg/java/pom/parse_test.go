@@ -35,7 +35,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "BSD-3-Clause",
 						},
 					},
@@ -46,7 +46,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -78,7 +78,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "BSD-3-Clause",
 						},
 					},
@@ -89,7 +89,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -140,7 +140,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -151,7 +151,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -188,7 +188,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -225,7 +225,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -300,7 +300,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0-SNAPSHOT",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -311,7 +311,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -337,7 +337,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "3.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -348,7 +348,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -380,7 +380,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "4.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -391,7 +391,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -403,7 +403,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -441,7 +441,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -452,7 +452,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -515,7 +515,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -526,7 +526,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -563,7 +563,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -574,7 +574,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -635,7 +635,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -703,7 +703,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -714,7 +714,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -776,7 +776,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -794,7 +794,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -805,7 +805,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -837,7 +837,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -848,7 +848,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -929,7 +929,7 @@ func TestPom_Parse(t *testing.T) {
 					Indirect: true,
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -1034,7 +1034,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -1045,7 +1045,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.1.1",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -1056,7 +1056,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -1126,7 +1126,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -1137,7 +1137,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -1174,7 +1174,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -1234,7 +1234,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "2.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -1295,7 +1295,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0-SNAPSHOT",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -1306,7 +1306,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.7.30",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},
@@ -1338,7 +1338,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -1375,7 +1375,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 					},
@@ -1393,11 +1393,11 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache 2.0",
 						},
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "MIT",
 						},
 					},
@@ -1415,7 +1415,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "Apache-2.0",
 						},
 					},
@@ -1433,7 +1433,7 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 					Licenses: types.Licenses{
 						{
-							Type:  types.NameLicenseType,
+							Type:  types.LicenseTypeName,
 							Value: "The Apache Software License, Version 2.0",
 						},
 					},

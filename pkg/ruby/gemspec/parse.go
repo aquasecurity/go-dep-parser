@@ -79,7 +79,7 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) (libs []types.Library, deps []types.D
 		case strings.HasPrefix(line, fmt.Sprintf("%s.license", newVar)):
 			// https://guides.rubygems.org/specification-reference/#license=
 			license := findSubString(licenseRegexp, line, "license")
-			licenses = types.LicensesFromString(trim(license), types.NameLicenseType)
+			licenses = types.LicensesFromString(trim(license), types.LicenseTypeName)
 		}
 
 		// No need to iterate the loop anymore
@@ -128,7 +128,7 @@ func parseLicenses(s string) types.Licenses {
 	//      => {"Ruby", "BSDL"}
 	var licenses types.Licenses
 	for _, l := range ss {
-		licenses = append(licenses, types.LicensesFromString(trim(l), types.NameLicenseType)...)
+		licenses = append(licenses, types.LicensesFromString(trim(l), types.LicenseTypeName)...)
 	}
 
 	return licenses
