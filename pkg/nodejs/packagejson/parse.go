@@ -3,6 +3,7 @@ package packagejson
 import (
 	"encoding/json"
 	"io"
+	"strings"
 
 	"github.com/aquasecurity/go-dep-parser/pkg/types"
 	"github.com/aquasecurity/go-dep-parser/pkg/utils"
@@ -71,6 +72,27 @@ func parseLicense(val interface{}) types.Licenses {
 			license = l.(string)
 		}
 	}
-	// NPM uses SPDX licenses and expressions - https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license
-	return types.LicensesFromString(license, types.NameLicenseType)
+
+	// If the license is missing, it may be stored in the `LICENSE` file.
+	if license == "" {
+		return types.LicensesFromString("LICENSE", types.LicenseTypeFile)
+	}
+
+	// The license field can refer to a file:
+	// https://docs.npmjs.com/cli/v9/configuring-npm/package-json#license
+	var licenseFileName string
+	if strings.HasPrefix(license, "LicenseRef-") {
+		// LicenseRef-<filename>
+		licenseFileName = strings.Split(license, "-")[1]
+	} else if strings.HasPrefix(license, "SEE LICENSE IN ") {
+		// SEE LICENSE IN <filename>
+		parts := strings.Split(license, " ")
+		licenseFileName = parts[len(parts)-1]
+	}
+
+	if licenseFileName != "" {
+		return types.LicensesFromString(licenseFileName, types.LicenseTypeFile)
+	}
+
+	return types.LicensesFromString(license, types.LicenseTypeName)
 }
