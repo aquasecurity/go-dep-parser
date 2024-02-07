@@ -71,8 +71,8 @@ type License struct {
 type LicenseType string
 
 const (
-	LicenseTypeName         LicenseType = "name"          // license name or expression
-	LicenseTypeFile         LicenseType = "file"          // filename for license file
+	LicenseTypeName         LicenseType = "license-name"  // license name or expression
+	LicenseTypeFile         LicenseType = "license-file"  // filename for license file
 	LicenseTypeNonSeparable LicenseType = "non-separable" // text of license without possible to split
 )
 
