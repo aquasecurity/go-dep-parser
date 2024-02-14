@@ -42,29 +42,35 @@ func (*Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, e
 
 	// "License-Expression" takes precedence as "License" is deprecated.
 	// cf. https://peps.python.org/pep-0639/#deprecate-license-field
-	var license string
+	var licenses types.Licenses
 	if l := h.Get("License-Expression"); l != "" {
-		license = l
+		licenses = types.LicensesFromString(l, types.LicenseTypeName)
 	} else if l := h.Get("License"); l != "" {
-		license = l
+		// The license field can contain information about different licenses, license exceptions , etc.:
+		// https://packaging.python.org/en/latest/specifications/core-metadata/#license,
+		// but it is impossible to define a delimiter to separate them.
+		// Mark them, so we don't have to separate them later.
+		licenses = types.LicensesFromString(l, types.LicenseTypeNonSeparable)
 	} else {
+		// license classifiers are deprecated:
+		// https://peps.python.org/pep-0639/#deprecate-license-classifiers
 		for _, classifier := range h.Values("Classifier") {
 			if strings.HasPrefix(classifier, "License :: ") {
 				values := strings.Split(classifier, " :: ")
-				license = values[len(values)-1]
-				break
+				// there can be several classifiers with licenses
+				licenses = append(licenses, types.LicensesFromString(values[len(values)-1], types.LicenseTypeName)...)
 			}
 		}
 	}
-	if license == "" && h.Get("License-File") != "" {
-		license = "file://" + h.Get("License-File")
+	if len(licenses) == 0 && h.Get("License-File") != "" {
+		licenses = types.LicensesFromStringSlice(h.Values("License-File"), types.LicenseTypeFile)
 	}
 
 	return []types.Library{
 		{
-			Name:    name,
-			Version: version,
-			License: license,
+			Name:     name,
+			Version:  version,
+			Licenses: licenses,
 		},
 	}, nil, nil
 }

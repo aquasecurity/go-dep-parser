@@ -212,7 +212,7 @@ func (p *parser) parseRoot(root artifact) ([]types.Library, []types.Dependency, 
 			ID:        packageID(name, art.Version.String()),
 			Name:      name,
 			Version:   art.Version.String(),
-			License:   art.JoinLicenses(),
+			Licenses:  types.LicensesFromStringSlice(art.Licenses, types.LicenseTypeName), // Maven recommends using SPDX licenses - https://maven.apache.org/pom.html#licenses.
 			Indirect:  !art.Direct,
 			Locations: art.Locations,
 		}

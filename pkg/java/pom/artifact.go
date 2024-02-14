@@ -49,10 +49,6 @@ func (a artifact) Equal(o artifact) bool {
 	return a.GroupID == o.GroupID || a.ArtifactID == o.ArtifactID || a.Version.String() == o.Version.String()
 }
 
-func (a artifact) JoinLicenses() string {
-	return strings.Join(a.Licenses, ", ")
-}
-
 func (a artifact) ToPOMLicenses() pomLicenses {
 	return pomLicenses{
 		License: lo.Map(a.Licenses, func(lic string, _ int) pomLicense {
