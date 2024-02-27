@@ -1,9 +1,11 @@
 package core_deps
 
 import (
-	"github.com/liamg/jfather"
+	"fmt"
 	"io"
 	"strings"
+
+	"github.com/liamg/jfather"
 
 	"golang.org/x/xerrors"
 
@@ -19,6 +21,20 @@ func NewParser() types.Parser {
 	return &Parser{}
 }
 
+func packageID(name, version string) string {
+	return fmt.Sprintf("%s/%s", name, version)
+}
+
+func splitNameVer(nameVer string) (string, string) {
+	split := strings.Split(nameVer, "/")
+	if len(split) != 2 {
+		// Invalid name
+		log.Logger.Warnf("Cannot parse .NET library version from: %s", nameVer)
+		return "", ""
+	}
+	return split[0], split[1]
+}
+
 func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency, error) {
 	var depsFile dotNetDependencies
 
@@ -31,40 +47,60 @@ func (p *Parser) Parse(r dio.ReadSeekerAt) ([]types.Library, []types.Dependency,
 	}
 
 	var libraries []types.Library
-	for nameVer, lib := range depsFile.Libraries {
-		if !strings.EqualFold(lib.Type, "package") {
+	var deps []types.Dependency
+	targets := depsFile.Targets[depsFile.RuntimeTarget.Name]
+	for pkgNameVersion, target := range targets {
+		name, version := splitNameVer(pkgNameVersion)
+		if name == "" || version == "" {
 			continue
 		}
 
-		split := strings.Split(nameVer, "/")
-		if len(split) != 2 {
-			// Invalid name
-			log.Logger.Warnf("Cannot parse .NET library version from: %s", nameVer)
-			continue
+		lib := types.Library{
+			ID:        packageID(name, version),
+			Name:      name,
+			Version:   version,
+			Locations: []types.Location{{StartLine: target.StartLine, EndLine: target.EndLine}},
 		}
 
-		libraries = append(libraries, types.Library{
-			Name:      split[0],
-			Version:   split[1],
-			Locations: []types.Location{{StartLine: lib.StartLine, EndLine: lib.EndLine}},
-		})
+		var childDeps []string
+		for depName, depVersion := range target.Dependencies {
+			depID := packageID(depName, depVersion)
+			if _, ok := targets[depID]; ok {
+				childDeps = append(childDeps, depID)
+			}
+		}
+
+		if len(childDeps) > 0 {
+			deps = append(deps, types.Dependency{
+				ID:        lib.ID,
+				DependsOn: childDeps,
+			})
+		}
+
+		libraries = append(libraries, lib)
 	}
 
-	return libraries, nil, nil
+	return libraries, deps, nil
 }
 
 type dotNetDependencies struct {
-	Libraries map[string]dotNetLibrary `json:"libraries"`
+	RuntimeTarget dotNetRuntimeTarget                `json:"runtimeTarget"`
+	Targets       map[string]map[string]dotNetTarget `json:"targets"`
 }
 
-type dotNetLibrary struct {
-	Type      string `json:"type"`
-	StartLine int
-	EndLine   int
+type dotNetRuntimeTarget struct {
+	Name string `json:"name"`
+}
+
+type dotNetTarget struct {
+	Dependencies map[string]string   `json:"dependencies"`
+	Runtime      map[string]struct{} `json:"runtime"`
+	StartLine    int
+	EndLine      int
 }
 
 // UnmarshalJSONWithMetadata needed to detect start and end lines of deps
-func (t *dotNetLibrary) UnmarshalJSONWithMetadata(node jfather.Node) error {
+func (t *dotNetTarget) UnmarshalJSONWithMetadata(node jfather.Node) error {
 	if err := node.Decode(&t); err != nil {
 		return err
 	}
