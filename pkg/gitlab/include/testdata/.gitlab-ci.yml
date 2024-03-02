@@ -1,0 +1,4 @@
+include:
+  - project: my-group/my-project
+    ref: 1.0.0
+    file: /templates/.gitlab-ci-template.yml
