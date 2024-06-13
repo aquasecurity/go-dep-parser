@@ -33,13 +33,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:happy:1.0.0",
 					Name:    "com.example:happy",
 					Version: "1.0.0",
-					License: "BSD-3-Clause",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "BSD-3-Clause",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 32,
@@ -66,13 +76,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:happy:1.0.0",
 					Name:    "com.example:happy",
 					Version: "1.0.0",
-					License: "BSD-3-Clause",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "BSD-3-Clause",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 32,
@@ -118,13 +138,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:child:1.0.0",
 					Name:    "com.example:child",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 33,
@@ -156,7 +186,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "org.example:example-api:2.0.0",
 					Name:    "org.example:example-api",
 					Version: "2.0.0",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 18,
@@ -188,7 +223,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "org.example:example-api:2.0.0",
 					Name:    "org.example:example-api",
 					Version: "2.0.0",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 18,
@@ -258,13 +298,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:child:1.0.0-SNAPSHOT",
 					Name:    "com.example:child",
 					Version: "1.0.0-SNAPSHOT",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 				},
 			},
 			wantDeps: []types.Dependency{
@@ -285,13 +335,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:child:3.0.0",
 					Name:    "com.example:child",
 					Version: "3.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 26,
@@ -318,20 +378,35 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:base:4.0.0",
 					Name:    "com.example:base",
 					Version: "4.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
-					ID:       "org.example:example-api:1.7.30",
-					Name:     "org.example:example-api",
-					Version:  "1.7.30",
-					License:  "The Apache Software License, Version 2.0",
+					ID:      "org.example:example-api:1.7.30",
+					Name:    "org.example:example-api",
+					Version: "1.7.30",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Indirect: true,
 				},
 				{
 					ID:      "org.example:example-child:2.0.0",
 					Name:    "org.example:example-child",
 					Version: "2.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 28,
@@ -364,13 +439,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:child:1.0.0",
 					Name:    "com.example:child",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 26,
@@ -428,13 +513,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "org.example:child:1.0.0",
 					Name:    "org.example:child",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 25,
@@ -466,13 +561,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:soft:1.0.0",
 					Name:    "com.example:soft",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 32,
@@ -525,10 +630,15 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 				},
 				{
-					ID:       "org.example:example-api:2.0.0",
-					Name:     "org.example:example-api",
-					Version:  "2.0.0",
-					License:  "The Apache Software License, Version 2.0",
+					ID:      "org.example:example-api:2.0.0",
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Indirect: true,
 				},
 				{
@@ -591,13 +701,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:hard:1.0.0",
 					Name:    "com.example:hard",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
-					ID:       "org.example:example-api:2.0.0",
-					Name:     "org.example:example-api",
-					Version:  "2.0.0",
-					License:  "The Apache Software License, Version 2.0",
+					ID:      "org.example:example-api:2.0.0",
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Indirect: true,
 				},
 				{
@@ -654,7 +774,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:hard:1.0.0",
 					Name:    "com.example:hard",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 			},
 		},
@@ -667,13 +792,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:import:2.0.0",
 					Name:    "com.example:import",
 					Version: "2.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 34,
@@ -700,13 +835,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:import:2.0.0",
 					Name:    "com.example:import",
 					Version: "2.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 42,
@@ -782,7 +927,12 @@ func TestPom_Parse(t *testing.T) {
 					Name:     "org.example:example-api",
 					Version:  "1.7.30",
 					Indirect: true,
-					License:  "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 				},
 				{
 					ID:       "org.example:example-dependency:1.2.3",
@@ -882,19 +1032,34 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:aggregation:1.0.0",
 					Name:    "com.example:aggregation",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "com.example:module:1.1.1",
 					Name:    "com.example:module",
 					Version: "1.1.1",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
-					ID:       "org.example:example-api:2.0.0",
-					Name:     "org.example:example-api",
-					Version:  "2.0.0",
-					License:  "The Apache Software License, Version 2.0",
+					ID:      "org.example:example-api:2.0.0",
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Indirect: true,
 				},
 				{
@@ -959,13 +1124,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:2.0.0",
 					Name:    "org.example:example-api",
 					Version: "2.0.0",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 				},
 			},
 			wantDeps: []types.Dependency{
@@ -994,10 +1169,15 @@ func TestPom_Parse(t *testing.T) {
 					Version: "1.0.0",
 				},
 				{
-					ID:       "org.example:example-api:2.0.0",
-					Name:     "org.example:example-api",
-					Version:  "2.0.0",
-					License:  "The Apache Software License, Version 2.0",
+					ID:      "org.example:example-api:2.0.0",
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Indirect: true,
 				},
 				// dependency version is taken from `com.example:root-pom-dep-management` from dependencyManagement
@@ -1049,10 +1229,15 @@ func TestPom_Parse(t *testing.T) {
 				// Managed dependencies (org.example:example-api:1.7.30) in org.example:example-dependency-management3
 				// should not affect dependencies of example-dependency (org.example:example-api:2.0.0)
 				{
-					ID:       "org.example:example-api:2.0.0",
-					Name:     "org.example:example-api",
-					Version:  "2.0.0",
-					License:  "The Apache Software License, Version 2.0",
+					ID:      "org.example:example-api:2.0.0",
+					Name:    "org.example:example-api",
+					Version: "2.0.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Indirect: true,
 				},
 				{
@@ -1108,13 +1293,23 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:no-parent:1.0-SNAPSHOT",
 					Name:    "com.example:no-parent",
 					Version: "1.0-SNAPSHOT",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-api:1.7.30",
 					Name:    "org.example:example-api",
 					Version: "1.7.30",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 					Locations: types.Locations{
 						{
 							StartLine: 27,
@@ -1141,7 +1336,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:not-found-dependency:1.0.0",
 					Name:    "com.example:not-found-dependency",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 				{
 					ID:      "org.example:example-not-found:999",
@@ -1173,7 +1373,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:aggregation:1.0.0",
 					Name:    "com.example:aggregation",
 					Version: "1.0.0",
-					License: "Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+					},
 				},
 			},
 		},
@@ -1186,7 +1391,16 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:multiply-licenses:1.0.0",
 					Name:    "com.example:multiply-licenses",
 					Version: "1.0.0",
-					License: "MIT, Apache 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache 2.0",
+						},
+						{
+							Type:  types.LicenseTypeName,
+							Value: "MIT",
+						},
+					},
 				},
 			},
 		},
@@ -1199,7 +1413,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example.app:submodule:1.0.0",
 					Name:    "com.example.app:submodule",
 					Version: "1.0.0",
-					License: "Apache-2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "Apache-2.0",
+						},
+					},
 				},
 			},
 		},
@@ -1212,7 +1431,12 @@ func TestPom_Parse(t *testing.T) {
 					ID:      "com.example:child:1.0.0",
 					Name:    "com.example:child",
 					Version: "1.0.0",
-					License: "The Apache Software License, Version 2.0",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "The Apache Software License, Version 2.0",
+						},
+					},
 				},
 			},
 		},

@@ -31,6 +31,7 @@ Classifier: Topic :: Scientific/Engineering :: Information Analysis
 Classifier: Topic :: Scientific/Engineering :: Mathematics
 Classifier: Topic :: Scientific/Engineering :: Physics
 Requires-Python: >=3.8
+License-File: LICENSE-APACHE
 License-File: LICENSE.txt
 Provides-Extra: default
 Requires-Dist: numpy (>=1.20) ; extra == 'default'

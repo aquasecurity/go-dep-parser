@@ -2,7 +2,6 @@ package packagejson_test
 
 import (
 	"os"
-	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,7 +31,12 @@ func TestParse(t *testing.T) {
 					ID:      "bootstrap@5.0.2",
 					Name:    "bootstrap",
 					Version: "5.0.2",
-					License: "MIT",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "MIT",
+						},
+					},
 				},
 				Dependencies: map[string]string{
 					"js-tokens": "^4.0.0",
@@ -58,7 +62,12 @@ func TestParse(t *testing.T) {
 					ID:      "angular@4.1.2",
 					Name:    "angular",
 					Version: "4.1.2",
-					License: "ISC",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "ISC",
+						},
+					},
 				},
 				Dependencies: map[string]string{},
 				DevDependencies: map[string]string{
@@ -74,6 +83,46 @@ func TestParse(t *testing.T) {
 				Library: types.Library{
 					ID:   "",
 					Name: "angular",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeFile,
+							Value: "LICENSE",
+						},
+					},
+				},
+			},
+		},
+		{
+			name:      "happy path - licenseRef is used",
+			inputFile: "testdata/license-ref.json",
+			want: packagejson.Package{
+				Library: types.Library{
+					ID:      "package-b@0.0.1",
+					Name:    "package-b",
+					Version: "0.0.1",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeFile,
+							Value: "LICENSE.txt",
+						},
+					},
+				},
+			},
+		},
+		{
+			name:      "happy path - 'SEE LICENSE IN` is used",
+			inputFile: "testdata/see-license.json",
+			want: packagejson.Package{
+				Library: types.Library{
+					ID:      "package-c@0.0.1",
+					Name:    "package-c",
+					Version: "0.0.1",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeFile,
+							Value: "LICENSE.md",
+						},
+					},
 				},
 			},
 		},
@@ -92,14 +141,19 @@ func TestParse(t *testing.T) {
 			inputFile: "testdata/without_name_and_version_package.json",
 			want: packagejson.Package{
 				Library: types.Library{
-					License: "MIT",
+					Licenses: types.Licenses{
+						{
+							Type:  types.LicenseTypeName,
+							Value: "MIT",
+						},
+					},
 				},
 			},
 		},
 	}
 
 	for _, v := range vectors {
-		t.Run(path.Base(v.name), func(t *testing.T) {
+		t.Run(v.name, func(t *testing.T) {
 			f, err := os.Open(v.inputFile)
 			require.NoError(t, err)
 			defer f.Close()
