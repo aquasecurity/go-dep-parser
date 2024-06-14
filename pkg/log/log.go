@@ -4,9 +4,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var Logger *zap.SugaredLogger
-
-func init() {
+var Logger = NewLazyLogger(func() (*zap.SugaredLogger, error) {
 	config := zap.Config{
 		Level:            zap.NewAtomicLevelAt(zap.InfoLevel),
 		Development:      false,
@@ -15,10 +13,13 @@ func init() {
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
-	logger, _ := config.Build()
-	Logger = logger.Sugar()
-}
+	logger, err := config.Build()
+	if err != nil {
+		return nil, err
+	}
+	return logger.Sugar(), nil
+})
 
 func SetLogger(l *zap.SugaredLogger) {
-	Logger = l
+	Logger.zapLogger = l
 }
